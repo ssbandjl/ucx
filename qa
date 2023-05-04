@@ -1,0 +1,304 @@
+经常问的问题
+一般的
+概述
+什么是UCX？
+UCX 是一个框架（库和接口的集合），它提供了高效且相对简单的方法来构建广泛使用的 HPC 协议：MPI 标签匹配、RMA 操作、会合协议、流、分片、远程原子操作等。
+
+什么是UCP、UCT、UCS？
+UCT是一个传输层，它抽象了各种硬件架构之间的差异，并提供了一个支持通信协议实现的低级 API。该层的主要目标是以最小的软件开销提供对硬件网络资源的直接和高效访问。为此，UCT 依赖于低级驱动程序，例如 uGNI、Verbs、共享内存、ROCM、CUDA。此外，该层还提供用于通信上下文管理（基于线程和应用程序级别）的结构，以及设备特定内存（包括加速器中的内存）的分配和管理。在通信 API 方面，UCT 定义了用于立即（short）、缓冲复制和发送（bcopy）和零复制（zcopy）通信操作的接口。短操作针对可就地发布和完成的小消息进行了优化。bcopy 操作针对通常通过所谓的弹跳缓冲区发送的中等大小的消息进行了优化。最后，zcopy 操作公开了零拷贝内存到内存通信语义。
+
+UCP通过使用通过 UCT 层公开的较低级别功能来实现通常由消息传递 (MPI) 和 PGAS 编程模型使用的较高级别协议。UCP 负责以下功能：库的初始化、通信传输选择、消息分段和多轨通信。目前，API 有以下几类接口：初始化、远程内存访问 (RMA) 通信、原子内存操作 (AMO)、活动消息、标签匹配和集合。
+
+UCS是一个服务层，它为实现可移植和高效的实用程序提供了必要的功能。
+
+我如何贡献？
+叉
+修复错误或实现新功能
+打开拉取请求
+我如何与 UCX 开发人员取得联系？
+请加入我们的邮件列表： https: //elist.ornl.gov/mailman/listinfo/ucx-group或在 github 上提交问题： https: //github.com/openucx/ucx/issues
+
+
+UCX使命
+UCX 的主要特点是什么？
+供应商支持的开源框架
+除了开源社区之外，UCX 框架还由硬件供应商维护和支持。每个拉取请求都经过测试，并且供应商社区支持多个硬件平台。
+
+性能，性能，性能！ 框架体系结构、数据结构和组件旨在提供对网络硬件的优化访问。
+
+适用于范围广泛的 HPC 编程模型的高级 API。
+UCX 提供了一个高级和性能可移植的网络 API。该 API 针对从高性能 MPI 实现到 Apache Spark 的各种编程模型。UCP API 抽象了差异并填补了 UCT 层中实现的互连之间的空白。因此，编程模型和库（MPI、OpenSHMEM、Apache Spark、RAPIDS 等）的实现得到简化，同时为多个互连（uGNI、Verbs、TCP、共享内存、ROCM、CUDA 等）提供高效支持。
+
+支持多个传输（或提供者）之间的交互以传递消息。
+例如，UCX 具有使“GPUDirect”、“IB”和共享内存高效协同工作的逻辑（在 UCP 中），无需用户处理即可将数据传送到需要的地方。
+
+交叉运输多轨能力。UCX 协议层可以利用多种传输、事件在不同类型的硬件上更快地传递消息，而无需任何特殊调整。
+
+利用硬件卸载来优化性能，例如 RDMA、硬件标签匹配硬件原子操作等。
+
+UCX 支持哪些协议？
+UCP 实现 RMA 放置/获取、发送/接收标签匹配、活动消息、原子操作。在不久的将来，我们计划增加对常用集合操作的支持。
+
+UCX 是 GASNET 的替代品吗？
+否。GASNET 公开了用于 PGAS 编程管理的高级 API，提供对称内存管理功能并在运行时环境中构建。这些功能超出了 UCX 项目的范围。相反，GASNET 可以利用 UCX 框架为 UCX 支持的网络技术快速高效地实施 GASNET。
+
+UCX和网络驱动有什么关系？
+UCX框架不提供驱动，依赖厂商提供的驱动。目前我们使用：OFA VERBs、Cray的UGNI、NVIDIA CUDA。
+
+UCX 和 OFA Verbs 或 Libfabrics 之间有什么关系？
+UCX是一个依赖设备驱动程序的中间件通信框架，例如RDMA、CUDA、ROCM。RDMA 和操作系统绕过网络设备通常使用 UCX 支持的 RDMA 核心 Linux 子系统来实现设备驱动程序。可以根据社区的请求和贡献添加对其他网络抽象的支持。
+
+UCX是用户级驱动吗？
+UCX 不是用户级驱动程序。通常，驱动程序旨在公开对网络架构特定功能的细粒度访问。UCX 提取了各种驱动程序之间的差异，并使用软件协议为某些不为所有操作提供硬件级别支持的体系结构填补了空白。
+
+
+依赖关系
+我的机器上应该有什么东西才能使用 UCX？
+UCX 检测构建机器上的现有库，并相应地启用/禁用对各种功能的支持。如果在运行时找不到构建 UCX 的某些模块，它们将被静默禁用。
+
+基本共享内存和 TCP 支持- 始终启用。
+优化的共享内存- 需要 knem 或 xpmem 驱动程序。在现代内核上，如果可用，还将使用 CMA（跨内存附加）。
+RDMA 支持- 需要 rdma-core 或 libibverbs 库。UCX >= 1.12.0 需要 rdma-core >= 28.0 或 MLNX_OFED >= 5.0。
+NVIDIA GPU 支持- 需要 CUDA >= 6.0。UCX >= 1.8 需要支持 nv_peer_mem 的 CUDA。
+AMD GPU 支持- 需要 ROCm 版本 >= 4.0。
+UCX 是否依赖外部运行环境？
+UCX 不依赖于外部运行时环境。
+
+ucx_perftest（基于 UCX 的应用程序/基准）可以与可用于远程ucx_perftest启动的外部运行时环境链接，但这是一个可选配置，仅用于不提供对计算节点的直接访问的环境。默认情况下禁用此选项。
+
+
+配置和调整
+如何为 UCX 指定特殊配置和调整？
+UCX 从以前缀 开头的特定环境变量UCX_中获取参数。
+
+重要说明：将 UCX 环境变量设置为非默认值可能会导致未定义的行为。环境变量主要用于高级用户，或用于 UCX 社区推荐的特定调整或解决方法。
+
+我在哪里可以看到所有 UCX 环境变量？
+运行ucx_info -c打印所有环境变量及其默认值。
+运行ucx_info -cf打印所有环境变量的文档。
+UCX配置文件
+UCX在 中查找配置文件{prefix}/etc/ucx/ucx.conf，其中{prefix}是编译时配置的安装前缀。它允许自定义各种参数。环境变量优先于 中定义的值ucx.conf。该文件可以使用创建ucx_info -Cf。
+
+使用 UCX 构建用户应用程序
+为了使用 UCX 开发库构建应用程序，UCX 支持基于 pkg-config 工具的元信息子系统。例如，这就是如何将 pkg-config 合并到基于 Makefile 的构建中：
+
+program: program.c
+        $(CC) program.c $(shell pkg-config --cflags --libs ucx)
+当链接静态 UCX 库时，用户必须明确列出所有需要的传输模块。例如，为了仅支持 cma 和 knem 传输，用户必须使用：
+
+program: program.c
+        $(CC) -static program.c $(shell pkg-config --cflags --libs --static ucx-cma ucx-knem ucx)
+目前，以下传输模块可以与 pkg-config 一起使用：
+
+包裹名字	提供运输服务
+ucx-cma	使用Linux Cross-Memory Attach 的共享内存
+ucx-knem	使用高性能节点内 MPI 通信的共享内存
+ucx-xpmem	使用XPMEM 的共享内存
+ucx-one	基于Infiniband 的网络传输
+ucx-rdmacm	基于RDMACM的连接管理器
+
+TCP、基本共享内存和自传输内置于 UCT 中，不需要额外的编译操作。
+
+重要的提示：
+ucx-ib 包需要libnl和 的静态库numactl，作为rdma-core. 大多数 Linux 发行版默认不提供这些静态库，因此需要手动构建和安装。它们可以从以下位置下载：
+
+libnl	https://www.infradead.org/~tgr/libnl	（在版本 3.2.25 上测试）
+numactl	https://github.com/numactl/numactl	（在版本 2.0.14 上测试）
+
+
+网络能力
+选择网络和传输
+UCX 使用哪些网络设备？
+默认情况下，UCX 尝试使用机器上的所有可用设备，并根据性能特征（带宽、延迟、NUMA 位置等）选择最佳设备。设置UCX_NET_DEVICES=<dev1>,<dev2>,...会将 UCX 限制为仅使用 指定的设备。
+例如：
+
+UCX_NET_DEVICES=eth2- 使用以太网设备 eth2 进行 TCP 套接字传输。
+UCX_NET_DEVICES=mlx5_2:1- 使用 RDMA 设备 mlx5_2，端口 1
+运行ucx_info -d将显示 UCX 可以使用的系统上的所有可用设备。
+
+UCX 使用哪些传输？
+默认情况下，UCX 尝试使用所有可用的传输，并根据其性能和规模选择最佳传输（作为端点的估计数量传递给ucp_init() API）。
+例如：
+
+在只有以太网设备的机器上，共享内存将用于节点内通信，TCP 套接字用于节点间通信。
+在带有 RDMA 设备的机器上，RC 传输将用于小规模，而 DC 传输（适用于 Connect-IB 设备及更高版本）将用于大规模。如果没有DC，大规模使用UD。
+如果机器上有 GPU，将启用 GPU 传输以检测内存指针类型并复制到/从 GPU 内存。
+可以通过设置来限制正在使用的传输UCX_TLS=<tl1>,<tl2>,...。 ^在开头将列表变成拒绝列表。UCX 在当前机器上支持的所有传输列表可以通过ucx_info -d命令生成。
+
+重要说明 在某些情况下，限制传输可能会导致意外和未定义的行为：
+
+使用rc_verbs或rc_mlx5还需要ud_verbs或ud_mlx5传输以进行引导。
+使用 GPU 内存的应用程序还必须指定 GPU 传输以检测和处理非主机内存。
+除了内置传输之外，还可以使用指定多个传输的别名。
+
+主要传输和别名列表
+全部	使用所有可用的传输。
+SM 或 SHM	所有共享内存传输。
+每一个	ugni_rdma 和 ugni_udt。
+遥控	RC（=可靠连接），如果可能，使用“加速”传输。
+出去	UD（=不可靠数据报），如果可能，使用“加速”。
+直流电	DC - Mellanox 可扩展卸载动态连接传输
+rc_x	与“rc”相同，但仅使用加速传输
+rc_v	与“rc”相同，但仅使用基于动词的传输
+out_x	与“ud”相同，但仅使用加速传输
+out_v	与“ud”相同，但仅使用基于动词的传输
+不同的	CUDA (NVIDIA GPU) 内存支持：cuda_copy、cuda_ipc、gdr_copy
+罗姆	ROCm (AMD GPU) 内存支持：rocm_copy、rocm_ipc、rocm_gdr
+TCP	SOCK_STREAM 套接字上的 TCP
+自己	环回传输以在同一进程内进行通信
+
+例如：
+
+UCX_TLS=rc将选择 RC、UD 进行引导，并且更喜欢加速传输
+UCX_TLS=rc,cuda将选择 RC 以及 Cuda 内存传输
+UCX_TLS=^rc将选择所有可用的传输，RC 除外
+重要说明 UCX_TLS=^ud将选择除 UD 之外的所有可用传输。但是，UD 仍可用于引导程序。只会UCX_TLS=^ud,ud:aux完全禁用 UD。
+
+
+多轨
+UCX 是否支持多轨？
+是的。
+
+多轨环境中的默认行为是什么？
+默认情况下，UCX 会选择 2 个最好的网络设备，并在 rails 之间拆分大消息。例如，在 100MB 的消息中 - 第一个 50MB 将在第一台设备上发送，第二个 50MB 将在第二台设备上发送。如果设备网络速度不同，则拆分将与它们的速度比成正比。
+
+要使用的设备是根据最佳网络速度、PCI 带宽和 NUMA 位置来选择的。
+
+是否可以使用 2 个以上的导轨？
+是的，通过设置UCX_MAX_RNDV_RAILS=<num-rails>. 目前最多支持 4 个。
+
+是否有可能每个进程只使用最近的设备？
+是的，UCX_MAX_RNDV_RAILS=1每个进程将根据 NUMA 位置使用单个网络设备。
+
+我可以禁用多轨吗？
+是的，通过设置UCX_NET_DEVICES=<dev>为应该使用的单个设备。
+
+
+自适应路由
+UCX 是否支持自适应路由结构？
+是的。
+
+我需要做什么才能使用自适应路由运行 UCX？
+在 Infiniband 结构上配置自适应路由时，它会按 SL（IB 服务层）启用。
+设置UCX_IB_SL=<sl-num>将使 UCX 在给定的服务级别上运行并利用自适应路由。
+
+
+RoCE
+如何使用 UCX 指定服务级别？
+设置UCX_IB_SL=<sl-num>将使 UCX 在给定的服务级别上运行。
+
+如何指定 DSCP 优先级？
+设定UCX_IB_TRAFFIC_CLASS=<num>。
+
+如何指定使用哪个地址？
+设置UCX_IB_GID_INDEX=<num>将使 UCX 在 RoCE 端口上使用指定的 GID 索引。系统命令show_gids将打印所有可用地址及其索引。
+
+
+使用 GPU
+显卡支持
+UCX如何支持GPU？
+UCX 协议操作可以像使用主机内存指针一样使用 GPU 内存指针。例如，传递给的“缓冲区”参数ucp_tag_send_nb()可以是主机内存或 GPU 内存。
+
+支持哪些 GPU？
+目前 UCX 通过 Cuda 库支持 NVIDIA GPU，通过 ROCm 库支持 AMD GPU。
+
+哪些 UCX API 支持 GPU 内存？
+目前只有UCX tagged APIs、stream APIs、active messages APIs完全支持GPU显存。远程内存访问 API，包括原子操作，对 GPU 内存的支持不完整；计划在未来的版本中提供全面支持。
+
+应用程序接口	GPU内存支持级别
+标记 (ucp_tag_send_XX/ucp_tag_recv_XX)	全力支持
+流 (ucp_stream_send/ucp_stream_recv_XX)	全力支持
+活动消息 (ucp_am_send_XX/ucp_am_recv_data_XX)	全力支持
+远程内存访问（ucp_put_XX/ucp_get_XX）	部分支持
+原子操作 (ucp_atomic_XX)	部分支持
+
+如何在 GPU 支持下运行 UCX？
+为了运行支持 GPU 的 UCX，您需要一个分配 GPU 内存的应用程序（例如， 支持 Cuda 的 MPI OSU 基准测试），以及编译支持 GPU 的 UCX。然后您可以像往常一样运行应用程序（例如，使用 MPI），每当 GPU 内存传递给 UCX 时，它要么使用 GPU-direct 进行零复制操作，要么将数据复制到主机内存或从主机内存复制数据。
+
+NOTE 显式指定UCX_TLS时，必须同时指定cuda/rocm对GPU显存的支持，否则GPU显存将无法识别。例如：UCX_TLS=rc,cuda或UCX_TLS=dc,rocm
+
+我正在使用 GPU 内存运行 UCX 并出现段错误，为什么？
+很可能 UCX 没有检测到指针是 GPU 内存并尝试从 CPU 访问它。如果 UCX 未使用 GPU 支持编译，或者由于缺少库路径或版本不匹配而无法加载 CUDA 或 ROCm 模块，则可能会发生这种情况。请运行ucx_info -d | grep cuda或ucx_info -d | grep rocm检查 UCX GPU 支持。
+
+在某些情况下，内部存储器类型缓存可能会将 GPU 内存误检测为主机内存，从而导致无效的内存访问。可以通过设置禁用此缓存UCX_MEMTYPE_CACHE=n。
+
+为什么我会收到错误“假设 PTX 是使用不受支持的工具链编译的”？
+该应用程序正在加载为较新版本的 cuda 编译的 cuda 二进制文件，并且通过来自 UCX 的 Cuda API 调用异步检测到故障。为了解决这个问题，您需要安装更新的 cuda 版本或使用 nvcc 的适当 -arch 选项编译 cuda 二进制文件。请参阅https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#virtual-architecture-feature-list ，以便将适当的-arch选项传递给NVCC。
+
+
+性能考虑
+UCX 是否支持通过 RDMA 对 GPU 内存进行零拷贝？
+是的。对于大型消息，UCX 可以使用集合点协议使用零拷贝 RDMA 传输 GPU 内存。它需要加载相关 GPU 类型的对等内存驱动程序，或者（从 UCX v1.14.0 开始）系统上的 dmabuf 支持。
+
+注意：在某些情况下，如果 RDMA 网络设备和 GPU 不在同一个 NUMA 节点上，这种零拷贝传输效率低下。
+
+dmabuf 支持需要什么？
+UCX v1.14.0 或更高版本。
+Linux 内核 >= 5.12（例如，Ubuntu 22.04）。
+Cuda 11.7 或更高版本，安装时带有“-m=kernel-open”标志。
+注意：目前 UCX 代码假设 dmabuf 支持在所有可用的 GPU 设备上是统一的。
+
+
+内省
+协议选择
+我如何知道哪些协议和传输被用于通信？
+设置UCX_LOG_LEVEL=info打印有关传输和设备的基本信息：
+
+ $ mpirun -x UCX_LOG_LEVEL=info -np 2 --map-by node osu_bw D D
+ [1645203303.393917] [host1:42:0]     ucp_context.c:1782 UCX  INFO  UCP version is 1.13 (release 0)
+ [1645203303.485011] [host2:43:0]     ucp_context.c:1782 UCX  INFO  UCP version is 1.13 (release 0)
+ [1645203303.701062] [host1:42:0]          parser.c:1918 UCX  INFO  UCX_* env variable: UCX_LOG_LEVEL=info
+ [1645203303.758427] [host2:43:0]          parser.c:1918 UCX  INFO  UCX_* env variable: UCX_LOG_LEVEL=info
+ [1645203303.759862] [host2:43:0]      ucp_worker.c:1877 UCX  INFO  ep_cfg[2]: tag(self/memory0 knem/memory cuda_copy/cuda rc_mlx5/mlx5_0:1)
+ [1645203303.760167] [host1:42:0]      ucp_worker.c:1877 UCX  INFO  ep_cfg[2]: tag(self/memory0 knem/memory cuda_copy/cuda rc_mlx5/mlx5_0:1)
+ # MPI_Init() took 500.788 msec
+ # OSU MPI-CUDA Bandwidth Test v5.6.2
+ # Send Buffer on DEVICE (D) and Receive Buffer on DEVICE (D)
+ # Size    Bandwidth (MB/s)
+ [1645203303.805848] [host2:43:0]      ucp_worker.c:1877 UCX  INFO  ep_cfg[3]: tag(rc_mlx5/mlx5_0:1)
+ [1645203303.873362] [host1:42:a]      ucp_worker.c:1877 UCX  INFO  ep_cfg[3]: tag(rc_mlx5/mlx5_0:1)
+ ...
+使用协议 v2 时，设置UCX_PROTO_INFO=y详细信息：
+
+$ mpirun -x UCX_PROTO_ENABLE=y -x UCX_PROTO_INFO=y -np 2 --map-by node osu_bw D D
+[1645027038.617078] [host1:42:0]   +---------------+---------------------------------------------------------------------------------------------------+
+[1645027038.617101] [host1:42:0]   | mpi ep_cfg[2] | tagged message by ucp_tag_send*() from host memory                                                |
+[1645027038.617104] [host1:42:0]   +---------------+--------------------------------------------------+------------------------------------------------+
+[1645027038.617107] [host1:42:0]   |       0..8184 | eager short                                      | self/memory0                                   |
+[1645027038.617110] [host1:42:0]   |    8185..9806 | eager copy-in copy-out                           | self/memory0                                   |
+[1645027038.617112] [host1:42:0]   |     9807..inf | (?) rendezvous zero-copy flushed write to remote | 55% on knem/memory and 45% on rc_mlx5/mlx5_0:1 |
+[1645027038.617115] [host1:42:0]   +---------------+--------------------------------------------------+------------------------------------------------+
+[1645027038.617307] [host2:43:0]   +---------------+---------------------------------------------------------------------------------------------------+
+[1645027038.617337] [host2:43:0]   | mpi ep_cfg[2] | tagged message by ucp_tag_send*() from host memory                                                |
+[1645027038.617341] [host2:43:0]   +---------------+--------------------------------------------------+------------------------------------------------+
+[1645027038.617344] [host2:43:0]   |       0..8184 | eager short                                      | self/memory0                                   |
+[1645027038.617348] [host2:43:0]   |    8185..9806 | eager copy-in copy-out                           | self/memory0                                   |
+[1645027038.617351] [host2:43:0]   |     9807..inf | (?) rendezvous zero-copy flushed write to remote | 55% on knem/memory and 45% on rc_mlx5/mlx5_0:1 |
+[1645027038.617354] [host2:43:0]   +---------------+--------------------------------------------------+------------------------------------------------+
+# MPI_Init() took 1479.255 msec
+# OSU MPI-CUDA Bandwidth Test v5.6.2
+# Size    Bandwidth (MB/s)
+[1645027038.674035] [host2:43:0]   +---------------+--------------------------------------------------------------+
+[1645027038.674043] [host2:43:0]   | mpi ep_cfg[3] | tagged message by ucp_tag_send*() from host memory           |
+[1645027038.674047] [host2:43:0]   +---------------+-------------------------------------------+------------------+
+[1645027038.674049] [host2:43:0]   |       0..2007 | eager short                               | rc_mlx5/mlx5_0:1 |
+[1645027038.674052] [host2:43:0]   |    2008..8246 | eager zero-copy copy-out                  | rc_mlx5/mlx5_0:1 |
+[1645027038.674055] [host2:43:0]   |   8247..17297 | eager zero-copy copy-out                  | rc_mlx5/mlx5_0:1 |
+[1645027038.674058] [host2:43:0]   |    17298..inf | (?) rendezvous zero-copy read from remote | rc_mlx5/mlx5_0:1 |
+[1645027038.674060] [host2:43:0]   +---------------+-------------------------------------------+------------------+
+[1645027038.680982] [host2:43:0]   +---------------+------------------------------------------------------------------------------------+
+[1645027038.680993] [host2:43:0]   | mpi ep_cfg[3] | tagged message by ucp_tag_send*() from cuda/GPU0                                   |
+[1645027038.680996] [host2:43:0]   +---------------+-----------------------------------------------------------------+------------------+
+[1645027038.680999] [host2:43:0]   |       0..8246 | eager zero-copy copy-out                                        | rc_mlx5/mlx5_0:1 |
+[1645027038.681001] [host2:43:0]   |  8247..811555 | eager zero-copy copy-out                                        | rc_mlx5/mlx5_0:1 |
+[1645027038.681004] [host2:43:0]   |   811556..inf | (?) rendezvous pipeline cuda_copy, fenced write to remote, cuda | rc_mlx5/mlx5_0:1 |
+[1645027038.681007] [host2:43:0]   +---------------+-----------------------------------------------------------------+------------------+
+[1645027038.693843] [host1:42:a]   +---------------+--------------------------------------------------------------+
+[1645027038.693856] [host1:42:a]   | mpi ep_cfg[3] | tagged message by ucp_tag_send*() from host memory           |
+[1645027038.693858] [host1:42:a]   +---------------+-------------------------------------------+------------------+
+[1645027038.693861] [host1:42:a]   |       0..2007 | eager short                               | rc_mlx5/mlx5_0:1 |
+[1645027038.693863] [host1:42:a]   |    2008..8246 | eager zero-copy copy-out                  | rc_mlx5/mlx5_0:1 |
+[1645027038.693865] [host1:42:a]   |   8247..17297 | eager zero-copy copy-out                  | rc_mlx5/mlx5_0:1 |
+[1645027038.693867] [host1:42:a]   |    17298..inf | (?) rendezvous zero-copy read from remote | rc_mlx5/mlx5_0:1 |
+[1645027038.693869] [host1:42:a]   +---------------+-------------------------------------------+------------------+
+...

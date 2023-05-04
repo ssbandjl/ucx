@@ -1,0 +1,690 @@
+https://github.com/ssbandjl/ucx.git
+
+build
+./autogen.sh
+close vagrind
+./contrib/configure-devel --prefix=$PWD/install-debug
+make -j8 && make install
+
+uct_ib_rcache_mem_reg_cb
+uct_ib_mem_reg
+uct_ib_mem_reg_internal -> uct_ib_md_reg_mr -> uct_ib_verbs_md_ops -> .reg_key -> uct_ib_verbs_reg_key -> uct_ib_reg_key_impl -> uct_ib_reg_mr -> ibv_reg_mr
+
+
+./src/tools/perf/ucx_perftest -c 0
+./src/tools/perf/ucx_perftest <server-hostname> -t tag_lat -c 1
+./ucx_perftest 182.200.53.61 -t tag_lat -c 1
+
+--with-java=no
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/xb/project/net/ucx/ucx/install-debug/lib
+cd bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../lib
+gdb --args ucx_perftest -c 0
+perf server src/tools/perf/perftest.c main
+
+
+
+for ip in c61 c62;do ssh root@$ip 'mkdir -p /home/xb/project/net/ucx';rsync -rupva /home/xb/project/net/ucx/ucx root@$ip:/home/xb/project/net/ucx/;done
+
+(gdb) bt
+#0  0x00007ffff51cda20 in ibv_reg_mr () from /lib64/libibverbs.so.1
+#1  0x00007ffff53f180f in uct_ib_reg_mr (pd=0x6ae5c0, addr=0x7ffff7ef1000, length=4096, access=15, dmabuf_fd=<optimized out>, dmabuf_offset=0, mr_p=mr_p@entry=0x6a2d58, silent=silent@entry=0)
+    at base/ib_md.c:486
+#2  0x00007ffff53f2401 in uct_ib_reg_key_impl (md=<optimized out>, address=<optimized out>, length=<optimized out>, access_flags=<optimized out>, dmabuf_fd=<optimized out>, 
+    dmabuf_offset=<optimized out>, memh=0x6a2d40, mr=mr@entry=0x6a2d58, mr_type=mr_type@entry=UCT_IB_MR_DEFAULT, silent=silent@entry=0) at base/ib_md.c:814
+#3  0x00007ffff53f2464 in uct_ib_verbs_reg_key (md=<optimized out>, address=<optimized out>, length=<optimized out>, access_flags=<optimized out>, dmabuf_fd=<optimized out>, 
+    dmabuf_offset=<optimized out>, ib_memh=0x6a2d40, mr_type=UCT_IB_MR_DEFAULT, silent=0) at base/ib_md.c:801
+#4  0x00007ffff53f131e in uct_ib_md_reg_mr (mr_type=UCT_IB_MR_DEFAULT, memh=0x6a2d40, silent=0, dmabuf_offset=<optimized out>, dmabuf_fd=<optimized out>, access_flags=15, length=4096, 
+    address=0x7ffff7ef1000, md=0x6b0710) at base/ib_md.c:472
+#5  uct_ib_mem_reg_internal (memh=<optimized out>, silent=0, params=0x7fffffffc450, length=4096, address=<optimized out>, uct_md=0x6b0710) at base/ib_md.c:654
+#6  uct_ib_rcache_mem_reg_cb (context=0x6b0710, rcache=<optimized out>, arg=0x7fffffffc450, rregion=0x6a2cf0, rcache_mem_reg_flags=<optimized out>) at base/ib_md.c:1075
+#7  0x00007ffff75f0b29 in ucs_rcache_create_region (rcache=rcache@entry=0x6b0ee0, address=address@entry=0x7ffff7ef1000, length=length@entry=4096, prot=prot@entry=3, arg=arg@entry=0x7fffffffc450, 
+    region_p=region_p@entry=0x7fffffffc440) at memory/rcache.c:913
+#8  0x00007ffff75f16a4 in ucs_rcache_get (rcache=0x6b0ee0, address=0x7ffff7ef1000, length=4096, prot=prot@entry=3, arg=arg@entry=0x7fffffffc450, region_p=region_p@entry=0x7fffffffc440)
+    at memory/rcache.c:1007
+#9  0x00007ffff53f0015 in uct_ib_mem_rcache_reg (uct_md=<optimized out>, address=<optimized out>, length=<optimized out>, params=<optimized out>, memh_p=0x6a2cc0) at base/ib_md.c:996
+#10 0x00007ffff7ac6b3b in ucp_memh_register (context=context@entry=0x6a3410, memh=0x6a2c10, md_map=499, address=address@entry=0x7ffff7ef1000, length=length@entry=4096, 
+    mem_type=mem_type@entry=UCS_MEMORY_TYPE_HOST, uct_flags=<optimized out>, uct_flags@entry=0) at core/ucp_mm.c:434
+#11 0x00007ffff7ac97a1 in ucp_memh_get_slow (context=context@entry=0x6a3410, address=address@entry=0x7ffff7ef1000, length=length@entry=4096, mem_type=mem_type@entry=UCS_MEMORY_TYPE_HOST, 
+    reg_md_map=reg_md_map@entry=499, uct_flags=uct_flags@entry=0, memh_p=memh_p@entry=0x6a2bb0) at core/ucp_mm.c:674
+#12 0x00007ffff7ac9f5c in ucp_memh_get (memh_p=0x6a2bb0, uct_flags=499, reg_md_map=499, mem_type=UCS_MEMORY_TYPE_HOST, length=4096, address=<optimized out>, context=0x6a3410)
+    at core/ucp_mm.inl:71
+#13 ucp_memh_init_uct_reg (context=context@entry=0x6a3410, memh=memh@entry=0x6a2b30, uct_flags=uct_flags@entry=0) at core/ucp_mm.c:610
+#14 0x00007ffff7acaae9 in ucp_memh_alloc (context=context@entry=0x6a3410, address=0x0, length=length@entry=8, mem_type=UCS_MEMORY_TYPE_HOST, uct_flags=0, 
+    alloc_name=alloc_name@entry=0x7ffff7ba5080 "user memory", memh_p=memh_p@entry=0x7fffffffc8b0) at core/ucp_mm.c:721
+#15 0x00007ffff7acaf00 in ucp_mem_map (context=0x6a3410, params=params@entry=0x7fffffffc950, memh_p=0x6a0990) at core/ucp_mm.c:838
+#16 0x000000000040c2e6 in ucp_perf_mem_alloc (memh_p=0x6a0990, address_p=0x69c7c0, mem_type=<optimized out>, length=<optimized out>, perf=0x69c6c0) at libperf_memory.c:65
+#17 ucp_perf_test_alloc_mem (perf=perf@entry=0x69c6c0) at libperf_memory.c:104
+#18 0x0000000000409903 in ucp_perf_setup (perf=0x69c6c0) at libperf.c:1638
+#19 0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffd050, result=result@entry=0x7fffffffcd20) at libperf.c:1790
+#20 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffd050, parent_params=parent_params@entry=0x7fffffffd050, depth=depth@entry=0) at perftest_run.c:273
+#21 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffd050) at perftest_run.c:332
+#22 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+(gdb) 
+
+setup_sock_rte_p2p
+Waiting for connection...
+
+ucp_perf_test_alloc_mem
+
+main -> run_test -> ucs_status_t run_test(struct perftest_context *ctx) -> run_test_recurs -> static ucs_status_t run_test_recurs -> ucx_perf_run
+  status = ucx_perf_funcs[params->api].setup(perf) -> static ucs_status_t ucp_perf_setup
+  
+server:
+[root@node61 bin]# gdb --args ucx_perftest -c 0^C
+[root@node61 bin]# ./ucx_perftest -c 0
+Waiting for connection...
+Accepted connection from 182.200.53.62:43696
++----------------------------------------------------------------------------------------------------------+
+| API:          protocol layer                                                                             |
+| Test:         tag match latency                                                                          |
+| Data layout:  (automatic)                                                                                |
+| Send memory:  host                                                                                       |
+| Recv memory:  host                                                                                       |
+| Message size: 8                                                                                          |
++----------------------------------------------------------------------------------------------------------+
+[root@node61 bin]# pwd
+/home/xb/project/net/ucx/ucx/install-debug/bin
+[root@node61 bin]# 
+
+
+client:
+[root@node62 bin]# ./ucx_perftest 182.200.53.61 -t tag_lat -c 1
++--------------+--------------+------------------------------+---------------------+-----------------------+
+|              |              |        latency (usec)        |   bandwidth (MB/s)  |  message rate (msg/s) |
++--------------+--------------+----------+---------+---------+----------+----------+-----------+-----------+
+|    Stage     | # iterations | 50.0%ile | average | overall |  average |  overall |  average  |  overall  |
++--------------+--------------+----------+---------+---------+----------+----------+-----------+-----------+
+[thread 0]            236825      2.080     2.116     2.116        3.61       3.61      472537      472537
+[thread 0]            474662      2.085     2.107     2.112        3.62       3.61      474557      473547
+[thread 0]            712538      2.086     2.107     2.110        3.62       3.62      474634      473909
+[thread 0]            950359      2.082     2.107     2.109        3.62       3.62      474525      474063
+Final:               1000000      2.079     2.111     2.109        3.61       3.62      473735      474047
+
+
+(gdb) bt
+#0  0x00007ffff51ce130 in ibv_modify_qp () from /lib64/libibverbs.so.1
+#1  0x00007ffff53ff2a4 in uct_ud_iface_create_qp (self=self@entry=0x6fa500, config=config@entry=0x6a0f90) at ud/base/ud_iface.c:215
+#2  0x00007ffff53ff960 in uct_ud_iface_t_init (self=self@entry=0x6fa500, _myclass=0x7ffff5622640 <uct_ud_iface_t_class>, _init_count=_init_count@entry=0x7fffffffc3f0, 
+    ops=ops@entry=0x7ffff5622940 <uct_ud_verbs_iface_ops>, tl_ops=tl_ops@entry=0x7ffff56227a0 <uct_ud_verbs_iface_tl_ops>, md=md@entry=0x6b0710, worker=worker@entry=0x6a1f00, 
+    params=params@entry=0x7fffffffc700, config=config@entry=0x6a0f90, init_attr=0x7fffffffc400) at ud/base/ud_iface.c:513
+#3  0x00007ffff540ed82 in uct_ud_verbs_iface_t_init (tl_config=0x6a0f90, params=0x7fffffffc700, worker=0x6a1f00, md=0x6b0710, _init_count=0x7fffffffc3f0, 
+    _myclass=0x7ffff5622760 <uct_ud_verbs_iface_t_class>, self=0x6fa500) at ud/verbs/ud_verbs.c:727
+#4  uct_ud_verbs_iface_t_new (arg0=0x6b0710, arg1=0x6a1f00, arg2=0x7fffffffc700, arg3=0x6a0f90, obj_p=0x6d7810) at ud/verbs/ud_verbs.c:792
+#5  0x00007ffff7840e4b in uct_iface_open (md=md@entry=0x6b0710, worker=0x6a1f00, params=params@entry=0x7fffffffc700, config=0x6a0f90, iface_p=iface_p@entry=0x6d7810) at base/uct_md.c:284
+#6  0x00007ffff7ad8c24 in ucp_worker_iface_open (worker=worker@entry=0x6c61b0, tl_id=tl_id@entry=11 '\v', iface_params=iface_params@entry=0x7fffffffc700, wiface_p=0x6a21c8)
+    at core/ucp_worker.c:1357
+#7  0x00007ffff7ada07a in ucp_worker_add_resource_ifaces (worker=worker@entry=0x6c61b0) at core/ucp_worker.c:1101
+#8  0x00007ffff7adc90c in ucp_worker_create (context=0x6a3410, params=params@entry=0x7fffffffcb50, worker_p=<optimized out>) at core/ucp_worker.c:2441
+#9  0x0000000000409b18 in ucp_perf_setup (perf=0x69c6c0) at libperf.c:1662
+#10 0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffd040, result=result@entry=0x7fffffffcd10) at libperf.c:1790
+#11 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffd040, parent_params=parent_params@entry=0x7fffffffd040, depth=depth@entry=0) at perftest_run.c:273
+#12 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffd040) at perftest_run.c:332
+#13 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+
+(gdb) p qp_init_attr.cap.max_send_wr
+$1 = 0
+(gdb) p config->super.tx.queue_len
+$2 = 256
+(gdb) p config->super.rx.queue_len
+$3 = 4096
+(gdb) p config->super.tx.min_inline
+$6 = 64
+
+(gdb) bt
+#0  uct_rc_verbs_iface_poll_rx_common (iface=0x6d7bb0) at rc/verbs/rc_verbs_impl.h:87
+#1  uct_rc_verbs_iface_progress (arg=0x6d7bb0) at rc/verbs/rc_verbs_iface.c:189
+#2  0x00007ffff7ad91ab in uct_iface_progress (iface=<optimized out>) at /home/xb/project/net/ucx/ucx/src/uct/api/uct.h:3594
+#3  ucp_worker_iface_check_events_do (progress_count=<synthetic pointer>, wiface=0x6d7320) at core/ucp_worker.c:616
+#4  ucp_worker_iface_check_events (force=1, wiface=0x6d7320) at core/ucp_worker.c:695
+#5  ucp_worker_iface_deactivate (force=1, wiface=0x6d7320) at core/ucp_worker.c:736
+#6  ucp_worker_iface_init (worker=worker@entry=0x6c61b0, tl_id=tl_id@entry=10 '\n', wiface=0x6d7320) at core/ucp_worker.c:1457
+#7  0x00007ffff7ada188 in ucp_worker_add_resource_ifaces (worker=worker@entry=0x6c61b0) at core/ucp_worker.c:1139
+#8  0x00007ffff7adc90c in ucp_worker_create (context=0x6a3410, params=params@entry=0x7fffffffcb50, worker_p=<optimized out>) at core/ucp_worker.c:2441
+#9  0x0000000000409b18 in ucp_perf_setup (perf=0x69c6c0) at libperf.c:1662
+#10 0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffd040, result=result@entry=0x7fffffffcd10) at libperf.c:1790
+#11 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffd040, parent_params=parent_params@entry=0x7fffffffd040, depth=depth@entry=0) at perftest_run.c:273
+#12 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffd040) at perftest_run.c:332
+#13 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+
+
+(gdb) info locals
+i = <optimized out>
+wc = {{
+    wr_id = 7175088, 
+    status = IBV_WC_LOC_PROT_ERR, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 7014160, 
+    byte_len = 0, 
+    {
+      imm_data = 4294951392, 
+      invalidated_rkey = 4294951392
+    }, 
+    qp_num = 32767, 
+    src_qp = 4114571393, 
+    wc_flags = 32767, 
+    pkey_index = 128, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 124, 
+    status = 7170304, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 4294951520, 
+    byte_len = 32767, 
+    {
+      imm_data = 4155732096, 
+      invalidated_rkey = 4155732096
+    }, 
+    qp_num = 32767, 
+    src_qp = 7014160, 
+---Type <return> to continue, or q <return> to quit---  
+    wc_flags = 0, 
+    pkey_index = 29472, 
+    slid = 109, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 7172896, 
+    status = 4294951472, 
+    opcode = 32767, 
+    vendor_err = 4114600374, 
+    byte_len = 32767, 
+    {
+      imm_data = 1, 
+      invalidated_rkey = 1
+    }, 
+    qp_num = 0, 
+    src_qp = 5, 
+    wc_flags = 0, 
+    pkey_index = 1, 
+    slid = 0, 
+    sl = 255 '\377', 
+    dlid_path_bits = 127 '\177'
+  }, {
+    wr_id = 16, 
+    status = 4155732096, 
+    opcode = 32767, 
+    vendor_err = 16, 
+    byte_len = 0, 
+    {
+      imm_data = 4155732096, 
+---Type <return> to continue, or q <return> to quit---
+      invalidated_rkey = 4155732096
+    }, 
+    qp_num = 32767, 
+    src_qp = 7175088, 
+    wc_flags = 0, 
+    pkey_index = 50336, 
+    slid = 65535, 
+    sl = 255 '\377', 
+    dlid_path_bits = 127 '\177'
+  }, {
+    wr_id = 140737346027453, 
+    status = 6980344, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 4135843680, 
+    byte_len = 0, 
+    {
+      imm_data = 4294967295, 
+      invalidated_rkey = 4294967295
+    }, 
+    qp_num = 0, 
+    src_qp = 4294967295, 
+    wc_flags = 0, 
+    pkey_index = 124, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 8256, 
+    status = IBV_WC_SUCCESS, 
+    opcode = IBV_WC_SEND, 
+---Type <return> to continue, or q <return> to quit---
+    vendor_err = 1073741824, 
+    byte_len = 0, 
+    {
+      imm_data = 512, 
+      invalidated_rkey = 512
+    }, 
+    qp_num = 0, 
+    src_qp = 1024, 
+    wc_flags = 0, 
+    pkey_index = 5, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 0, 
+    status = 8256, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 65, 
+    byte_len = 0, 
+    {
+      imm_data = 1073741824, 
+      invalidated_rkey = 1073741824
+    }, 
+    qp_num = 0, 
+    src_qp = 512, 
+    wc_flags = 0, 
+    pkey_index = 1024, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+---Type <return> to continue, or q <return> to quit---
+  }, {
+    wr_id = 5, 
+    status = 123, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 8255, 
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+    }, 
+    qp_num = 0, 
+    src_qp = 8255, 
+    wc_flags = 0, 
+    pkey_index = 512, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 1024, 
+    status = 127, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 4, 
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+    }, 
+    qp_num = 0, 
+    src_qp = 0, 
+    wc_flags = 0, 
+---Type <return> to continue, or q <return> to quit---
+    pkey_index = 0, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 0, 
+    status = IBV_WC_SUCCESS, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 0, 
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+    }, 
+    qp_num = 0, 
+    src_qp = 0, 
+    wc_flags = 0, 
+    pkey_index = 0, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 0, 
+    status = IBV_WC_SUCCESS, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 0, 
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+---Type <return> to continue, or q <return> to quit---
+    }, 
+    qp_num = 0, 
+    src_qp = 1, 
+    wc_flags = 0, 
+    pkey_index = 33, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 20617990506111, 
+    status = IBV_WC_REM_OP_ERR, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 18, 
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+    }, 
+    qp_num = 0, 
+    src_qp = 4, 
+    wc_flags = 0, 
+    pkey_index = 0, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 0, 
+    status = IBV_WC_SUCCESS, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 0, 
+---Type <return> to continue, or q <return> to quit---
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+    }, 
+    qp_num = 0, 
+    src_qp = 0, 
+    wc_flags = 0, 
+    pkey_index = 0, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 0, 
+    status = IBV_WC_SUCCESS, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 0, 
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+    }, 
+    qp_num = 0, 
+    src_qp = 0, 
+    wc_flags = 0, 
+    pkey_index = 0, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+---Type <return> to continue, or q <return> to quit---
+    wr_id = 0, 
+    status = IBV_WC_SUCCESS, 
+    opcode = IBV_WC_SEND, 
+    vendor_err = 0, 
+    byte_len = 0, 
+    {
+      imm_data = 0, 
+      invalidated_rkey = 0
+    }, 
+    qp_num = 0, 
+    src_qp = 4094526326, 
+    wc_flags = 1047798261, 
+    pkey_index = 0, 
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }, {
+    wr_id = 4757321741884849941, 
+    status = 2596056904, 
+    opcode = 1051383794, 
+    vendor_err = 3894859413, 
+    byte_len = 1041313291, 
+    {
+      imm_data = 38, 
+      invalidated_rkey = 38
+    }, 
+    qp_num = 0, 
+    src_qp = 256, 
+    wc_flags = 0, 
+    pkey_index = 1, 
+---Type <return> to continue, or q <return> to quit---
+    slid = 0, 
+    sl = 0 '\000', 
+    dlid_path_bits = 0 '\000'
+  }}
+desc = <optimized out>
+num_wcs = 16
+(gdb) 
+(gdb) p iface->super.super.config.rx_max_poll
+$8 = 16
+
+(gdb) bt
+#0  uct_ud_verbs_post_send (max_log_sge=1, send_flags=<optimized out>, wr=0x6fad90, ep=<optimized out>, iface=0x6fa500) at ud/verbs/ud_verbs.c:92
+#1  uct_ud_verbs_ep_tx_skb (max_log_sge=1, send_flags=<optimized out>, skb=<optimized out>, ep=<optimized out>, iface=0x6fa500) at ud/verbs/ud_verbs.c:119
+#2  uct_ud_verbs_ep_send_ctl (ud_ep=<optimized out>, skb=<optimized out>, iov=<optimized out>, iovcnt=<optimized out>, flags=<optimized out>, max_log_sge=1) at ud/verbs/ud_verbs.c:155
+#3  0x00007ffff5405270 in uct_ud_iface_send_ctl (iface=0x6fa500, max_log_sge=1, flags=2, iovcnt=0, iov=0x0, skb=0x7fffe3bff9c0, ep=0x82a430) at ud/base/ud_iface.h:536
+#4  uct_ud_ep_create_connected_common (ep_params=<optimized out>, new_ep_p=0x7fffffffc220) at ud/base/ud_ep.c:646
+#5  0x00007ffff7844d6a in uct_ep_create (params=0x7fffffffc2e0, ep_p=<optimized out>) at base/uct_iface.c:639
+#6  0x00007ffff7b89feb in ucp_wireup_ep_connect_aux (remote_address=0x7fffffffc8e0, ep_init_flags=0, wireup_ep=0x8198d0) at wireup/wireup_ep.c:249
+#7  ucp_wireup_ep_connect (uct_ep=<optimized out>, ep_init_flags=ep_init_flags@entry=0, rsc_index=<optimized out>, path_index=path_index@entry=0, connect_aux=<optimized out>, 
+    remote_address=remote_address@entry=0x7fffffffc8e0) at wireup/wireup_ep.c:492
+#8  0x00007ffff7b8f718 in ucp_wireup_connect_lane_to_ep (remote_address=0x7fffffffc8e0, wiface=0x6fbd10, rsc_index=12 '\f', path_index=0, lane=1 '\001', ep_init_flags=0, ep=<optimized out>)
+    at wireup/wireup.c:1112
+#9  ucp_wireup_connect_lane (addr_index=<optimized out>, remote_address=0x7fffffffc8e0, path_index=0, lane=1 '\001', ep_init_flags=0, ep=<optimized out>) at wireup/wireup.c:1150
+#10 ucp_wireup_init_lanes (ep=<optimized out>, ep_init_flags=ep_init_flags@entry=0, local_tl_bitmap=local_tl_bitmap@entry=0x7ffff7b9eb50 <ucp_tl_bitmap_max>, 
+    remote_address=remote_address@entry=0x7fffffffc8e0, addr_indices=addr_indices@entry=0x7fffffffc920) at wireup/wireup.c:1571
+#11 0x00007ffff7ac0825 in ucp_ep_create_to_worker_addr (worker=worker@entry=0x6c61b0, local_tl_bitmap=0x7ffff7b9eb50 <ucp_tl_bitmap_max>, remote_address=remote_address@entry=0x7fffffffc8e0, 
+    ep_init_flags=ep_init_flags@entry=0, message=message@entry=0x7ffff7ba3113 "from api call", addr_indices=addr_indices@entry=0x7fffffffc920, ep_p=ep_p@entry=0x7fffffffc8d0) at core/ucp_ep.c:830
+#12 0x00007ffff7ac143f in ucp_ep_create_api_to_worker_addr (ep_p=<synthetic pointer>, params=0x7fffffffcae0, worker=0x6c61b0) at core/ucp_ep.c:1084
+#13 ucp_ep_create (worker=0x6c61b0, params=params@entry=0x7fffffffcae0, ep_p=0x6c6078) at core/ucp_ep.c:1190
+#14 0x000000000040a317 in ucp_perf_test_receive_remote_data (peer_index=<optimized out>, perf=0x69c6c0) at libperf.c:1081
+#15 ucp_perf_test_setup_endpoints (features=<optimized out>, perf=0x69c6c0) at libperf.c:1288
+#16 ucp_perf_setup (perf=0x69c6c0) at libperf.c:1687
+#17 0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffd040, result=result@entry=0x7fffffffcd10) at libperf.c:1790
+#18 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffd040, parent_params=parent_params@entry=0x7fffffffd040, depth=depth@entry=0) at perftest_run.c:273
+#19 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffd040) at perftest_run.c:332
+#20 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+
+(gdb) bt
+#0  uct_ud_verbs_post_send (max_log_sge=2147483647, send_flags=0, wr=0x6fad90, ep=0x82a430, iface=0x6fa500) at ud/verbs/ud_verbs.c:92
+#1  uct_ud_verbs_ep_tx_skb (max_log_sge=2147483647, send_flags=0, skb=0x7fffe3bff9c0, ep=0x82a430, iface=0x6fa500) at ud/verbs/ud_verbs.c:119
+#2  uct_ud_verbs_ep_am_bcopy (tl_ep=0x82a430, id=<optimized out>, pack_cb=<optimized out>, arg=<optimized out>, flags=<optimized out>) at ud/verbs/ud_verbs.c:258
+#3  0x00007ffff7b8b8eb in uct_ep_am_bcopy (flags=<optimized out>, arg=0x7fffffffc5c0, pack_cb=0x7ffff7b8aef0 <ucp_wireup_msg_pack>, id=1 '\001', ep=<optimized out>)
+    at /home/xb/project/net/ucx/ucx/src/uct/api/uct.h:3028
+#4  ucp_wireup_msg_progress (self=0x82a8a0) at wireup/wireup.c:145
+#5  0x00007ffff7b8859f in ucp_wireup_ep_progress_pending (self=0x82a9c0) at wireup/wireup_ep.c:80
+#6  0x00007ffff5408553 in uct_ud_ep_do_pending (arbiter=arbiter@entry=0x6fab10, group=group@entry=0x82a460, elem=elem@entry=0x82a9c8, arg=arg@entry=0x0) at ud/base/ud_ep.c:1639
+#7  0x00007ffff75d9910 in ucs_arbiter_dispatch_nonempty (arbiter=0x6fab10, per_group=per_group@entry=1, cb=0x7ffff5408440 <uct_ud_ep_do_pending>, cb_arg=cb_arg@entry=0x0)
+    at datastruct/arbiter.c:321
+#8  0x00007ffff540ace6 in ucs_arbiter_dispatch (per_group=1, cb=<optimized out>, cb_arg=0x0, arbiter=0x6fab10) at /home/xb/project/net/ucx/ucx/src/ucs/datastruct/arbiter.h:386
+#9  uct_ud_iface_progress_pending (is_async=0, iface=0x6fa500) at /home/xb/project/net/ucx/ucx/src/uct/ib/ud/base/ud_iface.h:483
+#10 uct_ud_verbs_iface_progress (tl_iface=0x6fa500) at ud/verbs/ud_verbs.c:465
+#11 0x00007ffff75da6eb in ucs_callbackq_slow_proxy (arg=0x6a1f00) at datastruct/callbackq.c:404
+#12 0x00007ffff7ade2b2 in ucs_callbackq_dispatch (cbq=<optimized out>) at /home/xb/project/net/ucx/ucx/src/ucs/datastruct/callbackq.h:211
+#13 uct_worker_progress (worker=<optimized out>) at /home/xb/project/net/ucx/ucx/src/uct/api/uct.h:2777
+#14 ucp_worker_progress (worker=0x6c61b0) at core/ucp_worker.c:2867
+#15 0x000000000040a52e in ucp_perf_test_flush_workers (perf=0x69c6c0) at libperf.c:1252
+#16 ucp_perf_test_setup_endpoints (features=<optimized out>, perf=0x69c6c0) at libperf.c:1300
+#17 ucp_perf_setup (perf=0x69c6c0) at libperf.c:1687
+#18 0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffd040, result=result@entry=0x7fffffffcd10) at libperf.c:1790
+#19 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffd040, parent_params=parent_params@entry=0x7fffffffd040, depth=depth@entry=0) at perftest_run.c:273
+#20 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffd040) at perftest_run.c:332
+#21 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+
+将数据写入远程内存，同时避免本地内存复制 ::uct_iov_t 结构的 iov 数组中的输入数据发送到远程地址（“收集输出”）。 iov 中的缓冲区按数组顺序处理。 这意味着函数在继续 iov[1] 之前完成 iov[0]，依此类推。
+uct_ep_put_zcopy -> ep_put_zcopy -> .ep_put_zcopy 
+
+test_ucp_peer_failure, https://github.com/openucx/ucx/issues/5704
+zcopy, https://github.com/openucx/ucx/discussions/7551
+zcopy -> test_zcopy_comp.cc
+ucx_perftest prm-dgx-19 -t get -s $((2 ** 20)) -n 100 -w 0 -d memory -x cma -D zcopy
+
+ucx_perftest -t am_lat -x cma -d memory
+
+unit_test
+$ make -C test/gtest test
+
+gdb --args ./ucx_perftest 182.200.53.61 -t get -s $((2 ** 20)) -n 100 -w 0 -d memory -x cma -D zcopy
+
+uct_iface_is_reachable -> uct_cma_iface_is_reachable
+
+https://github.com/openucx/ucx/issues/3113
+
+[root@node61 bin]# ./ucx_perftest -h
+  Usage: ucx_perftest [ server-hostname ] [ options ]
+
+  Common options:
+     -t <test>      test to run:
+           am_lat - UCT active message latency
+          put_lat - UCT put latency
+          add_lat - UCT atomic add latency
+              get - UCT get latency / bandwidth / message rate
+             fadd - UCT atomic fetch-and-add latency / rate
+             swap - UCT atomic swap latency / rate
+            cswap - UCT atomic compare-and-swap latency / rate
+            am_bw - UCT active message bandwidth / message rate
+           put_bw - UCT put bandwidth / message rate
+           add_mr - UCT atomic add message rate
+          tag_lat - UCP tag match latency
+           tag_bw - UCP tag match bandwidth
+     tag_sync_lat - UCP tag sync match latency
+      tag_sync_bw - UCP tag sync match bandwidth
+      ucp_put_lat - UCP put latency
+       ucp_put_bw - UCP put bandwidth
+          ucp_get - UCP get latency / bandwidth / message rate
+          ucp_add - UCP atomic add bandwidth / message rate
+         ucp_fadd - UCP atomic fetch-and-add latency / bandwidth / rate
+         ucp_swap - UCP atomic swap latency / bandwidth / rate
+        ucp_cswap - UCP atomic compare-and-swap latency / bandwidth / rate
+        stream_bw - UCP stream bandwidth
+       stream_lat - UCP stream latency
+       ucp_am_lat - UCP am latency
+        ucp_am_bw - UCP am bandwidth / message rate
+
+     -s <size>      list of scatter-gather sizes for single message (8)
+                    for example: "-s 16,48,8192,8192,14"
+     -m <send mem type>[,<recv mem type>]
+                    memory type of message for sender and receiver (host)
+                        host - System memory
+     -n <iters>     number of iterations to run (1000000)
+     -w <iters>     number of warm-up iterations (10000)
+     -c <cpulist>   set affinity to this CPU list (separated by comma) (off)
+     -O <count>     maximal number of uncompleted outstanding sends (0)
+     -i <offset>    distance between consecutive scatter-gather entries (0)
+     -l             use loopback connection
+                    in this case, the process will communicate with itself,
+                    so passing server hostname is not allowed
+     -o             do not progress the responder in one-sided tests
+     -B             register memory with NONBLOCK flag
+     -b <file>      read and execute tests from a batch file: every line in the
+                    file is a test to run, first word is test name, the rest of
+                    the line is command-line arguments for the test.
+     -R <rank>      percentile rank of the percentile data in latency tests (50.0)
+     -p <port>      TCP port to use for data exchange (13337)
+     -6             Use IPv6 address for in data exchange
+     -h             show this help message
+
+  Output format:
+     -N             use numeric formatting (thousands separator)
+     -f             print only final numbers
+     -v             print CSV-formatted output
+     -I             print extra information about the operation
+
+  UCT only:
+     -d <device>    device to use for testing
+     -x <tl>        transport to use for testing
+     -D <layout>    data layout for sender side:
+                        short    - short messages (default, cannot be used for get)
+                        shortiov - short io-vector messages (only for active messages)
+                        bcopy    - copy-out (cannot be used for atomics)
+                        zcopy    - zero-copy (cannot be used for atomics)
+     -W <count>     flow control window size, for active messages (127)
+     -H <size>      active message header size (8), included in message size
+     -A <mode>      asynchronous progress mode (thread_spinlock)
+                        thread_spinlock - separate progress thread with spin locking
+                        thread_mutex - separate progress thread with mutex locking
+                        signal - signal-based timer
+
+  UCP only:
+     -T <threads>   number of threads in the test (1)
+     -M <thread>    thread support level for progress engine (single)
+                        single     - only the master thread can access
+                        serialized - one thread can access at a time
+                        multi      - multiple threads can access
+     -D <layout>[,<layout>]
+                    data layout for sender and receiver side (contig)
+                        contig - Continuous datatype
+                        iov    - Scatter-gather list
+     -C             use wild-card tag for tag tests
+     -U             force unexpected flow by using tag probe
+     -r <mode>      receive mode for stream tests (recv)
+                        recv       : Use ucp_stream_recv_nb
+                        recv_data  : Use ucp_stream_recv_data_nb
+     -I             create context with wakeup feature enabled
+     -e             create endpoints with error handling support
+     -E <mode>      wait mode for tests
+                        poll       : repeatedly call worker_progress
+                        sleep      : go to sleep after posting requests
+     -H <size>      active message header size (0), not included in message size
+     -y             do additional memcopy to the user memory in active message receive handler
+     -z             pass pre-registered memory handle
+
+   NOTE: When running UCP tests, transport and device should be specified by
+         environment variables: UCX_TLS and UCX_[SELF|SHM|NET]_DEVICES.
+
+typedef struct ucx_perf_params
+
+ucp_ep_put, ucp_worker_fence
+
+IBV_WR_RDMA_
+
+
+gdb --args ucx_perftest -t tag_bw -s 16536 -n 1000 -p 9999
+ucx_perftest 182.200.53.61 -t tag_bw -s 16536 -n 1000 -p 9999
+
+参数, src/tools/perf/perftest_params.c 
+
+Any UCX environment variables used
+server:
+/hpcx/ucx/bin/ucx_perftest -c 0 -x rc_mlx5 -d mlx5_2:1
+client:
+/hpcx/ucx/bin/ucx_perftest 192.168.1.1 -t put_bw -c 0 -x rc_mlx5 -d mlx5_3:1 -n 1000000 -w 5 -D zcopy
+https://github.com/openucx/ucx/issues/4966
+
+mpirun --allow-run-as-root -np 2 -H 192.168.0.1:1,192.168.0.2:1 --mca pml ucx -mca osc ucx  -mca coll_hcoll_enable 0 -x coll_hcoll_np=0 -x UCX_IB_GID_INDEX=3 -x UCX_NET_DEVICES=mlx5_2:1,mlx5_3:1  -x UCX_TLS=rc_mlx5  /nv-tools/all_reduce_perf -g 1 -t 1
+
+UCX_TLS=rc;UCX_NET_DEVICES=mlx5_0:1;gdb --args ./install-debug/bin/ucx_perftest -c 0 -p 9999
+UCX_TLS=rc;UCX_NET_DEVICES=mlx5_0:1;gdb --args ./ucx_perftest 175.16.53.62 -t ucp_put_bw -c 0 -n 1000000 -w 5 -s 1048576 -p 9999 -D zcopy
+
+#0  uct_rc_verbs_iface_t_init (tl_config=0x6a0f90, params=<optimized out>, worker=<optimized out>, tl_md=<optimized out>, _init_count=0x7fffffffc250, _myclass=0x7ffff5621dc0 <uct_rc_verbs_iface_t_class>, self=0x6d6f40)
+    at rc/verbs/rc_verbs_iface.c:346
+#1  uct_rc_verbs_iface_t_new (arg0=<optimized out>, arg1=<optimized out>, arg2=<optimized out>, arg3=0x6a0f90, obj_p=0x6d66b0) at rc/verbs/rc_verbs_iface.c:459
+#2  0x00007ffff7840e4b in uct_iface_open (md=md@entry=0x6b06c0, worker=0x6a1eb0, params=params@entry=0x7fffffffc630, config=0x6a0f90, iface_p=iface_p@entry=0x6d66b0) at base/uct_md.c:284
+#3  0x00007ffff7ad8c24 in ucp_worker_iface_open (worker=worker@entry=0x6c6170, tl_id=tl_id@entry=9 '\t', iface_params=iface_params@entry=0x7fffffffc630, wiface_p=0x6a2168) at core/ucp_worker.c:1357
+#4  0x00007ffff7ada07a in ucp_worker_add_resource_ifaces (worker=worker@entry=0x6c6170) at core/ucp_worker.c:1101
+#5  0x00007ffff7adc90c in ucp_worker_create (context=0x6a3410, params=params@entry=0x7fffffffca80, worker_p=<optimized out>) at core/ucp_worker.c:2441
+#6  0x0000000000409b18 in ucp_perf_setup (perf=0x69c6c0) at libperf.c:1662
+#7  0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffcf70, result=result@entry=0x7fffffffcc40) at libperf.c:1790
+#8  0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffcf70, parent_params=parent_params@entry=0x7fffffffcf70, depth=depth@entry=0) at perftest_run.c:273
+#9  0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffcf70) at perftest_run.c:332
+#10 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+
+#0  uct_rc_verbs_ep_flush (tl_ep=0x808580, flags=0, comp=0x7ff258) at rc/verbs/rc_verbs_ep.c:497
+#1  0x00007ffff7b111cf in uct_ep_flush (comp=0x7ff258, flags=<optimized out>, ep=0x808580) at /home/xb/project/net/ucx/ucx/src/uct/api/uct.h:3234
+#2  ucp_ep_flush_progress (req=req@entry=0x7ff1c0) at rma/flush.c:120
+#3  0x00007ffff7b11983 in ucp_ep_flush_resume_slow_path_callback (arg=0x7ff1c0) at rma/flush.c:215
+#4  0x00007ffff75da6eb in ucs_callbackq_slow_proxy (arg=0x6a1eb0) at datastruct/callbackq.c:404
+#5  0x00007ffff7ade2b2 in ucs_callbackq_dispatch (cbq=<optimized out>) at /home/xb/project/net/ucx/ucx/src/ucs/datastruct/callbackq.h:211
+#6  uct_worker_progress (worker=<optimized out>) at /home/xb/project/net/ucx/ucx/src/uct/api/uct.h:2777
+#7  ucp_worker_progress (worker=0x6c6170) at core/ucp_worker.c:2867
+#8  0x000000000040a52e in ucp_perf_test_flush_workers (perf=0x69c6c0) at libperf.c:1252
+#9  ucp_perf_test_setup_endpoints (features=<optimized out>, perf=0x69c6c0) at libperf.c:1300
+#10 ucp_perf_setup (perf=0x69c6c0) at libperf.c:1687
+#11 0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffcf70, result=result@entry=0x7fffffffcc40) at libperf.c:1790
+#12 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffcf70, parent_params=parent_params@entry=0x7fffffffcf70, depth=depth@entry=0) at perftest_run.c:273
+#13 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffcf70) at perftest_run.c:332
+#14 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+
+(gdb) bt
+#0  uct_ud_verbs_post_send (max_log_sge=2147483647, send_flags=0, wr=0x6b2800, ep=0x72add0, iface=0x6b1f70) at ud/verbs/ud_verbs.c:92
+#1  uct_ud_verbs_ep_tx_skb (max_log_sge=2147483647, send_flags=0, skb=0x7fffe71ff9c0, ep=0x72add0, iface=0x6b1f70) at ud/verbs/ud_verbs.c:119
+#2  uct_ud_verbs_ep_am_bcopy (tl_ep=0x72add0, id=<optimized out>, pack_cb=<optimized out>, arg=<optimized out>, flags=<optimized out>) at ud/verbs/ud_verbs.c:258
+#3  0x00007ffff7b8b8eb in uct_ep_am_bcopy (flags=<optimized out>, arg=0x7fffffffc3e0, pack_cb=0x7ffff7b8aef0 <ucp_wireup_msg_pack>, id=1 '\001', ep=<optimized out>) at /home/xb/project/net/ucx/ucx/src/uct/api/uct.h:3028
+#4  ucp_wireup_msg_progress (self=0x716150) at wireup/wireup.c:145
+#5  0x00007ffff7b8859f in ucp_wireup_ep_progress_pending (self=0x716350) at wireup/wireup_ep.c:80
+#6  0x00007ffff5408553 in uct_ud_ep_do_pending (arbiter=arbiter@entry=0x6b2580, group=group@entry=0x72ae00, elem=elem@entry=0x716358, arg=arg@entry=0x0) at ud/base/ud_ep.c:1639
+#7  0x00007ffff75d9910 in ucs_arbiter_dispatch_nonempty (arbiter=0x6b2580, per_group=per_group@entry=1, cb=0x7ffff5408440 <uct_ud_ep_do_pending>, cb_arg=cb_arg@entry=0x0) at datastruct/arbiter.c:321
+#8  0x00007ffff540ace6 in ucs_arbiter_dispatch (per_group=1, cb=<optimized out>, cb_arg=0x0, arbiter=0x6b2580) at /home/xb/project/net/ucx/ucx/src/ucs/datastruct/arbiter.h:386
+#9  uct_ud_iface_progress_pending (is_async=0, iface=0x6b1f70) at /home/xb/project/net/ucx/ucx/src/uct/ib/ud/base/ud_iface.h:483
+#10 uct_ud_verbs_iface_progress (tl_iface=0x6b1f70) at ud/verbs/ud_verbs.c:465
+#11 0x00007ffff75da6eb in ucs_callbackq_slow_proxy (arg=0x6a34a0) at datastruct/callbackq.c:404
+#12 0x00007ffff7ade2b2 in ucs_callbackq_dispatch (cbq=<optimized out>) at /home/xb/project/net/ucx/ucx/src/ucs/datastruct/callbackq.h:211
+#13 uct_worker_progress (worker=<optimized out>) at /home/xb/project/net/ucx/ucx/src/uct/api/uct.h:2777
+#14 ucp_worker_progress (worker=0x6b8480) at core/ucp_worker.c:2867
+#15 0x000000000040a52e in ucp_perf_test_flush_workers (perf=0x69c6c0) at libperf.c:1252
+#16 ucp_perf_test_setup_endpoints (features=<optimized out>, perf=0x69c6c0) at libperf.c:1300
+#17 ucp_perf_setup (perf=0x69c6c0) at libperf.c:1687
+#18 0x000000000040915f in ucx_perf_run (params=params@entry=0x7fffffffce60, result=result@entry=0x7fffffffcb30) at libperf.c:1790
+#19 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffce60, parent_params=parent_params@entry=0x7fffffffce60, depth=depth@entry=0) at perftest_run.c:273
+#20 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffce60) at perftest_run.c:332
+#21 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
