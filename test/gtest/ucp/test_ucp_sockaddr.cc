@@ -1208,6 +1208,13 @@ UCS_TEST_SKIP_COND_P(test_ucp_sockaddr, force_close_during_rndv,
     do_force_close_during_rndv(false);
 }
 
+UCS_TEST_SKIP_COND_P(test_ucp_sockaddr, force_close_during_rndv_put_zcopy,
+                     (send_recv_type() != SEND_RECV_TAG), "RNDV_THRESH=0",
+                     "RNDV_SCHEME=put_zcopy")
+{
+    do_force_close_during_rndv(false);
+}
+
 UCS_TEST_SKIP_COND_P(test_ucp_sockaddr, fail_and_force_close_during_rndv,
                      (send_recv_type() != SEND_RECV_TAG), "RNDV_THRESH=0")
 {
@@ -1448,8 +1455,8 @@ UCS_TEST_SKIP_COND_P(test_max_lanes, 16_lanes_reconf, !cm_use_all_devices(),
     /* get configuration index for EP created through CM */
     listen_and_communicate(false, SEND_DIRECTION_C2S);
 
-    ASSERT_EQ(16, ucp_ep_num_lanes(sender().ep()));
-    ASSERT_EQ(16, ucp_ep_num_lanes(receiver().ep()));
+    ASSERT_EQ(16, (int)ucp_ep_num_lanes(sender().ep()));
+    ASSERT_EQ(16, (int)ucp_ep_num_lanes(receiver().ep()));
 }
 
 UCP_INSTANTIATE_TEST_CASE_TLS(test_max_lanes, ib, "ib")
@@ -1722,8 +1729,9 @@ private:
         UCS_ASYNC_BLOCK(&e.worker()->async);
         uct_priv_worker_t *worker = ucs_derived_of(e.worker()->uct,
                                                    uct_priv_worker_t);
-        ucs_callbackq_remove_if(&worker->super.progress_q,
-                                find_try_next_cm_cb, &find_try_next_cm_arg);
+        ucs_callbackq_remove_oneshot(&worker->super.progress_q, e.ep(),
+                                     find_try_next_cm_cb,
+                                     &find_try_next_cm_arg);
         UCS_ASYNC_UNBLOCK(&e.worker()->async);
 
         return find_try_next_cm_arg.found;
@@ -2265,26 +2273,6 @@ protected:
                                     message, &recv_param);
     }
 
-    void sreq_release(void *sreq) {
-        if ((sreq == NULL) || !UCS_PTR_IS_PTR(sreq)) {
-            return;
-        }
-
-        if (ucp_request_check_status(sreq) == UCS_INPROGRESS) {
-            ucp_request_t *req = (ucp_request_t*)sreq - 1;
-            req->flags        |= UCP_REQUEST_FLAG_COMPLETED;
-
-            ucp_request_t *req_from_id;
-            ucs_status_t status = ucp_send_request_get_by_id(
-                    sender().worker(), req->id,&req_from_id, 1);
-            if (status == UCS_OK) {
-                EXPECT_EQ(req, req_from_id);
-            }
-        }
-
-        ucp_request_release(sreq);
-    }
-
     void extra_send_before_disconnect(entity &e, const std::string &send_buf,
                                       const ucp_request_param_t &send_param)
     {
@@ -2737,34 +2725,37 @@ UCS_TEST_P(test_ucp_sockaddr_protocols,
     test_am_send_recv(64 * UCS_KBYTE, 0, 2 /* warmup + test */, true, false);
 }
 
-UCS_TEST_P(test_ucp_sockaddr_protocols,
-           am_rndv_64k_prereg_proto_v2_single_rndv_put_zcopy_lane,
-           "RNDV_THRESH=0", "MAX_RNDV_LANES=1", "RNDV_SCHEME=put_zcopy",
-           "PROTO_ENABLE=y")
+UCS_TEST_SKIP_COND_P(test_ucp_sockaddr_protocols,
+                     am_rndv_64k_prereg_proto_v1_single_rndv_put_zcopy_lane,
+                     RUNNING_ON_VALGRIND,
+                     "RNDV_THRESH=0", "MAX_RNDV_LANES=1",
+                     "RNDV_SCHEME=put_zcopy", "PROTO_ENABLE=n")
 {
     test_am_send_recv(64 * UCS_KBYTE, 0, 2, true, true);
 }
-UCS_TEST_P(test_ucp_sockaddr_protocols, am_short_reset, "PROTO_ENABLE=y",
-           "ZCOPY_THRESH=inf")
+UCS_TEST_SKIP_COND_P(test_ucp_sockaddr_protocols, am_short_reset,
+                     RUNNING_ON_VALGRIND, "PROTO_ENABLE=n", "ZCOPY_THRESH=inf")
 {
     test_am_send_recv(16, 8, 1, false, false, UCP_AM_SEND_FLAG_COPY_HEADER);
 }
 
-UCS_TEST_P(test_ucp_sockaddr_protocols, am_bcopy_reset, "PROTO_ENABLE=y",
-           "ZCOPY_THRESH=inf")
+UCS_TEST_SKIP_COND_P(test_ucp_sockaddr_protocols, am_bcopy_reset,
+                     RUNNING_ON_VALGRIND,
+                     "PROTO_ENABLE=n", "ZCOPY_THRESH=inf")
 {
     test_am_send_recv(2 * UCS_KBYTE, 8, 1, false, false,
                       UCP_AM_SEND_FLAG_COPY_HEADER);
 }
 
-UCS_TEST_P(test_ucp_sockaddr_protocols, am_zcopy_reset, "PROTO_ENABLE=y")
+UCS_TEST_SKIP_COND_P(test_ucp_sockaddr_protocols, am_zcopy_reset,
+                     RUNNING_ON_VALGRIND, "PROTO_ENABLE=n")
 {
     test_am_send_recv(16 * UCS_KBYTE, 8, 1, false, false,
                       UCP_AM_SEND_FLAG_COPY_HEADER);
 }
 
-UCS_TEST_P(test_ucp_sockaddr_protocols, am_rndv_reset, "PROTO_ENABLE=y",
-           "RNDV_THRESH=0")
+UCS_TEST_SKIP_COND_P(test_ucp_sockaddr_protocols, am_rndv_reset,
+                     RUNNING_ON_VALGRIND, "PROTO_ENABLE=n", "RNDV_THRESH=0")
 {
     test_am_send_recv(16 * UCS_KBYTE, 8, 1, false, false,
                       UCP_AM_SEND_FLAG_COPY_HEADER);
@@ -2816,9 +2807,15 @@ public:
         create_entity();
     }
 
-    void create_entities_and_connect(bool server_less_num_paths) {
+    void create_entities_and_connect(bool server_less_num_paths,
+                                     bool use_v2_addr = false) {
         /* coverity[tainted_string_argument] */
         ucs::scoped_setenv max_eager_lanes_env("UCX_MAX_EAGER_LANES", "2");
+
+        if (use_v2_addr) {
+            modify_config("SA_DATA_VERSION", "v2");
+            modify_config("ADDRESS_VERSION", "v2");
+        }
 
         if (server_less_num_paths) {
             // create the client
@@ -2856,6 +2853,13 @@ UCS_TEST_P(test_ucp_sockaddr_protocols_diff_config,
            diff_num_paths_small_msg_server_more_lanes)
 {
     create_entities_and_connect(false);
+    test_tag_send_recv(4 * UCS_KBYTE, false, false);
+}
+
+UCS_TEST_P(test_ucp_sockaddr_protocols_diff_config,
+           diff_num_paths_small_msg_server_more_lanes_v2)
+{
+    create_entities_and_connect(false, true);
     test_tag_send_recv(4 * UCS_KBYTE, false, false);
 }
 

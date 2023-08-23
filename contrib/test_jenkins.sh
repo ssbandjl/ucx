@@ -974,6 +974,25 @@ test_ucp_dlopen() {
 	fi
 }
 
+test_ucm_hooks() {
+    total=30
+    echo "==== Running UCM Bistro hook test ===="
+    for i in $(seq 1 $total); do
+        threads=$(((RANDOM % (2 * `nproc`)) + 1))
+
+        echo "iteration $i/$total: $threads threads"
+        timeout 10 ./test/apps/test_hooks -n $threads >test_hooks.log 2>&1 || \
+            { \
+                echo "ERROR running bistro hook test:"; \
+                cat test_hooks.log; \
+                exit 1; \
+            }
+    done
+
+    echo "SUCCESS running bistro hook test:"
+    cat test_hooks.log
+}
+
 test_init_mt() {
 	echo "==== Running multi-thread init ===="
 	# Each thread requires 5MB. Cap threads number by total available shared memory.
@@ -1113,6 +1132,17 @@ run_malloc_hook_gtest() {
 		MALLOC_MMAP_THRESHOLD_=16384 \
 		GTEST_FILTER=malloc_hook_cplusplus.mmap_ptrs \
 			make -C test/gtest test
+
+	echo "==== Running cuda hooks, $compiler_name compiler ===="
+	$AFFINITY $TIMEOUT env \
+		GTEST_FILTER='cuda_hooks.*' \
+			make -C test/gtest test
+
+	echo "==== Running cuda hooks with far jump, $compiler_name compiler ===="
+	$AFFINITY $TIMEOUT env \
+		UCM_BISTRO_FORCE_FAR_JUMP=y \
+		GTEST_FILTER='cuda_hooks.*' \
+			make -C test/gtest test
 }
 
 #
@@ -1128,14 +1158,6 @@ run_gtest() {
 	export GTEST_UCT_TCP_FASTEST_DEV=1
 	export OMP_NUM_THREADS=4
 
-	GTEST_EXTRA_ARGS=""
-	if [ "$JENKINS_TEST_PERF" == 1 ]
-	then
-		# Check performance with 10 retries and 2 seconds interval
-		GTEST_EXTRA_ARGS="$GTEST_EXTRA_ARGS -p 10 -i 2.0"
-	fi
-	export GTEST_EXTRA_ARGS
-
 	# Run specific tests
 	do_distributed_task 1 4 run_malloc_hook_gtest
 	do_distributed_task 2 4 run_gtest_watchdog_test 5 60 300
@@ -1147,9 +1169,19 @@ run_gtest() {
 	# Report TOP-20 longest test at the end of testing
 	export GTEST_REPORT_LONGEST_TESTS=20
 
+	GTEST_EXTRA_ARGS=""
+	if [ "$JENKINS_TEST_PERF" == 1 ]
+	then
+		# Check performance with 10 retries and 2 seconds interval
+		GTEST_EXTRA_ARGS="$GTEST_EXTRA_ARGS -p 10 -i 2.0"
+	fi
+	export GTEST_EXTRA_ARGS
+
 	# Run all tests
 	echo "==== Running unit tests, $compiler_name compiler ===="
 	$AFFINITY $TIMEOUT make -C test/gtest test
+
+	unset GTEST_EXTRA_ARGS
 
 	# Run valgrind tests
 	if ! [[ $(uname -m) =~ "aarch" ]] && ! [[ $(uname -m) =~ "ppc" ]] && \
@@ -1172,7 +1204,6 @@ run_gtest() {
 	unset GTEST_REPORT_LONGEST_TESTS
 	unset GTEST_TOTAL_SHARDS
 	unset GTEST_SHARD_INDEX
-	unset GTEST_EXTRA_ARGS
 	unset OMP_NUM_THREADS
 	unset GTEST_UCT_TCP_FASTEST_DEV
 	unset GTEST_SHUFFLE
@@ -1267,6 +1298,7 @@ run_release_mode_tests() {
 	test_ucs_load
 	test_ucp_dlopen
 	run_gtest_release
+	test_ucm_hooks
 }
 
 #
@@ -1281,6 +1313,8 @@ run_tests() {
 	# Don't cross-connect RoCE devices
 	export UCX_IB_ROCE_LOCAL_SUBNET=y
 	export UCX_IB_ROCE_SUBNET_PREFIX_LEN=inf
+
+	export UCX_PROTO_REQUEST_RESET=y
 
 	# load cuda env only if GPU available for remaining tests
 	try_load_cuda_env
@@ -1318,7 +1352,7 @@ run_tests() {
 	do_distributed_task 0 4 run_release_mode_tests
 }
 
-run_test_proto_enable() {
+run_test_proto_disable() {
 	export UCX_HANDLE_ERRORS=bt
 	export UCX_ERROR_SIGNALS=SIGILL,SIGSEGV,SIGBUS,SIGFPE,SIGPIPE,SIGABRT
 	export UCX_TCP_PORT_RANGE="$((33000 + EXECUTOR_NUMBER * 1000))-$((33999 + EXECUTOR_NUMBER * 1000))"
@@ -1331,8 +1365,7 @@ run_test_proto_enable() {
 	# build for devel tests and gtest
 	build devel --enable-gtest
 
-	export UCX_PROTO_ENABLE=y
-	export UCX_PROTO_REQUEST_RESET=y
+	export UCX_PROTO_ENABLE=n
 
 	# all are running gtest
 	run_gtest "default"
@@ -1344,8 +1377,8 @@ try_load_cuda_env
 if [ -n "$JENKINS_RUN_TESTS" ] || [ -n "$RUN_TESTS" ]
 then
     check_machine
-    if [[ "$PROTO_ENABLE" == "yes" ]]; then
-        run_test_proto_enable
+    if [[ "$PROTO_ENABLE" == "no" ]]; then
+        run_test_proto_disable
     else
         run_tests
     fi

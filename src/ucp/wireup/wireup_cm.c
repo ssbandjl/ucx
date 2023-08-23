@@ -107,7 +107,6 @@ static int ucp_cm_client_get_next_cm_idx(ucp_ep_h ep)
 static int ucp_cm_client_try_fallback_cms(ucp_ep_h ep)
 {
     ucp_worker_h worker          = ep->worker;
-    uct_worker_cb_id_t prog_id   = UCS_CALLBACKQ_ID_NULL;
     ucp_rsc_index_t num_cm_cmpts = ucp_worker_num_cm_cmpts(worker);
     UCS_STRING_BUFFER_ONSTACK(cms_strb, 64);
     char addr_str[UCS_SOCKADDR_STRING_LEN];
@@ -137,10 +136,8 @@ static int ucp_cm_client_try_fallback_cms(ucp_ep_h ep)
     }
 
     ep->ext->cm_idx = next_cm_idx;
-    uct_worker_progress_register_safe(worker->uct,
-                                      ucp_cm_client_try_next_cm_progress,
-                                      ep, UCS_CALLBACKQ_FLAG_ONESHOT,
-                                      &prog_id);
+    ucs_callbackq_add_oneshot(&worker->uct->progress_q, ep,
+                              ucp_cm_client_try_next_cm_progress, ep);
     ucp_worker_signal_internal(worker);
     return 1;
 }
@@ -191,7 +188,7 @@ ucp_cm_ep_client_initial_config_get(ucp_ep_h ucp_ep, unsigned ep_init_flags,
      * perspective. */
     status = ucp_address_pack(worker, NULL, tl_bitmap, addr_pack_flags,
                               context->config.ext.worker_addr_version, NULL,
-                              &ucp_addr_size, &ucp_addr);
+                              UINT_MAX, &ucp_addr_size, &ucp_addr);
     if (status != UCS_OK) {
         goto out;
     }
@@ -321,7 +318,7 @@ ucp_cm_ep_priv_data_pack(ucp_ep_h ep, const ucp_tl_bitmap_t *tl_bitmap,
                          ucs_log_level_t log_level,
                          ucp_object_version_t sa_data_version,
                          void **data_buf_p, size_t *data_buf_length_p,
-                         unsigned pack_flags)
+                         unsigned pack_flags, unsigned max_num_paths)
 {
     ucp_worker_h worker   = ep->worker;
     ucp_context_h context = worker->context;
@@ -338,7 +335,7 @@ ucp_cm_ep_priv_data_pack(ucp_ep_h ep, const ucp_tl_bitmap_t *tl_bitmap,
      * uct_cm_remote_data_t */
     status = ucp_address_pack(worker, ep, tl_bitmap, pack_flags,
                               context->config.ext.worker_addr_version, NULL,
-                              &ucp_addr_size, &ucp_addr);
+                              max_num_paths, &ucp_addr_size, &ucp_addr);
     if (status != UCS_OK) {
         goto err;
     }
@@ -523,7 +520,7 @@ static unsigned ucp_cm_client_uct_connect_progress(void *arg)
         status = ucp_cm_ep_priv_data_pack(
                 ep, &tl_bitmap, fallback_log_level,
                 context->config.ext.sa_client_min_hdr_version, &priv_data,
-                &priv_data_length, ep_pack_flags);
+                &priv_data_length, ep_pack_flags, UINT_MAX);
         if (status == UCS_OK) {
             break;
         } else if (status != UCS_ERR_BUFFER_TOO_SMALL) {
@@ -569,11 +566,10 @@ out:
 static ucs_status_t
 ucp_cm_client_resolve_cb(void *user_data, const uct_cm_ep_resolve_args_t *args)
 {
-    ucp_ep_h ep                = user_data;
-    ucp_worker_h worker        = ep->worker;
-    ucs_status_t status        = UCS_PARAM_VALUE(UCT_CM_EP_RESOLVE_ARGS_FIELD,
-                                                 args, status, STATUS, UCS_OK);
-    uct_worker_cb_id_t prog_id = UCS_CALLBACKQ_ID_NULL;
+    ucp_ep_h ep         = user_data;
+    ucp_worker_h worker = ep->worker;
+    ucs_status_t status = UCS_PARAM_VALUE(UCT_CM_EP_RESOLVE_ARGS_FIELD, args,
+                                          status, STATUS, UCS_OK);
     ucp_wireup_ep_t *cm_wireup_ep;
     char addr_str[UCS_SOCKADDR_STRING_LEN];
 
@@ -613,10 +609,8 @@ ucp_cm_client_resolve_cb(void *user_data, const uct_cm_ep_resolve_args_t *args)
               UCT_TL_BITMAP_ARG(&cm_wireup_ep->cm_resolve_tl_bitmap),
               ucp_context_cm_name(worker->context, ep->ext->cm_idx));
 
-    uct_worker_progress_register_safe(worker->uct,
-                                      ucp_cm_client_uct_connect_progress,
-                                      ep, UCS_CALLBACKQ_FLAG_ONESHOT,
-                                      &prog_id);
+    ucs_callbackq_add_oneshot(&worker->uct->progress_q, ep,
+                              ucp_cm_client_uct_connect_progress, ep);
     ucp_worker_signal_internal(worker);
     goto out;
 
@@ -767,9 +761,8 @@ static void ucp_cm_client_connect_cb(uct_ep_h uct_cm_ep, void *arg,
                                      const uct_cm_ep_client_connect_args_t
                                      *connect_args)
 {
-    ucp_ep_h ucp_ep            = (ucp_ep_h)arg;
-    ucp_worker_h worker        = ucp_ep->worker;
-    uct_worker_cb_id_t prog_id = UCS_CALLBACKQ_ID_NULL;
+    ucp_ep_h ucp_ep     = (ucp_ep_h)arg;
+    ucp_worker_h worker = ucp_ep->worker;
     ucp_cm_client_connect_progress_arg_t *progress_arg;
     const uct_cm_remote_data_t *remote_data;
     ucs_status_t status;
@@ -838,10 +831,8 @@ static void ucp_cm_client_connect_cb(uct_ep_h uct_cm_ep, void *arg,
     memcpy(progress_arg->sa_data, remote_data->conn_priv_data,
            remote_data->conn_priv_data_length);
 
-    uct_worker_progress_register_safe(worker->uct,
-                                      ucp_cm_client_connect_progress,
-                                      progress_arg, UCS_CALLBACKQ_FLAG_ONESHOT,
-                                      &prog_id);
+    ucs_callbackq_add_oneshot(&worker->uct->progress_q, ucp_ep,
+                              ucp_cm_client_connect_progress, progress_arg);
     ucp_worker_signal_internal(ucp_ep->worker);
     return;
 
@@ -947,9 +938,8 @@ out:
 
 static void ucp_cm_disconnect_cb(uct_ep_h uct_cm_ep, void *arg)
 {
-    ucp_ep_h ucp_ep            = arg;
-    uct_worker_cb_id_t prog_id = UCS_CALLBACKQ_ID_NULL;
-    ucp_worker_h worker        = ucp_ep->worker;
+    ucp_ep_h ucp_ep     = arg;
+    ucp_worker_h worker = ucp_ep->worker;
     uct_ep_h uct_ep;
 
     ucp_ep_update_flags(ucp_ep, UCP_EP_FLAG_DISCONNECT_CB_CALLED, 0);
@@ -963,10 +953,8 @@ static void ucp_cm_disconnect_cb(uct_ep_h uct_cm_ep, void *arg)
                        "%p: uct_cm_ep=%p vs found_uct_ep=%p",
                        ucp_ep, uct_cm_ep, uct_ep);
 
-    uct_worker_progress_register_safe(worker->uct,
-                                      ucp_ep_cm_disconnect_progress,
-                                      ucp_ep, UCS_CALLBACKQ_FLAG_ONESHOT,
-                                      &prog_id);
+    ucs_callbackq_add_oneshot(&worker->uct->progress_q, ucp_ep,
+                              ucp_ep_cm_disconnect_progress, ucp_ep);
     ucp_worker_signal_internal(worker);
 }
 
@@ -1131,7 +1119,6 @@ void ucp_cm_server_conn_request_cb(uct_listener_h listener, void *arg,
 {
     ucp_listener_h ucp_listener = arg;
     ucp_worker_h worker         = ucp_listener->worker;
-    uct_worker_cb_id_t prog_id  = UCS_CALLBACKQ_ID_NULL;
     ucp_conn_request_h ucp_conn_request;
     uct_conn_request_h conn_request;
     const uct_cm_remote_data_t *remote_data;
@@ -1203,10 +1190,9 @@ void ucp_cm_server_conn_request_cb(uct_listener_h listener, void *arg,
     memcpy(ucp_conn_request + 1, remote_data->conn_priv_data,
            remote_data->conn_priv_data_length);
 
-    uct_worker_progress_register_safe(worker->uct,
-                                      ucp_cm_server_conn_request_progress,
-                                      ucp_conn_request,
-                                      UCS_CALLBACKQ_FLAG_ONESHOT, &prog_id);
+    ucs_callbackq_add_oneshot(&worker->uct->progress_q, ucp_listener,
+                              ucp_cm_server_conn_request_progress,
+                              ucp_conn_request);
 
     /* If the worker supports the UCP_FEATURE_WAKEUP feature, signal the user so
      * that he can wake-up on this event */
@@ -1326,7 +1312,8 @@ static ucs_status_t
 ucp_ep_server_init_priv_data(ucp_ep_h ep, const char *dev_name,
                              const void **data_buf_p, size_t *data_buf_size_p,
                              unsigned ep_init_flags,
-                             ucp_object_version_t sa_data_version)
+                             ucp_object_version_t sa_data_version,
+                             unsigned max_num_paths)
 {
     ucp_wireup_ep_t *cm_wireup_ep = ucp_ep_get_cm_wireup_ep(ep);
     ucp_worker_h worker           = ep->worker;
@@ -1352,7 +1339,8 @@ ucp_ep_server_init_priv_data(ucp_ep_h ep, const char *dev_name,
 
     status = ucp_cm_ep_priv_data_pack(ep, &tl_bitmap, UCS_LOG_LEVEL_ERROR,
                                       sa_data_version, (void**)data_buf_p,
-                                      data_buf_size_p, ep_pack_flags);
+                                      data_buf_size_p, ep_pack_flags,
+                                      max_num_paths);
 
 out:
     UCS_ASYNC_UNBLOCK(&worker->async);
@@ -1388,8 +1376,7 @@ static void ucp_cm_server_conn_notify_cb(
         uct_ep_h uct_cm_ep, void *arg,
         const uct_cm_ep_server_conn_notify_args_t *notify_args)
 {
-    ucp_ep_h ucp_ep            = arg;
-    uct_worker_cb_id_t prog_id = UCS_CALLBACKQ_ID_NULL;
+    ucp_ep_h ucp_ep = arg;
     ucs_status_t status;
 
     ucs_assert_always(notify_args->field_mask &
@@ -1403,10 +1390,8 @@ static void ucp_cm_server_conn_notify_cb(
     UCP_EP_CM_CALLBACK_ENTER(ucp_ep, uct_cm_ep, return);
 
     if (status == UCS_OK) {
-        uct_worker_progress_register_safe(ucp_ep->worker->uct,
-                                          ucp_cm_server_conn_notify_progress,
-                                          ucp_ep, UCS_CALLBACKQ_FLAG_ONESHOT,
-                                          &prog_id);
+        ucs_callbackq_add_oneshot(&ucp_ep->worker->uct->progress_q, ucp_ep,
+                                  ucp_cm_server_conn_notify_progress, ucp_ep);
         ucp_worker_signal_internal(ucp_ep->worker);
     } else {
         /* if reject is arrived on server side, then UCT does something wrong */
@@ -1424,10 +1409,12 @@ ucp_ep_cm_connect_server_lane(ucp_ep_h ep, uct_listener_h uct_listener,
                               const ucp_unpacked_address_t *remote_address,
                               const unsigned *addr_indices)
 {
-    ucp_worker_h worker   = ep->worker;
-    ucp_lane_index_t lane = ucp_ep_get_cm_lane(ep);
+    ucp_worker_h worker    = ep->worker;
+    ucp_lane_index_t lane  = ucp_ep_get_cm_lane(ep);
+    unsigned max_num_paths = 0;
     ucp_rsc_index_t dst_rsc_indices[UCP_MAX_LANES];
     uct_ep_params_t uct_ep_params;
+    const ucp_address_entry_t *ae;
     uct_ep_h uct_ep;
     ucs_status_t status;
 
@@ -1436,6 +1423,15 @@ ucp_ep_cm_connect_server_lane(ucp_ep_h ep, uct_listener_h uct_listener,
     ucp_wireup_get_dst_rsc_indices(ep, &ucp_ep_config(ep)->key,
                                    remote_address, addr_indices,
                                    dst_rsc_indices);
+
+    ucp_unpacked_address_for_each(ae, remote_address) {
+        max_num_paths = ucs_max(max_num_paths, ae->dev_num_paths);
+    }
+
+    /* Address should not be empty and contain transport addresses of a single
+     * device.
+     */
+    ucs_assert(max_num_paths > 0);
 
     /* TODO: split CM and wireup lanes */
     status = ucp_wireup_ep_create(ep, dst_rsc_indices, &uct_ep);
@@ -1471,7 +1467,8 @@ ucp_ep_cm_connect_server_lane(ucp_ep_h ep, uct_listener_h uct_listener,
     status = ucp_ep_server_init_priv_data(ep, dev_name,
                                           &uct_ep_params.private_data,
                                           &uct_ep_params.private_data_length,
-                                          ep_init_flags, sa_data_version);
+                                          ep_init_flags, sa_data_version,
+                                          max_num_paths);
     if (status != UCS_OK) {
         goto err;
     }
@@ -1531,9 +1528,8 @@ void ucp_ep_cm_disconnect_cm_lane(ucp_ep_h ucp_ep)
     /* Remove the client's connect_progress or the server's connect notify
      * callbacks from the callbackq to make sure it won't be invoked after
      * CM lane has already been disconnected */
-    ucs_callbackq_remove_if(&ucp_ep->worker->uct->progress_q,
-                            ucp_cm_connect_progress_remove_filter,
-                            ucp_ep);
+    ucs_callbackq_remove_oneshot(&ucp_ep->worker->uct->progress_q, ucp_ep,
+                                 ucp_cm_connect_progress_remove_filter, ucp_ep);
 
     /* this will invoke @ref ucp_cm_disconnect_cb on remote side */
     status = uct_ep_disconnect(uct_cm_ep, 0);
@@ -1571,6 +1567,6 @@ static int ucp_cm_progress_remove_filter(const ucs_callbackq_elem_t *elem,
 
 void ucp_ep_cm_slow_cbq_cleanup(ucp_ep_h ep)
 {
-    ucs_callbackq_remove_if(&ep->worker->uct->progress_q,
-                            ucp_cm_progress_remove_filter, ep);
+    ucs_callbackq_remove_oneshot(&ep->worker->uct->progress_q, ep,
+                                 ucp_cm_progress_remove_filter, ep);
 }

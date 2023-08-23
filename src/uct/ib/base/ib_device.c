@@ -198,7 +198,7 @@ uct_ib_device_async_event_schedule_callback(uct_ib_device_t *dev,
     ucs_assert(ucs_spinlock_is_held(&dev->async_event_lock));
     ucs_assert(wait_ctx->cb_id == UCS_CALLBACKQ_ID_NULL);
     wait_ctx->cb_id = ucs_callbackq_add_safe(wait_ctx->cbq, wait_ctx->cb,
-                                             wait_ctx, 0);
+                                             wait_ctx);
 }
 
 static void
@@ -1304,7 +1304,8 @@ const char* uct_ib_ah_attr_str(char *buf, size_t max,
         p += strlen(p);
         uct_ib_gid_str(&ah_attr->grh.dgid, p, endp - p);
         p += strlen(p);
-        snprintf(p, endp - p, " sgid_index=%d traffic_class=%d",
+        snprintf(p, endp - p, " flow_label=0x%x sgid_index=%d "
+                 "traffic_class=%d", ah_attr->grh.flow_label,
                  ah_attr->grh.sgid_index, ah_attr->grh.traffic_class);
     }
 

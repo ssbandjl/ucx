@@ -187,6 +187,9 @@ enum {
     UCT_IB_MLX5_MD_FLAG_CQE128_ZIP           = UCS_BIT(11),
     /* Device performance is optimized when RDMA_WRITE is not used */
     UCT_IB_MLX5_MD_FLAG_NO_RDMA_WR_OPTIMIZED = UCS_BIT(12),
+    /* Device supports indirect xgvmi MR. This flag is removed if xgvmi access
+     * command fails */
+    UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI       = UCS_BIT(13),
 
     /* Object to be created by DevX */
     UCT_IB_MLX5_MD_FLAG_DEVX_OBJS_SHIFT  = 16,
@@ -226,7 +229,32 @@ enum {
 
 
 #if HAVE_DEVX
-typedef struct uct_ib_mlx5_devx_umem {
+typedef struct {
+    struct mlx5dv_devx_obj *dvmr;
+    int                    mr_num;
+    size_t                 length;
+    struct ibv_mr          *mrs[];
+} uct_ib_mlx5_devx_ksm_data_t;
+
+
+typedef union {
+    uct_ib_mr_t                 super;
+    uct_ib_mlx5_devx_ksm_data_t *ksm_data;
+} uct_ib_mlx5_devx_mr_t;
+
+
+typedef struct {
+    uct_ib_mem_t            super;
+    void                    *address;
+    struct mlx5dv_devx_obj  *atomic_dvmr;
+    struct mlx5dv_devx_obj  *indirect_dvmr;
+    struct mlx5dv_devx_umem *umem;
+    struct mlx5dv_devx_obj  *cross_mr;
+    uct_ib_mlx5_devx_mr_t   mrs[];
+} uct_ib_mlx5_devx_mem_t;
+
+
+typedef struct {
     struct mlx5dv_devx_umem  *mem;
     size_t                   size;
 } uct_ib_mlx5_devx_umem_t;

@@ -24,13 +24,23 @@ ucp_proto_request_complete_success(ucp_request_t *req)
 static UCS_F_ALWAYS_INLINE ucs_status_t
 ucp_proto_request_bcopy_complete_success(ucp_request_t *req)
 {
-    ucp_datatype_iter_cleanup(&req->send.state.dt_iter, UCP_DT_MASK_ALL);
+    ucp_datatype_iter_cleanup(&req->send.state.dt_iter, 0, UCP_DT_MASK_ALL);
     if (ucp_proto_select_op_id(&req->send.proto_config->select_param) ==
         UCP_OP_ID_TAG_SEND) {
         UCP_EP_STAT_TAG_OP(req->send.ep, EAGER)
     }
 
     return ucp_proto_request_complete_success(req);
+}
+
+static UCS_F_ALWAYS_INLINE ucs_status_t
+ucp_proto_bcopy_send_func_status(ssize_t packed_size)
+{
+    if (ucs_unlikely(packed_size < 0)) {
+        return (ucs_status_t)packed_size;
+    }
+
+    return UCS_OK;
 }
 
 static UCS_F_ALWAYS_INLINE void
@@ -55,38 +65,29 @@ ucp_proto_request_zcopy_init(ucp_request_t *req, ucp_md_map_t md_map,
                              unsigned uct_reg_flags, unsigned dt_mask)
 {
     ucp_ep_h ep = req->send.ep;
-    ucs_status_t status;
 
     ucp_trace_req(req, "ucp_proto_request_zcopy_init for %s",
                   req->send.proto_config->proto->name);
 
     ucp_proto_completion_init(&req->send.state.uct_comp, comp_func);
 
-    status = ucp_datatype_iter_mem_reg(ep->worker->context,
-                                       &req->send.state.dt_iter,
-                                       md_map, uct_reg_flags, dt_mask);
-    if (status != UCS_OK) {
-        return status;
-    }
-
-    ucp_trace_req(req, "registered md_map 0x%"PRIx64"/0x%"PRIx64,
-                  req->send.state.dt_iter.type.contig.memh->md_map, md_map);
-    return UCS_OK;
+    return ucp_datatype_iter_mem_reg(ep->worker->context,
+                                     &req->send.state.dt_iter,
+                                     md_map, uct_reg_flags, dt_mask);
 }
 
 static UCS_F_ALWAYS_INLINE void
 ucp_proto_request_zcopy_clean(ucp_request_t *req, unsigned dt_mask)
 {
-    ucp_datatype_iter_mem_dereg(req->send.ep->worker->context,
-                                &req->send.state.dt_iter, dt_mask);
+    ucp_datatype_iter_mem_dereg(&req->send.state.dt_iter, dt_mask);
     req->flags &= ~UCP_REQUEST_FLAG_PROTO_INITIALIZED;
 }
 
 static UCS_F_ALWAYS_INLINE void
 ucp_proto_request_zcopy_complete(ucp_request_t *req, ucs_status_t status)
 {
-    ucp_proto_request_zcopy_clean(req, UCP_DT_MASK_CONTIG_IOV);
-    ucp_datatype_iter_cleanup(&req->send.state.dt_iter, UCP_DT_MASK_CONTIG_IOV);
+    ucp_datatype_iter_cleanup(&req->send.state.dt_iter, 1,
+                              UCP_DT_MASK_CONTIG_IOV);
     if (ucp_proto_select_op_id(&req->send.proto_config->select_param) ==
         UCP_OP_ID_TAG_SEND) {
         UCP_EP_STAT_TAG_OP(req->send.ep, EAGER)
@@ -366,7 +367,7 @@ ucp_proto_request_pack_rkey(ucp_request_t *req, ucp_md_map_t md_map,
     packed_rkey_size = ucp_rkey_pack_memh(req->send.ep->worker->context, md_map,
                                           dt_iter->type.contig.memh,
                                           &dt_iter->mem_info, distance_dev_map,
-                                          dev_distance, rkey_buffer);
+                                          dev_distance, 0, rkey_buffer);
     if (packed_rkey_size < 0) {
         ucs_error("failed to pack remote key: %s",
                   ucs_status_string((ucs_status_t)packed_rkey_size));

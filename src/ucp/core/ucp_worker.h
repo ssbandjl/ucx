@@ -121,9 +121,10 @@ enum {
                                                                of arm_ifaces list, so
                                                                it needs to be armed
                                                                in ucp_worker_arm(). */
-    UCP_WORKER_IFACE_FLAG_UNUSED            = UCS_BIT(2)  /**< There is another UCP iface
+    UCP_WORKER_IFACE_FLAG_UNUSED            = UCS_BIT(2), /**< There is another UCP iface
                                                                with the same caps, but
                                                                with better performance */
+    UCP_WORKER_IFACE_FLAG_KEEP_ACTIVE       = UCS_BIT(3)  /**< Progress should be activated */
 };
 
 
@@ -315,6 +316,9 @@ typedef struct ucp_worker {
     ucp_tag_match_t                  tm;                  /* Tag-matching queues and offload info */
     ucp_am_info_t                    am;                  /* Array of AM callbacks and their data */
     uint64_t                         am_message_id;       /* For matching long AMs */
+    size_t                           max_am_header;       /* Maximum allowed
+                                                             header size used by
+                                                             UCP AM */
     ucp_ep_h                         mem_type_ep[UCS_MEMORY_TYPE_LAST]; /* Memory type EPs */
 
     UCS_STATS_NODE_DECLARE(stats)
@@ -372,7 +376,6 @@ ucp_worker_add_rkey_config(ucp_worker_h worker,
                            ucp_worker_cfg_index_t *cfg_index_p);
 
 ucs_status_t ucp_worker_iface_open(ucp_worker_h worker, ucp_rsc_index_t tl_id,
-                                   uct_iface_params_t *iface_params,
                                    ucp_worker_iface_t **wiface);
 
 ucs_status_t ucp_worker_iface_init(ucp_worker_h worker, ucp_rsc_index_t tl_id,

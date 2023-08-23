@@ -250,7 +250,7 @@ KHASH_MAP_INIT_INT64(uct_dc_mlx5_fc_hash, uct_dc_mlx5_ep_fc_entry_t);
 
 /* DCI pool
  * same array is used to store DCI's to allocate and DCI's to release:
- * 
+ *
  * +--------------+-----+-------------+
  * | to release   |     | to allocate |
  * +--------------+-----+-------------+
@@ -258,7 +258,7 @@ KHASH_MAP_INIT_INT64(uct_dc_mlx5_fc_hash, uct_dc_mlx5_ep_fc_entry_t);
  * |              |     |             |
  * 0        release     stack      ndci
  *              top     top
- * 
+ *
  * Overall count of DCI's to release and allocated DCI's could not be more than
  * ndci and these stacks are not intersected
  */
@@ -315,8 +315,6 @@ struct uct_dc_mlx5_iface {
 
         ucs_arbiter_callback_t    pend_cb;
 
-        uct_worker_cb_id_t        dci_release_prog_id;
-
         uint8_t                   dci_pool_release_bitmap;
 
         uint8_t                   av_fl_mlid;
@@ -346,10 +344,6 @@ extern ucs_config_field_t uct_dc_mlx5_iface_config_table[];
 ucs_status_t
 uct_dc_mlx5_iface_create_dct(uct_dc_mlx5_iface_t *iface,
                              const uct_dc_mlx5_iface_config_t *config);
-
-int uct_dc_mlx5_iface_is_reachable(const uct_iface_h tl_iface,
-                                   const uct_device_addr_t *dev_addr,
-                                   const uct_iface_addr_t *iface_addr);
 
 ucs_status_t uct_dc_mlx5_iface_get_address(uct_iface_h tl_iface, uct_iface_addr_t *iface_addr);
 

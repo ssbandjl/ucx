@@ -225,7 +225,7 @@ static ucs_status_t uct_dc_mlx5_iface_query(uct_iface_h tl_iface, uct_iface_attr
     iface_attr->cap.flags     |= UCT_IFACE_FLAG_CONNECT_TO_IFACE;
     iface_attr->ep_addr_len    = 0;
     iface_attr->max_conn_priv  = 0;
-    iface_attr->iface_addr_len = iface->super.super.config.flush_remote ?
+    iface_attr->iface_addr_len = uct_rc_iface_flush_rkey_enabled(&iface->super.super) ?
                                  sizeof(uct_dc_mlx5_iface_flush_addr_t) :
                                  sizeof(uct_dc_mlx5_iface_addr_t);
     iface_attr->latency.c     += 60e-9; /* connect packet + cqe */
@@ -913,21 +913,27 @@ void uct_dc_mlx5_iface_init_version(uct_dc_mlx5_iface_t *iface, uct_md_h md)
     }
 }
 
-int uct_dc_mlx5_iface_is_reachable(const uct_iface_h tl_iface,
-                                   const uct_device_addr_t *dev_addr,
-                                   const uct_iface_addr_t *iface_addr)
+static int
+uct_dc_mlx5_iface_is_reachable_v2(const uct_iface_h tl_iface,
+                                  const uct_iface_is_reachable_params_t *params)
 {
-    uct_dc_mlx5_iface_addr_t *addr = (uct_dc_mlx5_iface_addr_t *)iface_addr;
-    uct_dc_mlx5_iface_t *iface;
+    uct_dc_mlx5_iface_t *iface = ucs_derived_of(tl_iface, uct_dc_mlx5_iface_t);
+    const uct_dc_mlx5_iface_addr_t *addr;
+    int same_tm, same_version;
 
-    iface = ucs_derived_of(tl_iface, uct_dc_mlx5_iface_t);
-    ucs_assert_always(iface_addr != NULL);
+    addr = (const uct_dc_mlx5_iface_addr_t*)UCS_PARAM_VALUE(
+            UCT_IFACE_IS_REACHABLE_FIELD, params, iface_addr, IFACE_ADDR, NULL);
+    if (addr != NULL) {
+        same_tm      = (UCT_DC_MLX5_IFACE_ADDR_TM_ENABLED(addr) ==
+                        UCT_RC_MLX5_TM_ENABLED(&iface->super));
+        same_version = ((addr->flags & UCT_DC_MLX5_IFACE_ADDR_DC_VERS) ==
+                        iface->version_flag);
+        if (!same_version || !same_tm) {
+            return 0;
+        }
+    }
 
-    return ((addr->flags & UCT_DC_MLX5_IFACE_ADDR_DC_VERS) ==
-            iface->version_flag) &&
-           (UCT_DC_MLX5_IFACE_ADDR_TM_ENABLED(addr) ==
-            UCT_RC_MLX5_TM_ENABLED(&iface->super)) &&
-           uct_ib_iface_is_reachable(tl_iface, dev_addr, iface_addr);
+    return uct_ib_iface_is_reachable_v2(tl_iface, params);
 }
 
 ucs_status_t
@@ -939,13 +945,14 @@ uct_dc_mlx5_iface_get_address(uct_iface_h tl_iface, uct_iface_addr_t *iface_addr
                                                           uct_ib_md_t);
 
     uct_ib_pack_uint24(addr->super.qp_num, iface->rx.dct.qp_num);
-    uct_ib_mlx5_md_get_atomic_mr_id(md, &addr->super.atomic_mr_id);
-    addr->super.flags = iface->version_flag;
+    addr->super.flags        = iface->version_flag;
+    addr->super.atomic_mr_id = uct_ib_md_get_atomic_mr_id(md);
+
     if (UCT_RC_MLX5_TM_ENABLED(&iface->super)) {
         addr->super.flags |= UCT_DC_MLX5_IFACE_ADDR_HW_TM;
     }
 
-    if (iface->super.super.config.flush_remote) {
+    if (uct_rc_iface_flush_rkey_enabled(&iface->super.super)) {
         addr->flush_rkey_hi = md->flush_rkey >> 16;
         addr->super.flags  |= UCT_DC_MLX5_IFACE_ADDR_FLUSH_RKEY;
     }
@@ -1263,7 +1270,7 @@ static uct_rc_iface_ops_t uct_dc_mlx5_iface_ops = {
             .ep_query              = (uct_ep_query_func_t)ucs_empty_function_return_unsupported,
             .ep_invalidate         = uct_dc_mlx5_ep_invalidate,
             .ep_connect_to_ep_v2   = ucs_empty_function_return_unsupported,
-            .iface_is_reachable_v2 = uct_ib_iface_is_reachable_v2
+            .iface_is_reachable_v2 = uct_dc_mlx5_iface_is_reachable_v2,
         },
         .create_cq      = uct_rc_mlx5_iface_common_create_cq,
         .destroy_cq     = uct_rc_mlx5_iface_common_destroy_cq,
@@ -1313,13 +1320,13 @@ static uct_iface_ops_t uct_dc_mlx5_iface_tl_ops = {
     .iface_progress_disable   = uct_base_iface_progress_disable,
     .iface_progress           = uct_rc_iface_do_progress,
     .iface_event_fd_get       = uct_rc_mlx5_iface_event_fd_get,
-    .iface_event_arm          = uct_rc_mlx5_iface_devx_arm,
+    .iface_event_arm          = uct_rc_mlx5_iface_arm,
     .ep_create                = uct_dc_mlx5_ep_create_connected,
     .ep_destroy               = UCS_CLASS_DELETE_FUNC_NAME(uct_dc_mlx5_ep_t),
     .iface_close              = UCS_CLASS_DELETE_FUNC_NAME(uct_dc_mlx5_iface_t),
     .iface_query              = uct_dc_mlx5_iface_query,
     .iface_get_device_address = uct_ib_iface_get_device_address,
-    .iface_is_reachable       = uct_dc_mlx5_iface_is_reachable,
+    .iface_is_reachable       = uct_base_iface_is_reachable,
     .iface_get_address        = uct_dc_mlx5_iface_get_address,
 };
 
@@ -1509,7 +1516,6 @@ static UCS_CLASS_INIT_FUNC(uct_dc_mlx5_iface_t, uct_md_h tl_md, uct_worker_h wor
     self->tx.fc_hard_req_timeout           = config->fc_hard_req_timeout;
     self->tx.fc_hard_req_resend_time       = ucs_get_time();
     self->tx.fc_hard_req_progress_cb_id    = UCS_CALLBACKQ_ID_NULL;
-    self->tx.dci_release_prog_id           = UCS_CALLBACKQ_ID_NULL;
     self->keepalive_dci                    = -1;
     self->tx.num_dci_pools                 = 1;
     self->super.super.config.tx_moderation = 0; /* disable tx moderation for dcs */
@@ -1617,8 +1623,18 @@ err:
     return status;
 }
 
+static int
+uct_dc_mlx5_ep_dci_release_remove_filter(const ucs_callbackq_elem_t *elem,
+                                         void *arg)
+{
+    return (elem->cb == uct_dc_mlx5_ep_dci_release_progress) &&
+           (elem->arg == arg);
+}
+
 static UCS_CLASS_CLEANUP_FUNC(uct_dc_mlx5_iface_t)
 {
+    uct_worker_h worker = &self->super.super.super.super.worker->super;
+
     ucs_trace_func("");
     uct_base_iface_progress_disable(&self->super.super.super.super.super,
                                     UCT_PROGRESS_SEND | UCT_PROGRESS_RECV);
@@ -1626,9 +1642,9 @@ static UCS_CLASS_CLEANUP_FUNC(uct_dc_mlx5_iface_t)
     uct_dc_mlx5_destroy_dct(self);
     kh_destroy_inplace(uct_dc_mlx5_fc_hash, &self->tx.fc_hash);
     uct_dc_mlx5_iface_cleanup_fc_ep(self);
-    uct_worker_progress_unregister_safe(
-            &self->super.super.super.super.worker->super,
-            &self->tx.dci_release_prog_id);
+    ucs_callbackq_remove_oneshot(&worker->progress_q, self,
+                                 uct_dc_mlx5_ep_dci_release_remove_filter,
+                                 self);
     uct_dc_mlx5_iface_dcis_destroy(self, self->tx.num_dci_pools,
                                    uct_dc_mlx5_iface_total_ndci(self));
 }

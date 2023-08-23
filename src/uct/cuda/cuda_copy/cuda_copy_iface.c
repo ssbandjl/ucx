@@ -291,8 +291,8 @@ static void uct_cuda_copy_event_desc_init(ucs_mpool_t *mp, void *obj, void *chun
     ucs_status_t status;
 
     memset(base, 0 , sizeof(*base));
-    status = UCT_CUDA_FUNC_LOG_ERR(cudaEventCreateWithFlags(&base->event,
-                                                            cudaEventDisableTiming));
+    status = UCT_CUDA_CALL_LOG_ERR(cudaEventCreateWithFlags, &base->event,
+                                   cudaEventDisableTiming);
     if (UCS_OK != status) {
         ucs_error("cudaEventCreateWithFlags Failed");
     }
@@ -308,7 +308,7 @@ static void uct_cuda_copy_event_desc_cleanup(ucs_mpool_t *mp, void *obj)
 
     UCT_CUDADRV_FUNC_LOG_ERR(cuCtxGetCurrent(&cuda_context));
     if (uct_cuda_base_context_match(cuda_context, iface->cuda_context)) {
-        UCT_CUDA_FUNC_LOG_ERR(cudaEventDestroy(base->event));
+        UCT_CUDA_CALL_LOG_ERR(cudaEventDestroy, base->event);
     }
 }
 
@@ -410,10 +410,9 @@ static UCS_CLASS_INIT_FUNC(uct_cuda_copy_iface_t, uct_md_h md, uct_worker_h work
                               &uct_cuda_copy_iface_internal_ops, md, worker,
                               params, tl_config, "cuda_copy");
 
-    if (strncmp(params->mode.device.dev_name,
-                UCT_CUDA_DEV_NAME, strlen(UCT_CUDA_DEV_NAME)) != 0) {
-        ucs_error("no device was found: %s", params->mode.device.dev_name);
-        return UCS_ERR_NO_DEVICE;
+    status = uct_cuda_base_check_device_name(params);
+    if (status != UCS_OK) {
+        return status;
     }
 
     self->id                     = ucs_generate_uuid((uintptr_t)self);
@@ -474,12 +473,12 @@ static UCS_CLASS_CLEANUP_FUNC(uct_cuda_copy_iface_t)
                     continue;
                 }
 
-                UCT_CUDA_FUNC_LOG_ERR(cudaStreamDestroy(*stream));
+                UCT_CUDA_CALL_LOG_ERR(cudaStreamDestroy, *stream);
             }
         }
 
         if (self->short_stream) {
-            UCT_CUDA_FUNC_LOG_ERR(cudaStreamDestroy(self->short_stream));
+            UCT_CUDA_CALL_LOG_ERR(cudaStreamDestroy, self->short_stream);
         }
     }
 

@@ -11,7 +11,7 @@
 #include "gdr_copy_md.h"
 #include "gdr_copy_ep.h"
 
-#include <uct/cuda/base/cuda_iface.h>
+#include <uct/cuda/base/cuda_md.h>
 #include <ucs/type/class.h>
 #include <ucs/sys/string.h>
 
@@ -104,22 +104,26 @@ static ucs_status_t
 uct_gdr_copy_estimate_perf(uct_iface_h iface, uct_perf_attr_t *perf_attr)
 {
     if (perf_attr->field_mask & UCT_PERF_ATTR_FIELD_BANDWIDTH) {
-        perf_attr->bandwidth.dedicated = 0;
         if (perf_attr->field_mask & UCT_PERF_ATTR_FIELD_OPERATION) {
             switch (perf_attr->operation) {
             case UCT_EP_OP_GET_SHORT:
             case UCT_EP_OP_GET_ZCOPY:
-                perf_attr->bandwidth.shared = 250.0 * UCS_MBYTE;
+                perf_attr->bandwidth.dedicated = 250.0 * UCS_MBYTE;
+                perf_attr->bandwidth.shared    = 0;
                 break;
             case UCT_EP_OP_PUT_SHORT:
-                perf_attr->bandwidth.shared = 10200.0 * UCS_MBYTE;
+                perf_attr->bandwidth.dedicated = 0;
+                perf_attr->bandwidth.shared    = 10200.0 * UCS_MBYTE;
                 break;
             default:
-                perf_attr->bandwidth.shared =
+                perf_attr->bandwidth.dedicated = 0;
+                perf_attr->bandwidth.shared    =
                         UCT_GDR_COPY_IFACE_DEFAULT_BANDWIDTH;
             }
         } else {
-            perf_attr->bandwidth.shared = UCT_GDR_COPY_IFACE_DEFAULT_BANDWIDTH;
+            perf_attr->bandwidth.dedicated = 0;
+            perf_attr->bandwidth.shared    =
+                    UCT_GDR_COPY_IFACE_DEFAULT_BANDWIDTH;
         }
     }
 
@@ -180,16 +184,17 @@ static UCS_CLASS_INIT_FUNC(uct_gdr_copy_iface_t, uct_md_h md, uct_worker_h worke
                            const uct_iface_params_t *params,
                            const uct_iface_config_t *tl_config)
 {
+    ucs_status_t status;
+
     UCS_CLASS_CALL_SUPER_INIT(uct_base_iface_t, &uct_gdr_copy_iface_ops,
                               &uct_gdr_copy_iface_internal_ops, md, worker,
                               params,
                               tl_config UCS_STATS_ARG(params->stats_root)
                               UCS_STATS_ARG("gdr_copy"));
 
-    if (strncmp(params->mode.device.dev_name,
-                UCT_CUDA_DEV_NAME, strlen(UCT_CUDA_DEV_NAME)) != 0) {
-        ucs_error("No device was found: %s", params->mode.device.dev_name);
-        return UCS_ERR_NO_DEVICE;
+    status = uct_cuda_base_check_device_name(params);
+    if (status != UCS_OK) {
+        return status;
     }
 
     self->id = ucs_generate_uuid((uintptr_t)self);

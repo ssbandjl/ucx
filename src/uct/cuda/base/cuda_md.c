@@ -15,18 +15,19 @@
 #include <cuda.h>
 
 
-ucs_status_t uct_cuda_base_get_sys_dev(CUdevice cuda_device,
-                                       ucs_sys_device_t *sys_dev_p)
+void uct_cuda_base_get_sys_dev(CUdevice cuda_device,
+                               ucs_sys_device_t *sys_dev_p)
 {
     ucs_sys_bus_id_t bus_id;
     CUresult cu_err;
     int attrib;
+    ucs_status_t status;
 
     /* PCI domain id */
     cu_err = cuDeviceGetAttribute(&attrib, CU_DEVICE_ATTRIBUTE_PCI_DOMAIN_ID,
                                   cuda_device);
     if (cu_err != CUDA_SUCCESS) {
-         return UCS_ERR_IO_ERROR;
+        goto err;
     }
     bus_id.domain = (uint16_t)attrib;
 
@@ -34,7 +35,7 @@ ucs_status_t uct_cuda_base_get_sys_dev(CUdevice cuda_device,
     cu_err = cuDeviceGetAttribute(&attrib, CU_DEVICE_ATTRIBUTE_PCI_BUS_ID,
                                   cuda_device);
     if (cu_err != CUDA_SUCCESS) {
-         return UCS_ERR_IO_ERROR;
+        goto err;
     }
     bus_id.bus = (uint8_t)attrib;
 
@@ -42,14 +43,22 @@ ucs_status_t uct_cuda_base_get_sys_dev(CUdevice cuda_device,
     cu_err = cuDeviceGetAttribute(&attrib, CU_DEVICE_ATTRIBUTE_PCI_DEVICE_ID,
                                   cuda_device);
     if (cu_err != CUDA_SUCCESS) {
-         return UCS_ERR_IO_ERROR;
+        goto err;
     }
     bus_id.slot = (uint8_t)attrib;
 
     /* Function - always 0 */
     bus_id.function = 0;
 
-    return ucs_topo_find_device_by_bus_id(&bus_id, sys_dev_p);
+    status = ucs_topo_find_device_by_bus_id(&bus_id, sys_dev_p);
+    if (status != UCS_OK) {
+        goto err;
+    }
+
+    return;
+
+err:
+    *sys_dev_p = UCS_SYS_DEVICE_ID_UNKNOWN;
 }
 
 ucs_status_t
@@ -60,19 +69,18 @@ uct_cuda_base_query_md_resources(uct_component_t *component,
     const unsigned sys_device_priority = 10;
     ucs_sys_device_t sys_dev;
     CUdevice cuda_device;
-    cudaError_t cudaErr;
     ucs_status_t status;
     char device_name[10];
     int num_gpus;
 
-    cudaErr = cudaGetDeviceCount(&num_gpus);
-    if ((cudaErr != cudaSuccess) || (num_gpus == 0)) {
+    status = UCT_CUDA_CALL(UCS_LOG_LEVEL_DIAG, cudaGetDeviceCount, &num_gpus);
+    if ((status != UCS_OK) || (num_gpus == 0)) {
         return uct_md_query_empty_md_resource(resources_p, num_resources_p);
     }
 
     for (cuda_device = 0; cuda_device < num_gpus; ++cuda_device) {
-        status = uct_cuda_base_get_sys_dev(cuda_device, &sys_dev);
-        if (status == UCS_OK) {
+        uct_cuda_base_get_sys_dev(cuda_device, &sys_dev);
+        if (sys_dev != UCS_SYS_DEVICE_ID_UNKNOWN) {
             ucs_snprintf_safe(device_name, sizeof(device_name), "GPU%d",
                               cuda_device);
             status = ucs_topo_sys_device_set_name(sys_dev, device_name,

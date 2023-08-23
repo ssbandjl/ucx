@@ -241,7 +241,7 @@ static ucs_status_t uct_rc_mlx5_iface_query(uct_iface_h tl_iface, uct_iface_attr
         return status;
     }
 
-    if (uct_rc_mlx5_iface_flush_rkey_enabled(iface)) {
+    if (uct_rc_iface_flush_rkey_enabled(&iface->super)) {
         ep_addr_len = sizeof(uct_rc_mlx5_ep_ext_address_t) + sizeof(uint16_t);
     } else {
         ep_addr_len = sizeof(uct_rc_mlx5_ep_address_t);
@@ -703,17 +703,21 @@ static ucs_status_t uct_rc_mlx5_iface_get_address(uct_iface_h tl_iface,
     return UCS_OK;
 }
 
-int uct_rc_mlx5_iface_is_reachable(const uct_iface_h tl_iface,
-                                   const uct_device_addr_t *dev_addr,
-                                   const uct_iface_addr_t *iface_addr)
+static int
+uct_rc_mlx5_iface_is_reachable_v2(const uct_iface_h tl_iface,
+                                  const uct_iface_is_reachable_params_t *params)
 {
     uint8_t my_type = uct_rc_mlx5_iface_get_address_type(tl_iface);
+    const uct_iface_addr_t *iface_addr;
 
+    iface_addr = UCS_PARAM_VALUE(UCT_IFACE_IS_REACHABLE_FIELD, params,
+                                 iface_addr, IFACE_ADDR, NULL);
+    /* Check hardware tag matching compatibility */
     if ((iface_addr != NULL) && (my_type != *(uint8_t*)iface_addr)) {
         return 0;
     }
 
-    return uct_ib_iface_is_reachable(tl_iface, dev_addr, iface_addr);
+    return uct_ib_iface_is_reachable_v2(tl_iface, params);
 }
 
 ucs_status_t uct_rc_mlx5_iface_event_fd_get(uct_iface_h tl_iface, int *fd_p)
@@ -728,6 +732,20 @@ ucs_status_t uct_rc_mlx5_iface_event_fd_get(uct_iface_h tl_iface, int *fd_p)
     }
 
     return uct_ib_iface_event_fd_get(tl_iface, fd_p);
+}
+
+ucs_status_t uct_rc_mlx5_iface_arm(uct_iface_h tl_iface, unsigned events)
+{
+    uct_rc_mlx5_iface_common_t *iface =
+            ucs_derived_of(tl_iface, uct_rc_mlx5_iface_common_t);
+    uct_ib_mlx5_md_t *md              =
+            uct_ib_mlx5_iface_md(&iface->super.super);
+
+    if (md->flags & UCT_IB_MLX5_MD_FLAG_DEVX_CQ) {
+        return uct_rc_mlx5_iface_devx_arm(iface, events);
+    }
+
+    return uct_rc_iface_event_arm(tl_iface, events);
 }
 
 static ucs_status_t
@@ -871,9 +889,14 @@ UCS_CLASS_INIT_FUNC(uct_rc_mlx5_iface_common_t, uct_iface_ops_t *tl_ops,
         goto cleanup_dm;
     }
 
-    status = uct_rc_mlx5_devx_iface_init_events(self);
-    if (status != UCS_OK) {
-        goto cleanup_mpool;
+    if (md->flags & UCT_IB_MLX5_MD_FLAG_DEVX) {
+        status = uct_rc_mlx5_devx_iface_init_events(self);
+        if (status != UCS_OK) {
+            goto cleanup_mpool;
+        }
+    } else {
+        self->event_channel    = NULL;
+        self->cq_event_channel = NULL;
     }
 
     status = uct_rc_mlx5_iface_subscribe_cqs(self);
@@ -988,7 +1011,7 @@ static uct_rc_iface_ops_t uct_rc_mlx5_iface_ops = {
             .ep_query              = (uct_ep_query_func_t)ucs_empty_function_return_unsupported,
             .ep_invalidate         = uct_rc_mlx5_ep_invalidate,
             .ep_connect_to_ep_v2   = uct_rc_mlx5_ep_connect_to_ep_v2,
-            .iface_is_reachable_v2 = uct_ib_iface_is_reachable_v2
+            .iface_is_reachable_v2 = uct_rc_mlx5_iface_is_reachable_v2
         },
         .create_cq      = uct_rc_mlx5_iface_common_create_cq,
         .destroy_cq     = uct_rc_mlx5_iface_common_destroy_cq,
@@ -1045,12 +1068,12 @@ static uct_iface_ops_t uct_rc_mlx5_iface_tl_ops = {
     .iface_progress_disable   = uct_base_iface_progress_disable,
     .iface_progress           = uct_rc_iface_do_progress,
     .iface_event_fd_get       = uct_rc_mlx5_iface_event_fd_get,
-    .iface_event_arm          = uct_rc_mlx5_iface_devx_arm,
+    .iface_event_arm          = uct_rc_mlx5_iface_arm,
     .iface_close              = UCS_CLASS_DELETE_FUNC_NAME(uct_rc_mlx5_iface_t),
     .iface_query              = uct_rc_mlx5_iface_query,
     .iface_get_address        = uct_rc_mlx5_iface_get_address,
     .iface_get_device_address = uct_ib_iface_get_device_address,
-    .iface_is_reachable       = uct_rc_mlx5_iface_is_reachable
+    .iface_is_reachable       = uct_base_iface_is_reachable
 };
 
 static ucs_status_t

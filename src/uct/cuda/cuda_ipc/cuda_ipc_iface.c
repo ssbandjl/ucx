@@ -12,6 +12,7 @@
 #include "cuda_ipc_ep.h"
 
 #include <uct/cuda/base/cuda_iface.h>
+#include <uct/cuda/base/cuda_md.h>
 #include <ucs/type/class.h>
 #include <ucs/sys/string.h>
 #include <ucs/debug/assert.h>
@@ -132,7 +133,7 @@ static int uct_cuda_ipc_get_device_nvlinks(int ordinal)
         return num_nvlinks;
     }
 
-    status = UCT_NVML_FUNC_LOG_ERR(nvmlInit_v2());
+    status = UCT_NVML_FUNC(nvmlInit_v2(), UCS_LOG_LEVEL_DIAG);
     if (status != UCS_OK) {
         goto err;
     }
@@ -385,7 +386,7 @@ static void uct_cuda_ipc_event_desc_cleanup(ucs_mpool_t *mp, void *obj)
 
     UCT_CUDADRV_FUNC_LOG_ERR(cuCtxGetCurrent(&cuda_context));
     if (uct_cuda_base_context_match(cuda_context, iface->cuda_context)) {
-        UCT_CUDA_FUNC_LOG_ERR(cudaEventDestroy(base->event));
+        UCT_CUDA_CALL_LOG_ERR(cudaEventDestroy, base->event);
     }
 }
 
@@ -489,10 +490,9 @@ static UCS_CLASS_INIT_FUNC(uct_cuda_ipc_iface_t, uct_md_h md, uct_worker_h worke
                               &uct_cuda_ipc_iface_internal_ops, md, worker, params,
                               tl_config, "cuda_ipc");
 
-    if (strncmp(params->mode.device.dev_name,
-                UCT_CUDA_DEV_NAME, strlen(UCT_CUDA_DEV_NAME)) != 0) {
-        ucs_error("No device was found: %s", params->mode.device.dev_name);
-        return UCS_ERR_NO_DEVICE;
+    status = uct_cuda_base_check_device_name(params);
+    if (status != UCS_OK) {
+        return status;
     }
 
     self->config.max_poll            = config->max_poll;

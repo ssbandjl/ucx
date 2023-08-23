@@ -50,20 +50,9 @@ protected:
 
 ucp_md_map_t test_ucp_proto::get_md_map(ucs_memory_type_t mem_type)
 {
-    ucp_md_map_t md_map = 0;
-
-    for (ucp_md_index_t md_index = 0; md_index < context()->num_mds;
-         ++md_index) {
-        const uct_md_attr_v2_t *md_attr = &context()->tl_mds[md_index].attr;
-        if ((md_attr->flags & UCT_MD_FLAG_REG) &&
-            (md_attr->reg_mem_types & UCS_BIT(mem_type)) &&
-            /* ucp_datatype_iter_mem_reg() always goes directly to registration cache */
-            (md_attr->cache_mem_types & UCS_BIT(mem_type)) &&
-            (ucs_popcount(md_map) < UCP_MAX_OP_MDS)) {
-            md_map |= UCS_BIT(md_index);
-        }
-    }
-    return md_map;
+    return context()->reg_md_map[mem_type] &
+    /* ucp_datatype_iter_mem_reg() always goes directly to registration cache */
+           context()->cache_md_map[mem_type];
 }
 
 void test_ucp_proto::do_mem_reg(ucp_datatype_iter_t *dt_iter,
@@ -71,7 +60,7 @@ void test_ucp_proto::do_mem_reg(ucp_datatype_iter_t *dt_iter,
 {
     ucp_datatype_iter_mem_reg(context(), dt_iter, md_map, UCT_MD_MEM_ACCESS_ALL,
                               UCP_DT_MASK_ALL);
-    ucp_datatype_iter_mem_dereg(context(), dt_iter, UCP_DT_MASK_ALL);
+    ucp_datatype_iter_mem_dereg(dt_iter, UCP_DT_MASK_ALL);
 }
 
 void test_ucp_proto::test_dt_iter_mem_reg(ucs_memory_type_t mem_type,

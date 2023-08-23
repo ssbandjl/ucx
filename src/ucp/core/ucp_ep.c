@@ -170,6 +170,7 @@ void ucp_ep_config_key_reset(ucp_ep_config_key_t *key)
     key->dst_md_cmpts     = NULL;
     key->err_mode         = UCP_ERR_HANDLING_MODE_NONE;
     key->flags            = 0;
+    key->dst_version      = UCP_API_MINOR;
     memset(key->am_bw_lanes,  UCP_NULL_LANE, sizeof(key->am_bw_lanes));
     memset(key->rma_lanes,    UCP_NULL_LANE, sizeof(key->rma_lanes));
     memset(key->rma_bw_lanes, UCP_NULL_LANE, sizeof(key->rma_bw_lanes));
@@ -485,7 +486,9 @@ static int ucp_ep_remove_filter(const ucs_callbackq_elem_t *elem, void *arg)
 
 void ucp_ep_destroy_base(ucp_ep_h ep)
 {
+    ucp_worker_h worker = ep->worker;
     ucp_ep_peer_mem_data_t data;
+
     ucp_ep_refcount_field_assert(ep, refcount, ==, 0);
     ucp_ep_refcount_assert(ep, create, ==, 0);
     ucp_ep_refcount_assert(ep, flush, ==, 0);
@@ -493,8 +496,8 @@ void ucp_ep_destroy_base(ucp_ep_h ep)
     ucs_assert(ucs_hlist_is_empty(&ep->ext->proto_reqs));
 
     if (!(ep->flags & UCP_EP_FLAG_INTERNAL)) {
-        ucs_assert(ep->worker->num_all_eps > 0);
-        --ep->worker->num_all_eps;
+        ucs_assert(worker->num_all_eps > 0);
+        --worker->num_all_eps;
     }
 
     ucp_worker_keepalive_remove_ep(ep);
@@ -502,12 +505,12 @@ void ucp_ep_destroy_base(ucp_ep_h ep)
     ucs_list_del(&ep->ext->ep_list);
 
     ucs_vfs_obj_remove(ep);
-    ucs_callbackq_remove_if(&ep->worker->uct->progress_q, ucp_ep_remove_filter,
-                            ep);
+    ucs_callbackq_remove_oneshot(&worker->uct->progress_q, ep,
+                                 ucp_ep_remove_filter, ep);
     UCS_STATS_NODE_FREE(ep->stats);
     if (ep->ext->peer_mem != NULL) {
         kh_foreach_value(ep->ext->peer_mem, data, {
-            ucp_ep_peer_mem_destroy(ep->worker->context, &data);
+            ucp_ep_peer_mem_destroy(worker->context, &data);
         });
 
         kh_destroy(ucp_ep_peer_mem_hash, ep->ext->peer_mem);
@@ -689,7 +692,7 @@ ucs_status_t ucp_worker_mem_type_eps_create(ucp_worker_h worker)
 
         status = ucp_address_pack(worker, NULL, &mem_access_tls, pack_flags,
                                   context->config.ext.worker_addr_version, NULL,
-                                  &address_length, &address_buffer);
+                                  UINT_MAX, &address_length, &address_buffer);
         if (status != UCS_OK) {
             goto err_cleanup_eps;
         }
@@ -1529,8 +1532,7 @@ ucp_ep_set_failed(ucp_ep_h ucp_ep, ucp_lane_index_t lane, ucs_status_t status)
 void ucp_ep_set_failed_schedule(ucp_ep_h ucp_ep, ucp_lane_index_t lane,
                                 ucs_status_t status)
 {
-    ucp_worker_h worker        = ucp_ep->worker;
-    uct_worker_cb_id_t prog_id = UCS_CALLBACKQ_ID_NULL;
+    ucp_worker_h worker = ucp_ep->worker;
     ucp_ep_set_failed_arg_t *set_ep_failed_arg;
 
     UCP_WORKER_THREAD_CS_CHECK_IS_BLOCKED(worker);
@@ -1546,9 +1548,8 @@ void ucp_ep_set_failed_schedule(ucp_ep_h ucp_ep, ucp_lane_index_t lane,
     set_ep_failed_arg->lane   = lane;
     set_ep_failed_arg->status = status;
 
-    uct_worker_progress_register_safe(worker->uct, ucp_ep_set_failed_progress,
-                                      set_ep_failed_arg,
-                                      UCS_CALLBACKQ_FLAG_ONESHOT, &prog_id);
+    ucs_callbackq_add_oneshot(&worker->uct->progress_q, ucp_ep,
+                              ucp_ep_set_failed_progress, set_ep_failed_arg);
 
     /* If the worker supports the UCP_FEATURE_WAKEUP feature, signal the user so
      * that he can wake-up on this event */
@@ -1638,17 +1639,15 @@ static void ucp_ep_set_close_request(ucp_ep_h ep, ucp_request_t *request,
 
 void ucp_ep_register_disconnect_progress(ucp_request_t *req)
 {
-    ucp_ep_h ep                = req->send.ep;
-    uct_worker_cb_id_t prog_id = UCS_CALLBACKQ_ID_NULL;
+    ucp_ep_h ep = req->send.ep;
 
     /* If a flush is completed from a pending/completion callback, we need to
      * schedule slow-path callback to release the endpoint later, since a UCT
      * endpoint cannot be released from pending/completion callback context.
      */
     ucs_trace("adding slow-path callback to destroy ep %p", ep);
-    uct_worker_progress_register_safe(ep->worker->uct,
-                                      ucp_ep_local_disconnect_progress, req,
-                                      UCS_CALLBACKQ_FLAG_ONESHOT, &prog_id);
+    ucs_callbackq_add_oneshot(&ep->worker->uct->progress_q, ep,
+                              ucp_ep_local_disconnect_progress, req);
 }
 
 static void ucp_ep_close_flushed_callback(ucp_request_t *req)
@@ -1895,7 +1894,8 @@ int ucp_ep_config_is_equal(const ucp_ep_config_key_t *key1,
         (key1->keepalive_lane != key2->keepalive_lane) ||
         (key1->rkey_ptr_lane != key2->rkey_ptr_lane) ||
         (key1->err_mode != key2->err_mode) ||
-        (key1->flags != key2->flags)) {
+        (key1->flags != key2->flags) ||
+        (key1->dst_version != key2->dst_version)) {
         return 0;
     }
 
@@ -1977,8 +1977,10 @@ static ucs_status_t ucp_ep_config_calc_params(ucp_worker_h worker,
             md_map |= UCS_BIT(md_index);
             md_attr = &context->tl_mds[md_index].attr;
             if (md_attr->flags & UCT_MD_FLAG_REG) {
-                params->reg_growth   += md_attr->reg_cost.m;
-                params->reg_overhead += md_attr->reg_cost.c;
+                if (context->rcache == NULL) {
+                    params->reg_growth   += md_attr->reg_cost.m;
+                    params->reg_overhead += md_attr->reg_cost.c;
+                }
                 params->overhead     += iface_attr->overhead;
                 params->latency      += ucp_tl_iface_latency(context,
                                                              &iface_attr->latency);
@@ -2007,6 +2009,10 @@ static ucs_status_t ucp_ep_config_calc_params(ucp_worker_h worker,
         } else {
             params->bw += bw;
         }
+    }
+
+    if (context->rcache != NULL) {
+        params->reg_overhead += 50.0e-9;
     }
 
     return UCS_OK;
@@ -2148,9 +2154,12 @@ static void ucp_ep_config_adjust_max_short(ssize_t *max_short,
  * user buffer when matched. Thus, minimum message size allowed to be sent with
  * RNDV protocol should be bigger than maximal possible SW RNDV request
  * (i.e. header plus packed keys size). */
-size_t ucp_ep_tag_offload_min_rndv_thresh(ucp_ep_config_t *config)
+size_t ucp_ep_tag_offload_min_rndv_thresh(ucp_context_h context,
+                                          const ucp_ep_config_key_t *key)
 {
-    return sizeof(ucp_rndv_rts_hdr_t) + config->rndv.rkey_size;
+    return sizeof(ucp_rndv_rts_hdr_t) +
+           ucp_rkey_packed_size(context, key->rma_bw_md_map,
+                                UCS_SYS_DEVICE_ID_UNKNOWN, 0);
 }
 
 static void ucp_ep_config_init_short_thresh(ucp_memtype_thresh_t *thresh)
@@ -2691,7 +2700,8 @@ ucs_status_t ucp_ep_config_init(ucp_worker_h worker, ucp_ep_config_t *config,
             config->tag.lane                   = lane;
             max_rndv_thresh                    = iface_attr->cap.tag.eager.max_zcopy;
             max_am_rndv_thresh                 = iface_attr->cap.tag.eager.max_bcopy;
-            min_rndv_thresh                    = ucp_ep_tag_offload_min_rndv_thresh(config);
+            min_rndv_thresh                    = ucp_ep_tag_offload_min_rndv_thresh(
+                                                     context, &config->key);
             min_am_rndv_thresh                 = min_rndv_thresh;
 
             ucs_assertv_always(iface_attr->cap.tag.rndv.max_hdr >=
@@ -3046,20 +3056,22 @@ void ucp_ep_config_lane_info_str(ucp_worker_h worker,
     uct_tl_resource_desc_t *rsc;
     ucp_rsc_index_t rsc_index;
     ucp_md_index_t dst_md_index;
+    ucp_md_index_t md_index;
     ucp_rsc_index_t cmpt_index;
     unsigned path_index;
     int prio;
 
     rsc_index  = key->lanes[lane].rsc_index;
     rsc        = &context->tl_rscs[rsc_index].tl_rsc;
-
+    md_index   = context->tl_rscs[rsc_index].md_index;
     path_index = key->lanes[lane].path_index;
+
     ucs_string_buffer_appendf(strbuf,
-            "lane[%d]: %2d:" UCT_TL_RESOURCE_DESC_FMT ".%u md[%d] %-*c-> ",
-            lane, rsc_index, UCT_TL_RESOURCE_DESC_ARG(rsc), path_index,
-            context->tl_rscs[rsc_index].md_index,
-            20 - (int)(strlen(rsc->dev_name) + strlen(rsc->tl_name)),
-            ' ');
+       "lane[%d]: %2d:" UCT_TL_RESOURCE_DESC_FMT ".%u md[%d] %-*c-> ",
+       lane, rsc_index, UCT_TL_RESOURCE_DESC_ARG(rsc), path_index, md_index,
+       20 - (int)(strlen(rsc->dev_name) + strlen(rsc->tl_name) +
+                       !!(md_index > 9)),
+       ' ');
 
     if (addr_indices != NULL) {
         ucs_string_buffer_appendf(strbuf, "addr[%d].", addr_indices[lane]);
@@ -3067,9 +3079,10 @@ void ucp_ep_config_lane_info_str(ucp_worker_h worker,
 
     dst_md_index = key->lanes[lane].dst_md_index;
     cmpt_index   = ucp_ep_config_get_dst_md_cmpt(key, dst_md_index);
-    ucs_string_buffer_appendf(strbuf, "md[%d]/%s/sysdev[%d]", dst_md_index,
-                              context->tl_cmpts[cmpt_index].attr.name,
-                              key->lanes[lane].dst_sys_dev);
+    ucs_string_buffer_appendf(
+         strbuf, "md[%d]/%s/sysdev[%d] seg %zu", dst_md_index,
+         context->tl_cmpts[cmpt_index].attr.name, key->lanes[lane].dst_sys_dev,
+         key->lanes[lane].seg_size);
 
     prio = ucp_ep_config_get_multi_lane_prio(key->rma_bw_lanes, lane);
     if (prio != -1) {
@@ -3133,6 +3146,11 @@ static void ucp_ep_config_print(FILE *stream, ucp_worker_h worker,
         }
         fprintf(stream, "#                 %s\n", ucs_string_buffer_cstr(&strb));
     }
+
+    if (worker->context->config.ext.proto_enable) {
+        return;
+    }
+
     fprintf(stream, "#\n");
 
     if (context->config.features & UCP_FEATURE_TAG) {
@@ -3238,7 +3256,7 @@ static void ucp_ep_print_info_internal(ucp_ep_h ep, const char *name,
     if (worker->context->config.ext.proto_enable) {
         ucs_string_buffer_init(&strb);
         ucp_proto_select_info(worker, ep->cfg_index, UCP_WORKER_CFG_INDEX_NULL,
-                              &config->proto_select, &strb);
+                              &config->proto_select, 1, &strb);
         ucs_string_buffer_dump(&strb, "# ", stream);
         ucs_string_buffer_cleanup(&strb);
     }

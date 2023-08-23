@@ -118,9 +118,10 @@ static void uct_rc_verbs_handle_failure(uct_ib_iface_t *ib_iface, void *arg,
     }
 
     ucs_log(log_lvl,
-            "send completion with error: %s [qpn 0x%x wrid 0x%lx"
-            "vendor_err 0x%x]\n%s", ibv_wc_status_str(wc->status), wc->qp_num,
-            wc->wr_id, wc->vendor_err, peer_info);
+            "send completion with error: %s [qpn 0x%x wrid 0x%lx "
+            "vendor_err 0x%x]\n%s",
+            ibv_wc_status_str(wc->status), wc->qp_num, wc->wr_id,
+            wc->vendor_err, peer_info);
 
 out:
     uct_rc_iface_arbiter_dispatch(iface);
@@ -191,7 +192,7 @@ static unsigned uct_rc_verbs_iface_progress(void *arg)
         return count;
     }
 
-    return uct_rc_verbs_iface_poll_tx(iface);
+    return count + uct_rc_verbs_iface_poll_tx(iface);
 }
 
 static void uct_rc_verbs_iface_init_inl_wrs(uct_rc_verbs_iface_t *iface)
@@ -211,9 +212,9 @@ static void uct_rc_verbs_iface_init_inl_wrs(uct_rc_verbs_iface_t *iface)
 static ucs_status_t uct_rc_verbs_iface_query(uct_iface_h tl_iface, uct_iface_attr_t *iface_attr)
 {
     uct_rc_verbs_iface_t *iface = ucs_derived_of(tl_iface, uct_rc_verbs_iface_t);
-    uct_ib_md_t *md             = uct_ib_iface_md(ucs_derived_of(iface, uct_ib_iface_t));
-    uint8_t mr_id;
+    uct_ib_md_t *md             = uct_ib_iface_md(&iface->super.super);
     ucs_status_t status;
+    uint8_t UCS_V_UNUSED mr_id;
 
     status = uct_rc_iface_query(&iface->super, iface_attr,
                                 iface->config.max_inline,
@@ -230,9 +231,11 @@ static ucs_status_t uct_rc_verbs_iface_query(uct_iface_h tl_iface, uct_iface_att
     iface_attr->latency.m += 1e-9;  /* 1 ns per each extra QP */
     iface_attr->overhead   = 75e-9; /* Software overhead */
 
-    iface_attr->ep_addr_len = (md->ops->get_atomic_mr_id(md, &mr_id) == UCS_OK) ?
-                              sizeof(uct_rc_verbs_ep_flush_addr_t) :
-                              sizeof(uct_rc_verbs_ep_addr_t);
+    status                  = uct_ib_md_ops(md)->get_atomic_mr_id(md, &mr_id);
+    iface_attr->ep_addr_len = (uct_rc_iface_flush_rkey_enabled(&iface->super) ||
+                               (status == UCS_OK)) ?
+                                      sizeof(uct_rc_verbs_ep_flush_addr_t) :
+                                      sizeof(uct_rc_verbs_ep_addr_t);
 
     return UCS_OK;
 }
@@ -497,7 +500,7 @@ static uct_iface_ops_t uct_rc_verbs_iface_tl_ops = {
     .iface_query              = uct_rc_verbs_iface_query,
     .iface_get_address        = ucs_empty_function_return_success,
     .iface_get_device_address = uct_ib_iface_get_device_address,
-    .iface_is_reachable       = uct_ib_iface_is_reachable,
+    .iface_is_reachable       = uct_base_iface_is_reachable,
 };
 
 static uct_rc_iface_ops_t uct_rc_verbs_iface_ops = {

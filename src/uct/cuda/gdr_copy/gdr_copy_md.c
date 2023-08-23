@@ -19,7 +19,7 @@
 #include <ucs/profile/profile.h>
 #include <ucm/api/ucm.h>
 #include <uct/api/v2/uct_v2.h>
-#include <uct/cuda/base/cuda_iface.h>
+#include <uct/cuda/base/cuda_md.h>
 
 #define UCT_GDR_COPY_MD_RCACHE_DEFAULT_ALIGN 65536
 
@@ -32,7 +32,7 @@ static ucs_config_field_t uct_gdr_copy_md_config_table[] = {
 
     {"", "RCACHE_ADDR_ALIGN=" UCS_PP_MAKE_STRING(UCT_GDR_COPY_MD_RCACHE_DEFAULT_ALIGN), NULL,
      ucs_offsetof(uct_gdr_copy_md_config_t, rcache),
-     UCS_CONFIG_TYPE_TABLE(uct_md_config_rcache_table)},
+     UCS_CONFIG_TYPE_TABLE(ucs_config_rcache_table)},
 
     {"MEM_REG_OVERHEAD", "16us", "Memory registration overhead", /* TODO take default from device */
      ucs_offsetof(uct_gdr_copy_md_config_t, uc_reg_cost.m), UCS_CONFIG_TYPE_TIME},
@@ -114,7 +114,7 @@ UCS_PROFILE_FUNC(ucs_status_t, uct_gdr_copy_mem_reg_internal,
                  unsigned flags, uct_gdr_copy_mem_t *mem_hndl)
 {
     uct_gdr_copy_md_t *md = ucs_derived_of(uct_md, uct_gdr_copy_md_t);
-    CUdeviceptr d_ptr     = ((CUdeviceptr )(char *) address);
+    unsigned long d_ptr   = ((unsigned long)(char*)address);
     ucs_log_level_t log_level;
     int ret;
 
@@ -273,14 +273,13 @@ static void uct_gdr_copy_md_close(uct_md_h uct_md)
 }
 
 static uct_md_ops_t md_ops = {
-    .close                  = uct_gdr_copy_md_close,
-    .query                  = uct_gdr_copy_md_query,
-    .mkey_pack              = uct_gdr_copy_mkey_pack,
-    .mem_reg                = uct_gdr_copy_mem_reg,
-    .mem_dereg              = uct_gdr_copy_mem_dereg,
-    .mem_attach             = ucs_empty_function_return_unsupported,
-    .is_sockaddr_accessible = ucs_empty_function_return_zero_int,
-    .detect_memory_type     = ucs_empty_function_return_unsupported
+    .close              = uct_gdr_copy_md_close,
+    .query              = uct_gdr_copy_md_query,
+    .mkey_pack          = uct_gdr_copy_mkey_pack,
+    .mem_reg            = uct_gdr_copy_mem_reg,
+    .mem_dereg          = uct_gdr_copy_mem_dereg,
+    .mem_attach         = ucs_empty_function_return_unsupported,
+    .detect_memory_type = ucs_empty_function_return_unsupported
 };
 
 static inline uct_gdr_copy_rcache_region_t*
@@ -413,13 +412,14 @@ uct_gdr_copy_md_open(uct_component_t *component, const char *md_name,
     }
 
     if (md_config->enable_rcache != UCS_NO) {
-        uct_md_set_rcache_params(&rcache_params, &md_config->rcache);
+        ucs_rcache_set_params(&rcache_params, &md_config->rcache);
         rcache_params.region_struct_size = sizeof(uct_gdr_copy_rcache_region_t);
         rcache_params.max_alignment      = UCT_GDR_COPY_MD_RCACHE_DEFAULT_ALIGN;
         rcache_params.ucm_events         = UCM_EVENT_MEM_TYPE_FREE;
         rcache_params.context            = md;
         rcache_params.ops                = &uct_gdr_copy_rcache_ops;
         rcache_params.flags              = 0;
+
         status = ucs_rcache_create(&rcache_params, "gdr_copy", NULL, &md->rcache);
         if (status == UCS_OK) {
             md->super.ops = &md_rcache_ops;

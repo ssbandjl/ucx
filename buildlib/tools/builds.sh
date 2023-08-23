@@ -201,18 +201,30 @@ build_ugni() {
 # Build CUDA
 #
 build_cuda() {
+	if [[ $CONTAINER == *"rocm"* ]]; then
+		echo "==== Not building with cuda flags ===="
+		return
+	fi
+
 	if az_module_load $CUDA_MODULE
 	then
 		if az_module_load $GDRCOPY_MODULE
 		then
 			echo "==== Build with enable cuda, gdr_copy ===="
-			${WORKSPACE}/contrib/configure-devel --prefix=$ucx_inst --with-cuda --with-gdrcopy
-			$MAKEP
-			make_clean distclean
-
 			${WORKSPACE}/contrib/configure-release --prefix=$ucx_inst --with-cuda --with-gdrcopy
 			$MAKEP
 			make_clean distclean
+
+			echo "==== Build with enable cuda, gdr_copy by ./configure parameter ===="
+			# Use path to CUDA instead of loading CUDA as module, to check
+			# GDRCopy subcomponent does not include CUDA headers
+			cuda_path=$(dirname $(dirname $(which nvcc)))
+			az_module_unload $CUDA_MODULE
+			${WORKSPACE}/contrib/configure-devel --prefix=$ucx_inst --with-cuda=$cuda_path --with-gdrcopy
+			$MAKEP
+			make_clean distclean
+			az_module_load $CUDA_MODULE
+
 			az_module_unload $GDRCOPY_MODULE
 		fi
 
@@ -261,8 +273,6 @@ build_clang() {
 # Build with gcc-latest module
 #
 build_gcc() {
-	cflags=$1
-
 	#If the glibc version on the host is older than 2.14, don't run
 	#check the glibc version with the ldd version since it comes with glibc
 	#see https://www.linuxquestions.org/questions/linux-software-2/how-to-check-glibc-version-263103/
@@ -279,7 +289,7 @@ build_gcc() {
 		if az_module_load $GCC_MODULE
 		then
 			echo "==== Build with GCC compiler ($(gcc --version|head -1)) ===="
-			${WORKSPACE}/contrib/configure-devel CFLAGS="$cflags" CXXFLAGS="$cflags" --prefix=$ucx_inst
+			${WORKSPACE}/contrib/configure-devel $@ --prefix=$ucx_inst
 			$MAKEP
 			$MAKEP install
 			az_module_unload $GCC_MODULE
@@ -289,8 +299,12 @@ build_gcc() {
 	fi
 }
 
+build_no_devx() {
+	build_gcc --with-devx=no
+}
+
 build_gcc_debug_opt() {
-	build_gcc "-Og"
+	build_gcc CFLAGS=-Og CXXFLAGS=-Og
 }
 
 #
@@ -433,6 +447,7 @@ then
 	do_task 10 build_icc
 	do_task 10 build_pgi
 	do_task 10 build_gcc
+	do_task 8 build_no_devx
 	do_task 10 build_gcc_debug_opt
 	do_task 10 build_clang
 	do_task 10 build_armclang

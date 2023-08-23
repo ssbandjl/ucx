@@ -9,7 +9,27 @@
 #endif
 
 #include "cuda_iface.h"
+#include "cuda_md.h"
 
+#include <ucs/sys/string.h>
+
+
+#define UCT_CUDA_DEV_NAME "cuda"
+
+
+const char *uct_cuda_base_cu_get_error_string(CUresult result)
+{
+    static __thread char buf[64];
+    const char *error_str;
+
+    if (cuGetErrorString(result, &error_str) != CUDA_SUCCESS) {
+        ucs_snprintf_safe(buf, sizeof(buf), "unrecognized error code %d",
+                          result);
+        error_str = buf;
+    }
+
+    return error_str;
+}
 
 ucs_status_t
 uct_cuda_base_query_devices_common(
@@ -62,6 +82,20 @@ ucs_status_t uct_cuda_base_iface_event_fd_get(uct_iface_h tl_iface, int *fd_p)
     }
 
     *fd_p = iface->eventfd;
+    return UCS_OK;
+}
+
+ucs_status_t uct_cuda_base_check_device_name(const uct_iface_params_t *params)
+{
+    UCT_CHECK_PARAM(params->field_mask & UCT_IFACE_PARAM_FIELD_DEVICE,
+                    "UCT_IFACE_PARAM_FIELD_DEVICE is not defined");
+
+    if (strncmp(params->mode.device.dev_name, UCT_CUDA_DEV_NAME,
+                strlen(UCT_CUDA_DEV_NAME)) != 0) {
+        ucs_error("no device was found: %s", params->mode.device.dev_name);
+        return UCS_ERR_NO_DEVICE;
+    }
+
     return UCS_OK;
 }
 
