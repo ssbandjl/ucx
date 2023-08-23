@@ -1,0 +1,1869 @@
+[root@node63 ucx]# ./autogen.sh
+autoreconf: Entering directory `.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: aclocal -I config/m4
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy
+libtoolize: putting auxiliary files in `.'.
+libtoolize: copying file `./ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIR, `config/m4'.
+libtoolize: copying file `config/m4/libtool.m4'
+libtoolize: copying file `config/m4/ltoptions.m4'
+libtoolize: copying file `config/m4/ltsugar.m4'
+libtoolize: copying file `config/m4/ltversion.m4'
+libtoolize: copying file `config/m4/lt~obsolete.m4'
+autoreconf: running: /usr/bin/autoconf
+autoreconf: running: /usr/bin/autoheader
+autoreconf: running: automake --add-missing --copy --no-force
+configure.ac:82: installing './config.guess'
+configure.ac:82: installing './config.sub'
+configure.ac:50: installing './install-sh'
+configure.ac:50: installing './missing'
+bindings/java/src/main/native/Makefile.am: installing './depcomp'
+autoreconf: Leaving directory `.'
+
+[root@node63 ucx]# ./contrib/configure-devel --prefix=$PWD/install-debug
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking for git... yes
+checking for a BSD-compatible install... /bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for style of include used by make... GNU
+checking whether make supports nested variables... yes
+checking whether UID '0' is supported by ustar format... yes
+checking whether GID '0' is supported by ustar format... yes
+checking how to create a ustar tar archive... gnutar
+checking dependency style of gcc... gcc3
+checking whether make supports nested variables... (cached) yes
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for gcc... (cached) gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking for gcc option to accept ISO C89... (cached) none needed
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking dependency style of g++... gcc3
+checking for gcc option to support OpenMP... -fopenmp
+checking dependency style of gcc... gcc3
+checking whether ln -s works... yes
+checking for a sed that does not truncate output... /bin/sed
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking how to print strings... printf
+checking for a sed that does not truncate output... (cached) /bin/sed
+checking for fgrep... /bin/grep -F
+checking for ld used by gcc... /bin/ld
+checking if the linker (/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /bin/nm -B
+checking the name lister (/bin/nm -B) interface... BSD nm
+checking the maximum length of command line arguments... 1572864
+checking whether the shell understands some XSI constructs... yes
+checking whether the shell understands "+="... yes
+checking how to convert x86_64-unknown-linux-gnu file names to x86_64-unknown-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-unknown-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /bin/ld option to reload object files... -r
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ar... ar
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... ranlib
+checking command to parse /bin/nm -B output from gcc object... ok
+checking for sysroot... no
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fPIC -DPIC
+checking if gcc PIC flag -fPIC -DPIC works... yes
+checking if gcc static flag -static works... no
+checking if gcc supports -c -o file.o... yes
+checking if gcc supports -c -o file.o... (cached) yes
+checking whether the gcc linker (/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking how to run the C++ preprocessor... g++ -E
+checking for ld used by g++... /bin/ld -m elf_x86_64
+checking if the linker (/bin/ld -m elf_x86_64) is GNU ld... yes
+checking whether the g++ linker (/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking for g++ option to produce PIC... -fPIC -DPIC
+checking if g++ PIC flag -fPIC -DPIC works... yes
+checking if g++ static flag -static works... no
+checking if g++ supports -c -o file.o... yes
+checking if g++ supports -c -o file.o... (cached) yes
+checking whether the g++ linker (/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking for cos in -lm... yes
+checking for C/C++ restrict keyword... __restrict
+checking whether strerror_r is declared... yes
+checking for strerror_r... yes
+checking whether strerror_r returns char *... yes
+checking for pkg-config... /bin/pkg-config
+checking if ln -s supports --relative... yes
+checking for dot... no
+checking for doxygen... /bin/doxygen
+configure: WARNING: doxygen version 1.8.5 is bad. Required version: 1.8.6 and above
+checking for perl... /bin/perl
+checking for size_t... yes
+checking compiler flag -diag-error 10006... no
+checking compiler flag -diag-error 10148... no
+checking whether -diag-disable 1478 overrides deprecated declarations... no
+checking whether -Wno-deprecated-declarations overrides deprecated declarations... yes
+checking compiler flag -diag-disable 269... no
+checking compiler flag -fmax-type-align=16... no
+configure: Detected CPU implementation: 
+configure: Detected CPU architecture: 
+configure: Detected CPU variant: 
+configure: Detected CPU part: 
+checking for __attribute__(optimize)... 1
+checking compiler flag -fno-omit-frame-pointer... yes
+configure: compiling with frame pointer
+checking compiler flag -funwind-tables... yes
+configure: compiling with unwind tables
+checking if g++ works... yes
+checking c++11 support... yes
+checking gnu++11 support... yes
+checking whether _GLIBCXX_NOTHROW is declared... yes
+checking compiler flag --display_error_number... no
+checking compiler flag --diag_suppress 1... no
+checking compiler flag --diag_suppress 68... no
+checking compiler flag --diag_suppress 111... no
+checking compiler flag --diag_suppress 167... no
+checking compiler flag --diag_suppress 181... no
+checking compiler flag --diag_suppress 188... no
+checking compiler flag --diag_suppress 381... no
+checking compiler flag --diag_suppress 1215... no
+checking compiler flag --diag_suppress 1901... no
+checking compiler flag --diag_suppress 1902... no
+checking compiler flag -pedantic... yes
+checking compiler flag -Wl,-dynamic-list-data... yes
+checking compiler flag -Wno-missing-field-initializers... yes
+checking compiler flag -Wno-unused-parameter... yes
+checking compiler flag -Wno-unused-label... yes
+checking compiler flag -Wno-long-long... yes
+checking compiler flag -Wno-endif-labels... yes
+checking compiler flag -Wno-sign-compare... yes
+checking compiler flag -Wno-multichar... yes
+checking compiler flag -Wno-deprecated-declarations... yes
+checking compiler flag -Winvalid-pch... yes
+checking compiler flag -Wno-pointer-sign... yes
+checking compiler flag -Werror-implicit-function-declaration... yes
+checking compiler flag -Wno-format-zero-length... yes
+checking compiler flag -Wnested-externs... yes
+checking compiler flag -Wshadow... yes
+checking compiler flag -Werror=declaration-after-statement... yes
+checking for working alloca.h... yes
+checking for alloca... yes
+checking for shm_open in -lrt... yes
+checking for timer_create in -lrt... yes
+checking libgen.h usability... yes
+checking libgen.h presence... yes
+checking for libgen.h... yes
+checking whether asprintf is declared... yes
+checking whether basename is declared... yes
+checking whether fmemopen is declared... yes
+checking sys/cpuset.h usability... no
+checking sys/cpuset.h presence... no
+checking for sys/cpuset.h... no
+checking whether CPU_ZERO is declared... yes
+checking whether CPU_ISSET is declared... yes
+checking for cpu_set_t... yes
+checking for cpuset_t... no
+checking for sighandler_t... yes
+checking for __sighandler_t... yes
+checking pthread_np.h usability... no
+checking pthread_np.h presence... no
+checking for pthread_np.h... no
+checking for library containing pthread_create... -lpthread
+checking for library containing pthread_atfork... none required
+checking for clearenv... yes
+checking for malloc_trim... yes
+checking for memalign... yes
+checking for posix_memalign... yes
+checking for mremap... yes
+checking for sched_setaffinity... yes
+checking for sched_getaffinity... yes
+checking for cpuset_setaffinity... no
+checking for cpuset_getaffinity... no
+checking whether F_SETOWN_EX is declared... yes
+checking whether ethtool_cmd_speed is declared... yes
+checking whether SPEED_UNKNOWN is declared... yes
+checking sys/platform/ppc.h usability... no
+checking sys/platform/ppc.h presence... no
+checking for sys/platform/ppc.h... no
+checking whether __ppc_get_timebase_freq is declared... no
+checking whether __ppc_get_timebase is declared... no
+checking for using Google C++ Testing Framework... yes
+checking malloc hooks... yes
+checking sys/capability.h usability... no
+checking sys/capability.h presence... no
+checking for sys/capability.h... no
+checking whether PR_SET_PTRACER is declared... yes
+checking for struct in6_addr.s6_addr32... yes
+checking for struct in6_addr.__u6_addr.__u6_addr32... no
+checking for struct iphdr.daddr.s_addr... no
+checking for struct ip.ip_dst.s_addr... yes
+checking for struct sigevent._sigev_un._tid... yes
+checking for struct sigevent.sigev_notify_thread_id... no
+checking for struct sigaction.sa_restorer... yes
+checking sys/epoll.h usability... yes
+checking sys/epoll.h presence... yes
+checking for sys/epoll.h... yes
+checking sys/eventfd.h usability... yes
+checking sys/eventfd.h presence... yes
+checking for sys/eventfd.h... yes
+checking sys/event.h usability... no
+checking sys/event.h presence... no
+checking for sys/event.h... no
+checking sys/thr.h usability... no
+checking sys/thr.h presence... no
+checking for sys/thr.h... no
+checking malloc.h usability... yes
+checking malloc.h presence... yes
+checking for malloc.h... yes
+checking malloc_np.h usability... no
+checking malloc_np.h presence... no
+checking for malloc_np.h... no
+checking endian.h, usability... no
+checking endian.h, presence... no
+checking for endian.h,... no
+checking sys/endian.h usability... no
+checking sys/endian.h presence... no
+checking for sys/endian.h... no
+checking linux/mman.h usability... yes
+checking linux/mman.h presence... yes
+checking for linux/mman.h... yes
+checking linux/ip.h usability... yes
+checking linux/ip.h presence... yes
+checking for linux/ip.h... yes
+checking linux/futex.h usability... yes
+checking linux/futex.h presence... yes
+checking for linux/futex.h... yes
+checking for net/ethernet.h... yes
+checking for netinet/ip.h... yes
+configure: Memory allocator is ptmalloc-2.8.6 version
+checking for malloc_get_state... yes
+checking for malloc_set_state... yes
+checking whether MADV_FREE is declared... no
+checking whether MADV_REMOVE is declared... yes
+checking whether POSIX_MADV_DONTNEED is declared... yes
+checking whether getauxval is declared... yes
+checking whether SYS_mmap is declared... yes
+checking whether SYS_munmap is declared... yes
+checking whether SYS_mremap is declared... yes
+checking whether SYS_brk is declared... yes
+checking whether SYS_madvise is declared... yes
+checking whether SYS_shmat is declared... yes
+checking whether SYS_shmdt is declared... yes
+checking whether SYS_ipc is declared... no
+checking for __curbrk... yes
+checking for tc_malloc in -ltcmalloc... no
+Package fuse3 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `fuse3.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'fuse3' found
+Package fuse3 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `fuse3.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'fuse3' found
+Package fuse3 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `fuse3.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'fuse3' found
+checking whether fuse_open_channel is declared... no
+checking whether fuse_mount is declared... no
+checking whether fuse_unmount is declared... no
+checking for go... no
+configure: WARNING: Disabling GO support - GO compiler version 1.16 or newer not found.
+checking for mvn... no
+checking for java... yes
+configure: WARNING: Disabling Java support - java or mvn not in path.
+configure: Infiniband MAD Path not specified. Guessing ...
+checking infiniband/mad.h usability... yes
+checking infiniband/mad.h presence... yes
+checking for infiniband/mad.h... yes
+checking infiniband/umad.h usability... yes
+checking infiniband/umad.h presence... yes
+checking for infiniband/umad.h... yes
+checking infiniband/umad_types.h usability... yes
+checking infiniband/umad_types.h presence... yes
+checking for infiniband/umad_types.h... yes
+checking for mad_build_pkt in -libmad... yes
+checking for umad_send in -libumad... yes
+configure: WARNING: LCOV support is not enabled.
+checking cuda.h usability... no
+checking cuda.h presence... no
+checking for cuda.h... no
+checking cuda_runtime.h usability... no
+checking cuda_runtime.h presence... no
+checking for cuda_runtime.h... no
+configure: WARNING: CUDA not found
+configure: ROCm path was not specified. Guessing ...
+checking hsa.h usability... no
+checking hsa.h presence... no
+checking for hsa.h... no
+configure: WARNING: ROCm not found
+checking for hsa_amd_portable_export_dmabuf... no
+checking for hipFree in -lhip_hcc... no
+checking hip_runtime.h usability... no
+checking hip_runtime.h presence... no
+checking for hip_runtime.h... no
+configure: WARNING: HIP Runtime not found
+checking whether inotify_init is declared... yes
+checking whether inotify_add_watch is declared... yes
+checking whether IN_ATTRIB is declared... yes
+configure: enabling profiling
+checking for bfd_openr in -lbfd... no
+checking for bfd_openr in -lbfd... no
+checking for bfd_openr in -lbfd... no
+checking bfd.h usability... no
+checking bfd.h presence... no
+checking for bfd.h... no
+checking for struct dl_phdr_info... yes
+configure: enabling statistics
+checking __attribute__((constructor))... yes
+configure: enabling builtin memcpy
+checking for __clear_cache... yes
+checking for __aarch64_sync_cache_range... no
+checking gdrapi.h usability... no
+checking gdrapi.h presence... no
+checking for gdrapi.h... no
+configure: WARNING: GDR_COPY not found
+configure: Compiling with verbs support from /usr
+checking infiniband/verbs.h usability... yes
+checking infiniband/verbs.h presence... yes
+checking for infiniband/verbs.h... yes
+checking for ibv_get_device_list in -libverbs... yes
+checking whether ibv_wc_status_str is declared... yes
+checking whether ibv_event_type_str is declared... yes
+checking whether ibv_query_gid is declared... yes
+checking whether ibv_get_device_name is declared... yes
+checking whether ibv_create_srq is declared... yes
+checking whether ibv_get_async_event is declared... yes
+checking whether IBV_CREATE_CQ_ATTR_IGNORE_OVERRUN is declared... yes
+configure: Checking for DV bare-metal support
+checking for mlx5dv_query_device in -lmlx5-rdmav2... no
+checking for mlx5dv_query_device in -lmlx5... yes
+checking for infiniband/mlx5dv.h... yes
+checking whether mlx5dv_init_obj is declared... yes
+checking whether mlx5dv_create_qp is declared... yes
+checking whether mlx5dv_is_supported is declared... yes
+checking whether mlx5dv_devx_subscribe_devx_event is declared... yes
+checking whether MLX5DV_CQ_INIT_ATTR_MASK_COMPRESSED_CQE is declared... yes
+checking whether MLX5DV_CQ_INIT_ATTR_MASK_CQE_SIZE is declared... yes
+checking whether MLX5DV_QP_CREATE_ALLOW_SCATTER_TO_CQE is declared... yes
+checking whether MLX5DV_UAR_ALLOC_TYPE_BF is declared... yes
+checking whether MLX5DV_UAR_ALLOC_TYPE_NC is declared... yes
+checking whether mlx5dv_devx_umem_reg_ex is declared... no
+checking for struct mlx5dv_cq.cq_uar... yes
+checking whether MLX5DV_OBJ_AH is declared... yes
+checking whether MLX5DV_DCTYPE_DCT is declared... yes
+checking whether ibv_alloc_td is declared... yes
+checking whether MLX5DV_CONTEXT_FLAGS_DEVX is declared... yes
+checking whether IBV_LINK_LAYER_INFINIBAND is declared... yes
+checking whether IBV_LINK_LAYER_ETHERNET is declared... yes
+checking whether IBV_EVENT_GID_CHANGE is declared... yes
+checking whether IBV_TRANSPORT_USNIC is declared... yes
+checking whether IBV_TRANSPORT_USNIC_UDP is declared... yes
+checking whether IBV_TRANSPORT_UNSPECIFIED is declared... yes
+checking whether ibv_create_qp_ex is declared... yes
+checking whether ibv_create_cq_ex is declared... yes
+checking whether ibv_create_srq_ex is declared... yes
+checking whether ibv_reg_dmabuf_mr is declared... no
+checking whether ibv_set_ece is declared... yes
+checking whether ibv_query_device_ex is declared... yes
+checking for struct ibv_device_attr_ex.pci_atomic_caps... yes
+checking whether IBV_ACCESS_RELAXED_ORDERING is declared... yes
+checking whether IBV_ACCESS_ON_DEMAND is declared... yes
+checking whether IBV_QPF_GRH_REQUIRED is declared... yes
+checking whether ibv_advise_mr is declared... yes
+checking for struct mlx5_wqe_av.base... no
+checking for struct mlx5_grh_av.rmac... no
+checking for struct mlx5_cqe64.ib_stride_index... no
+checking for struct ibv_tmh.tag... yes
+checking for struct ibv_tm_caps.flags... yes
+checking whether ibv_alloc_dm is declared... yes
+configure: Checking OFED valgrind libs /usr/lib64/mlnx_ofed/valgrind
+checking /usr/include/rdma/rdma_cma.h usability... yes
+checking /usr/include/rdma/rdma_cma.h presence... yes
+checking for /usr/include/rdma/rdma_cma.h... yes
+checking for rdma_establish in -lrdmacm... yes
+checking sys/uio.h usability... yes
+checking sys/uio.h presence... yes
+checking for sys/uio.h... yes
+checking for process_vm_readv... yes
+configure: KNEM path was not found, guessing ...
+Package knem was not found in the pkg-config search path.
+Perhaps you should add the directory containing `knem.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'knem' found
+checking whether KNEM_CMD_GET_INFO is declared... no
+configure: WARNING: KNEM requested but required file (knem_io.h) could not be found
+configure: XPMEM - failed to open the requested location (guess), guessing ...
+checking cray-ugni... no
+checking whether IPPROTO_TCP is declared... yes
+checking whether SOL_SOCKET is declared... yes
+checking whether SO_KEEPALIVE is declared... yes
+checking whether TCP_KEEPCNT is declared... yes
+checking whether TCP_KEEPIDLE is declared... yes
+checking whether TCP_KEEPINTVL is declared... yes
+checking compiler flag -fno-exceptions... yes
+checking compiler flag -fno-rtti... yes
+checking compiler flag --no_exceptions... no
+checking compiler flag -fno-tree-vectorize... yes
+checking compiler flag --diag_suppress 186... no
+checking compiler flag --diag_suppress 236... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating src/ucm/cuda/Makefile
+config.status: creating src/ucm/rocm/Makefile
+config.status: creating src/ucm/Makefile
+config.status: creating src/ucs/vfs/sock/Makefile
+config.status: creating src/ucs/vfs/fuse/Makefile
+config.status: creating src/ucs/vfs/fuse/ucx-fuse.pc
+config.status: creating src/ucs/Makefile
+config.status: creating src/ucs/signal/Makefile
+config.status: creating src/ucs/ucx-ucs.pc
+config.status: creating src/uct/cuda/gdr_copy/Makefile
+config.status: creating src/uct/cuda/gdr_copy/ucx-gdrcopy.pc
+config.status: creating src/uct/cuda/Makefile
+config.status: creating src/uct/cuda/ucx-cuda.pc
+config.status: creating src/uct/ib/rdmacm/Makefile
+config.status: creating src/uct/ib/rdmacm/ucx-rdmacm.pc
+config.status: creating src/uct/ib/Makefile
+config.status: creating src/uct/ib/ucx-ib.pc
+config.status: creating src/uct/rocm/Makefile
+config.status: creating src/uct/rocm/ucx-rocm.pc
+config.status: creating src/uct/sm/scopy/cma/Makefile
+config.status: creating src/uct/sm/scopy/cma/ucx-cma.pc
+config.status: creating src/uct/sm/scopy/knem/Makefile
+config.status: creating src/uct/sm/scopy/knem/ucx-knem.pc
+config.status: creating src/uct/sm/scopy/Makefile
+config.status: creating src/uct/sm/mm/xpmem/Makefile
+config.status: creating src/uct/sm/mm/xpmem/ucx-xpmem.pc
+config.status: creating src/uct/sm/mm/Makefile
+config.status: creating src/uct/sm/Makefile
+config.status: creating src/uct/ugni/Makefile
+config.status: creating src/uct/ugni/ucx-ugni.pc
+config.status: creating src/uct/Makefile
+config.status: creating src/uct/ucx-uct.pc
+config.status: creating src/tools/perf/lib/Makefile
+config.status: creating src/tools/perf/cuda/Makefile
+config.status: creating src/tools/perf/rocm/Makefile
+config.status: creating src/tools/perf/Makefile
+config.status: creating test/gtest/common/googletest/Makefile
+config.status: creating test/gtest/ucm/test_dlopen/Makefile
+config.status: creating test/gtest/ucm/test_dlopen/rpath-subdir/Makefile
+config.status: creating test/gtest/ucs/test_module/Makefile
+config.status: creating test/gtest/Makefile
+config.status: creating test/apps/uct_info/Makefile
+config.status: creating Makefile
+config.status: creating docs/doxygen/header.tex
+config.status: creating src/uct/api/version.h
+config.status: creating ucx.spec
+config.status: creating ucx.pc
+config.status: creating contrib/rpmdef.sh
+config.status: creating contrib/ucx
+config.status: creating debian/rules
+config.status: creating debian/control
+config.status: creating debian/changelog
+config.status: creating src/ucp/Makefile
+config.status: creating src/ucp/api/ucp_version.h
+config.status: creating src/ucp/core/ucp_version.c
+config.status: creating src/tools/vfs/Makefile
+config.status: creating src/tools/info/Makefile
+config.status: creating src/tools/profile/Makefile
+config.status: creating test/apps/Makefile
+config.status: creating test/apps/iodemo/Makefile
+config.status: creating test/apps/sockaddr/Makefile
+config.status: creating test/apps/profiling/Makefile
+config.status: creating test/mpi/Makefile
+config.status: creating bindings/go/Makefile
+config.status: creating bindings/java/Makefile
+config.status: creating bindings/java/pom.xml
+config.status: creating bindings/java/src/main/native/Makefile
+config.status: creating examples/Makefile
+config.status: creating cmake/Makefile
+config.status: creating cmake/ucx-config-version.cmake
+config.status: creating cmake/ucx-config.cmake
+config.status: creating cmake/ucx-targets.cmake
+config.status: creating test/mpi/run_mpi.sh
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+configure: =========================================================
+configure: UCX build configuration:
+configure:         Build prefix:   /home/xb/project/ucx/install-debug
+configure:    Configuration dir:   ${prefix}/etc/ucx
+configure:   Preprocessor flags:   -DCPU_FLAGS="" -I${abs_top_srcdir}/src -I${abs_top_builddir} -I${abs_top_builddir}/src
+configure:           C compiler:   gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement
+configure:         C++ compiler:   g++ -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch
+configure:         Multi-thread:   enabled
+configure:            MPI tests:   disabled
+configure:          VFS support:   no
+configure:        Devel headers:   no
+configure: io_demo CUDA support:   no
+configure:             Bindings:   < >
+configure:          UCS modules:   < >
+configure:          UCT modules:   < ib rdmacm cma >
+configure:         CUDA modules:   < >
+configure:         ROCM modules:   < >
+configure:           IB modules:   < >
+configure:          UCM modules:   < >
+configure:         Perf modules:   < >
+configure: =========================================================
+[root@node63 ucx]# make
+make  all-recursive
+make[1]: Entering directory `/home/xb/project/ucx'
+Making all in src/ucm
+make[2]: Entering directory `/home/xb/project/ucx/src/ucm'
+Making all in .
+make[3]: Entering directory `/home/xb/project/ucx/src/ucm'
+  CC       event/libucm_la-event.lo
+  CC       malloc/libucm_la-malloc_hook.lo
+  CC       mmap/libucm_la-install.lo
+  CC       util/libucm_la-replace.lo
+  CC       util/libucm_la-log.lo
+  CC       util/libucm_la-reloc.lo
+  CC       util/libucm_la-sys.lo
+  CC       bistro/libucm_la-bistro.lo
+  CC       bistro/libucm_la-bistro_x86_64.lo
+  CC       bistro/libucm_la-bistro_aarch64.lo
+  CC       bistro/libucm_la-bistro_ppc64.lo
+  CC       ptmalloc286/libucm_la-malloc.lo
+  CCLD     libucm.la
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucm'
+Making all in cuda
+make[3]: Entering directory `/home/xb/project/ucx/src/ucm/cuda'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucm/cuda'
+Making all in rocm
+make[3]: Entering directory `/home/xb/project/ucx/src/ucm/rocm'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucm/rocm'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucm'
+Making all in src/ucs
+make[2]: Entering directory `/home/xb/project/ucx/src/ucs'
+Making all in vfs/sock
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs/vfs/sock'
+  CC       libucs_vfs_sock_la-vfs_sock.lo
+  CCLD     libucs_vfs_sock.la
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs/vfs/sock'
+Making all in .
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs'
+  CC       algorithm/libucs_la-crc.lo
+  CC       algorithm/libucs_la-qsort_r.lo
+  CC       algorithm/libucs_la-string_distance.lo
+  CC       arch/aarch64/libucs_la-cpu.lo
+  CC       arch/aarch64/libucs_la-global_opts.lo
+  CC       arch/ppc64/libucs_la-timebase.lo
+  CC       arch/ppc64/libucs_la-global_opts.lo
+  CC       arch/x86_64/libucs_la-cpu.lo
+  CC       arch/x86_64/libucs_la-global_opts.lo
+  CC       arch/libucs_la-cpu.lo
+  CC       async/libucs_la-async.lo
+  CC       async/libucs_la-signal.lo
+  CC       async/libucs_la-pipe.lo
+  CC       async/libucs_la-eventfd.lo
+  CC       async/libucs_la-thread.lo
+  CC       config/libucs_la-global_opts.lo
+  CC       config/libucs_la-ucm_opts.lo
+  CC       config/libucs_la-ini.lo
+  CC       config/libucs_la-parser.lo
+  CC       datastruct/libucs_la-arbiter.lo
+  CC       datastruct/libucs_la-array.lo
+  CC       datastruct/libucs_la-callbackq.lo
+  CC       datastruct/libucs_la-frag_list.lo
+  CC       datastruct/libucs_la-mpmc.lo
+  CC       datastruct/libucs_la-mpool.lo
+  CC       datastruct/libucs_la-mpool_set.lo
+  CC       datastruct/libucs_la-pgtable.lo
+  CC       datastruct/libucs_la-ptr_array.lo
+  CC       datastruct/libucs_la-ptr_map.lo
+  CC       datastruct/libucs_la-strided_alloc.lo
+  CC       datastruct/libucs_la-string_buffer.lo
+  CC       datastruct/libucs_la-string_set.lo
+  CC       datastruct/libucs_la-conn_match.lo
+  CC       debug/libucs_la-assert.lo
+  CC       debug/libucs_la-debug.lo
+  CC       debug/libucs_la-log.lo
+  CC       debug/libucs_la-memtrack.lo
+  CC       memory/libucs_la-memory_type.lo
+  CC       memory/libucs_la-memtype_cache.lo
+  CC       memory/libucs_la-numa.lo
+  CC       memory/libucs_la-rcache.lo
+  CC       memory/libucs_la-rcache_vfs.lo
+  CC       profile/libucs_la-profile.lo
+  CC       stats/libucs_la-stats.lo
+  CC       sys/libucs_la-event_set.lo
+  CC       sys/libucs_la-init.lo
+  CC       sys/libucs_la-math.lo
+  CC       sys/libucs_la-module.lo
+  CC       sys/libucs_la-string.lo
+  CC       sys/libucs_la-sys.lo
+  CC       sys/libucs_la-iovec.lo
+  CC       sys/libucs_la-lib.lo
+  CC       sys/libucs_la-sock.lo
+  CC       sys/topo/base/libucs_la-topo.lo
+  CC       sys/libucs_la-stubs.lo
+  CC       sys/libucs_la-uid.lo
+  CC       time/libucs_la-time.lo
+  CC       time/libucs_la-timer_wheel.lo
+  CC       time/libucs_la-timerq.lo
+  CC       type/libucs_la-class.lo
+  CC       type/libucs_la-status.lo
+  CC       type/libucs_la-spinlock.lo
+  CC       type/libucs_la-thread_mode.lo
+  CC       vfs/base/libucs_la-vfs_obj.lo
+  CC       vfs/base/libucs_la-vfs_cb.lo
+  CC       stats/libucs_la-client_server.lo
+  CC       stats/libucs_la-serialization.lo
+  CC       stats/libucs_la-libstats.lo
+  CCLD     libucs.la
+copying selected object files to avoid basename conflicts...
+  CC       stats/ucs_stats_parser-stats_parser.o
+  CCLD     ucs_stats_parser
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs'
+Making all in vfs/fuse
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs/vfs/fuse'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs/vfs/fuse'
+Making all in signal
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs/signal'
+  CC       libucs_signal_la-signal.lo
+  CCLD     libucs_signal.la
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs/signal'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucs'
+Making all in src/uct
+make[2]: Entering directory `/home/xb/project/ucx/src/uct'
+Making all in .
+make[3]: Entering directory `/home/xb/project/ucx/src/uct'
+  CC       base/libuct_la-uct_md.lo
+  CC       base/libuct_la-uct_md_vfs.lo
+  CC       base/libuct_la-uct_mem.lo
+  CC       base/libuct_la-uct_component.lo
+  CC       base/libuct_la-uct_iface.lo
+  CC       base/libuct_la-uct_iface_vfs.lo
+  CC       base/libuct_la-uct_worker.lo
+  CC       base/libuct_la-uct_cm.lo
+  CC       base/libuct_la-uct_vfs_attr.lo
+  CC       sm/base/libuct_la-sm_ep.lo
+  CC       sm/base/libuct_la-sm_md.lo
+  CC       sm/base/libuct_la-sm_iface.lo
+  CC       sm/mm/base/libuct_la-mm_iface.lo
+  CC       sm/mm/base/libuct_la-mm_ep.lo
+  CC       sm/mm/base/libuct_la-mm_md.lo
+  CC       sm/mm/posix/libuct_la-mm_posix.lo
+  CC       sm/mm/sysv/libuct_la-mm_sysv.lo
+  CC       sm/scopy/base/libuct_la-scopy_iface.lo
+  CC       sm/scopy/base/libuct_la-scopy_ep.lo
+  CC       sm/self/libuct_la-self.lo
+  CC       tcp/libuct_la-tcp_ep.lo
+  CC       tcp/libuct_la-tcp_iface.lo
+  CC       tcp/libuct_la-tcp_md.lo
+  CC       tcp/libuct_la-tcp_net.lo
+  CC       tcp/libuct_la-tcp_cm.lo
+  CC       tcp/libuct_la-tcp_base.lo
+  CC       tcp/libuct_la-tcp_sockcm.lo
+  CC       tcp/libuct_la-tcp_listener.lo
+  CC       tcp/libuct_la-tcp_sockcm_ep.lo
+  CCLD     libuct.la
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct'
+Making all in cuda
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/cuda'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/cuda'
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/cuda'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/cuda'
+Making all in ib
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/ib'
+Making all in .
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/ib'
+  CC       base/libuct_ib_la-ib_device.lo
+  CC       base/libuct_ib_la-ib_iface.lo
+  CC       base/libuct_ib_la-ib_log.lo
+  CC       base/libuct_ib_la-ib_md.lo
+  CC       mlx5/libuct_ib_la-ib_mlx5_log.lo
+  CC       mlx5/libuct_ib_la-ib_mlx5.lo
+  CC       mlx5/dv/libuct_ib_la-ib_mlx5_dv.lo
+  CC       mlx5/dv/libuct_ib_la-ib_mlx5dv_md.lo
+  CC       rc/base/libuct_ib_la-rc_ep.lo
+  CC       rc/base/libuct_ib_la-rc_iface.lo
+  CC       rc/verbs/libuct_ib_la-rc_verbs_ep.lo
+  CC       rc/verbs/libuct_ib_la-rc_verbs_iface.lo
+  CC       rc/accel/libuct_ib_la-rc_mlx5_ep.lo
+  CC       rc/accel/libuct_ib_la-rc_mlx5_iface.lo
+  CC       rc/accel/libuct_ib_la-rc_mlx5_common.lo
+  CC       rc/accel/libuct_ib_la-rc_mlx5_devx.lo
+  CC       dc/libuct_ib_la-dc_mlx5_ep.lo
+  CC       dc/libuct_ib_la-dc_mlx5.lo
+  CC       dc/libuct_ib_la-dc_mlx5_devx.lo
+  CC       ud/base/libuct_ib_la-ud_iface_common.lo
+  CC       ud/base/libuct_ib_la-ud_iface.lo
+  CC       ud/base/libuct_ib_la-ud_ep.lo
+  CC       ud/base/libuct_ib_la-ud_log.lo
+  CC       ud/verbs/libuct_ib_la-ud_verbs.lo
+  CC       ud/accel/libuct_ib_la-ud_mlx5_common.lo
+  CC       ud/accel/libuct_ib_la-ud_mlx5.lo
+  CCLD     libuct_ib.la
+  LN       libuct_ib.la
+  LN       .libs/libuct_ib.so
+  LN       .libs/libuct_ib.so.0
+  LN       .libs/libuct_ib.so.0.0.0
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/ib'
+Making all in rdmacm
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/ib/rdmacm'
+  CC       libuct_rdmacm_la-rdmacm_component.lo
+  CC       libuct_rdmacm_la-rdmacm_cm.lo
+  CC       libuct_rdmacm_la-rdmacm_listener.lo
+  CC       libuct_rdmacm_la-rdmacm_cm_ep.lo
+  CCLD     libuct_rdmacm.la
+  LN       libuct_rdmacm.la
+  LN       .libs/libuct_rdmacm.so
+  LN       .libs/libuct_rdmacm.so.0
+  LN       .libs/libuct_rdmacm.so.0.0.0
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/ib/rdmacm'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/ib'
+Making all in rocm
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/rocm'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/rocm'
+Making all in sm
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/sm'
+Making all in scopy
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy'
+Making all in cma
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy/cma'
+  CC       libuct_cma_la-cma_iface.lo
+  CC       libuct_cma_la-cma_ep.lo
+  CC       libuct_cma_la-cma_md.lo
+  CCLD     libuct_cma.la
+  LN       libuct_cma.la
+  LN       .libs/libuct_cma.so
+  LN       .libs/libuct_cma.so.0
+  LN       .libs/libuct_cma.so.0.0.0
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy/cma'
+Making all in knem
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy/knem'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy/knem'
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy'
+make[5]: Nothing to be done for `all-am'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy'
+Making all in mm
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm'
+Making all in xpmem
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm/xpmem'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm/xpmem'
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[5]: Nothing to be done for `all-am'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm'
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/sm'
+Making all in ugni
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/ugni'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/ugni'
+make[2]: Leaving directory `/home/xb/project/ucx/src/uct'
+Making all in src/ucp
+make[2]: Entering directory `/home/xb/project/ucx/src/ucp'
+  CC       am/libucp_la-eager_single.lo
+  CC       am/libucp_la-eager_multi.lo
+  CC       am/libucp_la-rndv.lo
+  CC       core/libucp_la-ucp_context.lo
+  CC       core/libucp_la-ucp_am.lo
+  CC       core/libucp_la-ucp_ep.lo
+  CC       core/libucp_la-ucp_ep_vfs.lo
+  CC       core/libucp_la-ucp_listener.lo
+  CC       core/libucp_la-ucp_mm.lo
+  CC       core/libucp_la-ucp_proxy_ep.lo
+  CC       core/libucp_la-ucp_request.lo
+  CC       core/libucp_la-ucp_rkey.lo
+  CC       core/libucp_la-ucp_version.lo
+  CC       core/libucp_la-ucp_vfs.lo
+  CC       core/libucp_la-ucp_worker.lo
+  CC       dt/libucp_la-datatype_iter.lo
+  CC       dt/libucp_la-dt_iov.lo
+  CC       dt/libucp_la-dt_generic.lo
+  CC       dt/libucp_la-dt.lo
+  CC       proto/libucp_la-lane_type.lo
+  CC       proto/libucp_la-proto_am.lo
+  CC       proto/libucp_la-proto_init.lo
+  CC       proto/libucp_la-proto_common.lo
+  CC       proto/libucp_la-proto_debug.lo
+  CC       proto/libucp_la-proto_reconfig.lo
+  CC       proto/libucp_la-proto_multi.lo
+  CC       proto/libucp_la-proto_select.lo
+  CC       proto/libucp_la-proto_single.lo
+  CC       proto/libucp_la-proto.lo
+  CC       rma/libucp_la-amo_basic.lo
+  CC       rma/libucp_la-amo_offload.lo
+  CC       rma/libucp_la-amo_send.lo
+  CC       rma/libucp_la-amo_sw.lo
+  CC       rma/libucp_la-get_am.lo
+  CC       rma/libucp_la-get_offload.lo
+  CC       rma/libucp_la-put_am.lo
+  CC       rma/libucp_la-put_offload.lo
+  CC       rma/libucp_la-rma_basic.lo
+  CC       rma/libucp_la-rma_send.lo
+  CC       rma/libucp_la-rma_sw.lo
+  CC       rma/libucp_la-flush.lo
+  CC       rndv/libucp_la-proto_rndv.lo
+  CC       rndv/libucp_la-rndv_am.lo
+  CC       rndv/libucp_la-rndv_get.lo
+  CC       rndv/libucp_la-rndv_ppln.lo
+  CC       rndv/libucp_la-rndv_put.lo
+  CC       rndv/libucp_la-rndv_rtr.lo
+  CC       rndv/libucp_la-rndv_ats.lo
+  CC       rndv/libucp_la-rndv_rkey_ptr.lo
+  CC       rndv/libucp_la-rndv.lo
+  CC       stream/libucp_la-stream_multi.lo
+  CC       stream/libucp_la-stream_recv.lo
+  CC       stream/libucp_la-stream_send.lo
+  CC       tag/libucp_la-eager_multi.lo
+  CC       tag/libucp_la-eager_rcv.lo
+  CC       tag/libucp_la-eager_snd.lo
+  CC       tag/libucp_la-eager_single.lo
+  CC       tag/libucp_la-probe.lo
+  CC       tag/libucp_la-tag_rndv.lo
+  CC       tag/libucp_la-tag_match.lo
+  CC       tag/libucp_la-tag_recv.lo
+  CC       tag/libucp_la-tag_send.lo
+  CC       tag/libucp_la-offload.lo
+  CC       tag/offload/libucp_la-eager.lo
+  CC       tag/offload/libucp_la-rndv.lo
+  CC       wireup/libucp_la-address.lo
+  CC       wireup/libucp_la-ep_match.lo
+  CC       wireup/libucp_la-select.lo
+  CC       wireup/libucp_la-wireup_ep.lo
+  CC       wireup/libucp_la-wireup.lo
+  CC       wireup/libucp_la-wireup_cm.lo
+  CCLD     libucp.la
+copying selected object files to avoid basename conflicts...
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucp'
+Making all in src/tools/vfs
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/vfs'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/vfs'
+Making all in src/tools/info
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/info'
+/bin/sed -nr 's:\s*#define\s+(\w+)(\s+(\w+)|\s+(".*")|\s*)$:{"\1", UCS_PP_MAKE_STRING(\3\4)},:p' <../../../config.h >build_config.h
+make  all-am
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/info'
+  CC       ucx_info-build_info.o
+  CC       ucx_info-proto_info.o
+  CC       ucx_info-sys_info.o
+  CC       ucx_info-tl_info.o
+  CC       ucx_info-type_info.o
+  CC       ucx_info-version_info.o
+  CC       ucx_info-ucx_info.o
+  CCLD     ucx_info
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/info'
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/info'
+Making all in src/tools/perf
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/perf'
+Making all in cuda
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf/cuda'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf/cuda'
+Making all in rocm
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf/rocm'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf/rocm'
+Making all in lib
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf/lib'
+  CC       libucxperf_la-libperf.lo
+  CC       libucxperf_la-libperf_memory.lo
+  CC       libucxperf_la-libperf_thread.lo
+  CXX      libucxperf_la-uct_tests.lo
+  CXX      libucxperf_la-ucp_tests.lo
+  CXXLD    libucxperf.la
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf/lib'
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf'
+  CC       ucx_perftest-perftest.o
+  CC       ucx_perftest-perftest_run.o
+  CC       ucx_perftest-perftest_params.o
+  CC       ucx_perftest-perftest_mad.o
+  CCLD     ucx_perftest
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf'
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/perf'
+Making all in src/tools/profile
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/profile'
+  CC       ucx_read_profile-read_profile.o
+  CCLD     ucx_read_profile
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/profile'
+Making all in bindings/go
+make[2]: Entering directory `/home/xb/project/ucx/bindings/go'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/home/xb/project/ucx/bindings/go'
+Making all in bindings/java
+make[2]: Entering directory `/home/xb/project/ucx/bindings/java'
+Making all in src/main/native
+make[3]: Entering directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make  all-am
+make[4]: Entering directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[3]: Leaving directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[3]: Entering directory `/home/xb/project/ucx/bindings/java'
+make[3]: Nothing to be done for `all-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/bindings/java'
+make[2]: Leaving directory `/home/xb/project/ucx/bindings/java'
+Making all in test/apps
+make[2]: Entering directory `/home/xb/project/ucx/test/apps'
+Making all in profiling
+make[3]: Entering directory `/home/xb/project/ucx/test/apps/profiling'
+  CC       ucx_profiling-ucx_profiling.o
+  CCLD     ucx_profiling
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps/profiling'
+Making all in iodemo
+make[3]: Entering directory `/home/xb/project/ucx/test/apps/iodemo'
+  CXX      io_demo-ucx_wrapper.o
+  CXX      io_demo-io_demo.o
+  CXXLD    io_demo
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps/iodemo'
+Making all in sockaddr
+make[3]: Entering directory `/home/xb/project/ucx/test/apps/sockaddr'
+  CXX      sa-sa_base.o
+  CXX      sa-sa_main.o
+  CXX      sa-sa_tcp.o
+  CXX      sa-sa_util.o
+  CXXLD    sa
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps/sockaddr'
+make[3]: Entering directory `/home/xb/project/ucx/test/apps'
+  CC       test_ucp_dlopen-test_ucp_dlopen.o
+  CCLD     test_ucp_dlopen
+  CC       test_ucp_config-test_ucp_config.o
+  CCLD     test_ucp_config
+  CC       test_ucs_dlopen-test_ucs_dlopen.o
+  CCLD     test_ucs_dlopen
+  CC       test_link_map-test_link_map.o
+  CCLD     test_link_map
+  CC       test_dlopen_cfg_print-test_dlopen_cfg_print.o
+  CCLD     test_dlopen_cfg_print
+  CC       test_init_mt-test_init_mt.o
+  CCLD     test_init_mt
+  CC       test_memtrack_limit-test_memtrack_limit.o
+  CCLD     test_memtrack_limit
+  CC       test_hooks-test_hooks.o
+  CCLD     test_hooks
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps'
+make[2]: Leaving directory `/home/xb/project/ucx/test/apps'
+Making all in examples
+make[2]: Entering directory `/home/xb/project/ucx/examples'
+  CC       ucp_hello_world-ucp_hello_world.o
+  CCLD     ucp_hello_world
+  CC       uct_hello_world-uct_hello_world.o
+  CCLD     uct_hello_world
+  CC       ucp_client_server-ucp_client_server.o
+  CCLD     ucp_client_server
+make[2]: Leaving directory `/home/xb/project/ucx/examples'
+Making all in cmake
+make[2]: Entering directory `/home/xb/project/ucx/cmake'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/home/xb/project/ucx/cmake'
+Making all in test/gtest
+make[2]: Entering directory `/home/xb/project/ucx/test/gtest'
+Making all in ucs/test_module
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest/ucs/test_module'
+  CC       libtest_module_la-test_module.lo
+  CCLD     libtest_module.la
+  LN       libtest_module.la
+  LN       .libs/libtest_module.so
+  LN       .libs/libtest_module.so.0
+  LN       .libs/libtest_module.so.0.0.0
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest/ucs/test_module'
+Making all in ucm/test_dlopen
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+Making all in rpath-subdir
+make[4]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir'
+  CC       dlopen_test_rpath.lo
+  CCLD     libdlopen_test_rpath.la
+make[4]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir'
+make[4]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+  CC       dlopen_test_do_mmap.lo
+  CCLD     libdlopen_test_do_mmap.la
+  CC       libdlopen_test_do_load_la-dlopen_test_do_load.lo
+  CCLD     libdlopen_test_do_load.la
+  CC       libdlopen_test_do_load_rpath_la-dlopen_test_do_load.lo
+  CCLD     libdlopen_test_do_load_rpath.la
+make[4]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+Making all in common/googletest
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest/common/googletest'
+  CXX      libgtest_la-gtest.lo
+  CXX      libgtest_la-gtest-death-test.lo
+  CXX      libgtest_la-gtest-filepath.lo
+  CXX      libgtest_la-gtest-port.lo
+  CXX      libgtest_la-gtest-printers.lo
+  CXX      libgtest_la-gtest-test-part.lo
+  CXX      libgtest_la-gtest-typed-test.lo
+  CXXLD    libgtest.la
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest/common/googletest'
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest'
+  CXX      common/gtest-main.o
+  CXX      common/gtest-test_gtest_cmn.o
+  CXX      common/gtest-mem_buffer.o
+  CXX      common/gtest-test_helpers.o
+  CXX      common/gtest-test_obj_size.o
+  CXX      common/gtest-test_watchdog.o
+  CXX      common/gtest-test_perf.o
+  CXX      common/gtest-test.o
+  CXX      ucm/gtest-malloc_hook.o
+  CXX      uct/gtest-test_amo.o
+  CXX      uct/gtest-test_amo_add_xor.o
+  CXX      uct/gtest-test_amo_and_or.o
+  CXX      uct/gtest-test_amo_cswap.o
+  CXX      uct/gtest-test_amo_fadd_fxor.o
+  CXX      uct/gtest-test_amo_fand_for.o
+  CXX      uct/gtest-test_amo_swap.o
+  CXX      uct/gtest-test_event.o
+  CXX      uct/gtest-test_fence.o
+  CXX      uct/gtest-test_flush.o
+  CXX      uct/gtest-test_many2one_am.o
+  CXX      uct/gtest-test_md.o
+  CXX      uct/gtest-test_mm.o
+  CXX      uct/gtest-test_mem.o
+  CXX      uct/gtest-test_p2p_am.o
+  CXX      uct/gtest-test_p2p_err.o
+  CXX      uct/gtest-test_p2p_mix.o
+  CXX      uct/gtest-test_p2p_rma.o
+  CXX      uct/gtest-test_pending.o
+  CXX      uct/gtest-test_progress.o
+  CXX      uct/gtest-test_uct_ep.o
+  CXX      uct/gtest-test_uct_perf.o
+  CXX      uct/v2/gtest-test_uct_query.o
+  CXX      uct/gtest-test_zcopy_comp.o
+  CXX      uct/gtest-uct_p2p_test.o
+  CXX      uct/gtest-uct_test.o
+  CXX      uct/gtest-test_stats.o
+  CXX      ucs/gtest-test_event_set.o
+  CXX      ucs/gtest-test_stats_filter.o
+  CXX      uct/gtest-test_peer_failure.o
+  CXX      uct/gtest-test_sockaddr.o
+  CXX      uct/gtest-test_tag.o
+  CXX      uct/tcp/gtest-test_tcp.o
+  CXX      ucp/gtest-test_ucp_am.o
+  CXX      ucp/gtest-test_ucp_ep.o
+  CXX      ucp/gtest-test_ucp_stream.o
+  CXX      ucp/gtest-test_ucp_peer_failure.o
+  CXX      ucp/gtest-test_ucp_atomic.o
+  CXX      ucp/gtest-test_ucp_dt.o
+  CXX      ucp/gtest-test_ucp_tls.o
+  CXX      ucp/gtest-test_ucp_memheap.o
+  CXX      ucp/gtest-test_ucp_mmap.o
+  CXX      ucp/gtest-test_ucp_mem_type.o
+  CXX      ucp/gtest-test_ucp_perf.o
+  CXX      ucp/gtest-test_ucp_proto.o
+  CXX      ucp/gtest-test_ucp_rma.o
+  CXX      ucp/gtest-test_ucp_rma_mt.o
+  CXX      ucp/gtest-test_ucp_tag_cancel.o
+  CXX      ucp/gtest-test_ucp_tag_match.o
+  CXX      ucp/gtest-test_ucp_tag_offload.o
+  CXX      ucp/gtest-test_ucp_tag_mt.o
+  CXX      ucp/gtest-test_ucp_tag_perf.o
+  CXX      ucp/gtest-test_ucp_tag_probe.o
+  CXX      ucp/gtest-test_ucp_tag_xfer.o
+  CXX      ucp/gtest-test_ucp_tag_mem_type.o
+  CXX      ucp/gtest-test_ucp_tag.o
+  CXX      ucp/gtest-test_ucp_context.o
+  CXX      ucp/gtest-test_ucp_worker.o
+  CXX      ucp/gtest-test_ucp_wireup.o
+  CXX      ucp/gtest-test_ucp_request.o
+  CXX      ucp/gtest-test_ucp_wakeup.o
+  CXX      ucp/gtest-test_ucp_fence.o
+  CXX      ucp/gtest-test_ucp_sockaddr.o
+  CXX      ucp/gtest-ucp_test.o
+  CXX      ucp/gtest-ucp_datatype.o
+  CXX      ucs/gtest-test_algorithm.o
+  CXX      ucs/gtest-test_arbiter.o
+  CXX      ucs/gtest-test_async.o
+  CXX      ucs/gtest-test_bitmap.o
+  CXX      ucs/gtest-test_callbackq.o
+  CXX      ucs/gtest-test_class.o
+  CXX      ucs/gtest-test_config.o
+  CXX      ucs/gtest-test_conn_match.o
+  CXX      ucs/gtest-test_datatype.o
+  CXX      ucs/gtest-test_bitops.o
+  CXX      ucs/gtest-test_debug.o
+  CXX      ucs/gtest-test_memtrack.o
+  CXX      ucs/gtest-test_math.o
+  CXX      ucs/gtest-test_mpmc.o
+  CXX      ucs/gtest-test_mpool.o
+  CXX      ucs/gtest-test_mpool_set.o
+  CXX      ucs/gtest-test_pgtable.o
+  CXX      ucs/gtest-test_profile.o
+  CXX      ucs/gtest-test_rcache.o
+  CXX      ucs/gtest-test_khash.o
+  CXX      ucs/gtest-test_memtype_cache.o
+  CXX      ucs/gtest-test_stats.o
+  CXX      ucs/gtest-test_strided_alloc.o
+  CXX      ucs/gtest-test_string.o
+  CXX      ucs/gtest-test_sys.o
+  CXX      ucs/gtest-test_topo.o
+  CXX      ucs/gtest-test_sock.o
+  CXX      ucs/gtest-test_time.o
+  CXX      ucs/gtest-test_twheel.o
+  CXX      ucs/gtest-test_frag_list.o
+  CXX      ucs/gtest-test_type.o
+  CXX      ucs/gtest-test_log.o
+  CXX      ucs/gtest-test_iov.o
+  CXX      ucs/gtest-test_vfs.o
+  CXX      ucs/arch/gtest-test_x86_64.o
+  CXX      uct/ib/gtest-test_ib.o
+  CXX      uct/ib/gtest-test_ib_md.o
+  CXX      uct/ib/gtest-test_cq_moderation.o
+  CXX      uct/ib/gtest-test_ib_xfer.o
+  CXX      uct/ib/gtest-test_ib_pkey.o
+  CXX      uct/ib/gtest-test_ib_event.o
+  CXX      uct/ib/gtest-test_devx.o
+  CXX      uct/ib/gtest-ud_base.o
+  CXX      uct/ib/gtest-test_ud.o
+  CXX      uct/ib/gtest-test_ud_timer.o
+  CXX      uct/ib/gtest-test_ud_pending.o
+  CXX      uct/ib/gtest-test_ud_ds.o
+  CXX      uct/ib/gtest-test_rc.o
+  CXX      uct/ib/gtest-test_dc.o
+  CXX      uct/ib/gtest-test_cqe_zipping.o
+  CXXLD    gtest
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest'
+make[2]: Leaving directory `/home/xb/project/ucx/test/gtest'
+make[2]: Entering directory `/home/xb/project/ucx'
+make[2]: Leaving directory `/home/xb/project/ucx'
+make[1]: Leaving directory `/home/xb/project/ucx'
+[root@node63 ucx]# make install
+Making install in src/ucm
+make[1]: Entering directory `/home/xb/project/ucx/src/ucm'
+Making install in .
+make[2]: Entering directory `/home/xb/project/ucx/src/ucm'
+make[3]: Entering directory `/home/xb/project/ucx/src/ucm'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib'
+ /bin/sh ../../libtool   --mode=install /bin/install -c   libucm.la '/home/xb/project/ucx/install-debug/lib'
+libtool: install: /bin/install -c .libs/libucm.so.0.0.0 /home/xb/project/ucx/install-debug/lib/libucm.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucm.so.0.0.0 libucm.so.0 || { rm -f libucm.so.0 && ln -s libucm.so.0.0.0 libucm.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucm.so.0.0.0 libucm.so || { rm -f libucm.so && ln -s libucm.so.0.0.0 libucm.so; }; })
+libtool: install: /bin/install -c .libs/libucm.lai /home/xb/project/ucx/install-debug/lib/libucm.la
+libtool: install: /bin/install -c .libs/libucm.a /home/xb/project/ucx/install-debug/lib/libucm.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/libucm.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/libucm.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucm'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucm/api'
+ /bin/install -c -m 644  api/ucm.h '/home/xb/project/ucx/install-debug/include/ucm/api'
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucm'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucm'
+Making install in cuda
+make[2]: Entering directory `/home/xb/project/ucx/src/ucm/cuda'
+make[3]: Entering directory `/home/xb/project/ucx/src/ucm/cuda'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucm/cuda'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucm/cuda'
+Making install in rocm
+make[2]: Entering directory `/home/xb/project/ucx/src/ucm/rocm'
+make[3]: Entering directory `/home/xb/project/ucx/src/ucm/rocm'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucm/rocm'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucm/rocm'
+make[1]: Leaving directory `/home/xb/project/ucx/src/ucm'
+Making install in src/ucs
+make[1]: Entering directory `/home/xb/project/ucx/src/ucs'
+Making install in vfs/sock
+make[2]: Entering directory `/home/xb/project/ucx/src/ucs/vfs/sock'
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs/vfs/sock'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs/vfs/sock'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucs/vfs/sock'
+Making install in .
+make[2]: Entering directory `/home/xb/project/ucx/src/ucs'
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib'
+ /bin/sh ../../libtool   --mode=install /bin/install -c   libucs.la '/home/xb/project/ucx/install-debug/lib'
+libtool: install: warning: relinking `libucs.la'
+libtool: install: (cd /home/xb/project/ucx/src/ucs; /bin/sh /home/xb/project/ucx/libtool  --silent --tag CC --mode=relink gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement -ldl -version-info 0:0:0 -o libucs.la -rpath /home/xb/project/ucx/install-debug/lib algorithm/libucs_la-crc.lo algorithm/libucs_la-qsort_r.lo algorithm/libucs_la-string_distance.lo arch/aarch64/libucs_la-cpu.lo arch/aarch64/libucs_la-global_opts.lo arch/ppc64/libucs_la-timebase.lo arch/ppc64/libucs_la-global_opts.lo arch/x86_64/libucs_la-cpu.lo arch/x86_64/libucs_la-global_opts.lo arch/libucs_la-cpu.lo async/libucs_la-async.lo async/libucs_la-signal.lo async/libucs_la-pipe.lo async/libucs_la-eventfd.lo async/libucs_la-thread.lo config/libucs_la-global_opts.lo config/libucs_la-ucm_opts.lo config/libucs_la-ini.lo config/libucs_la-parser.lo datastruct/libucs_la-arbiter.lo datastruct/libucs_la-array.lo datastruct/libucs_la-callbackq.lo datastruct/libucs_la-frag_list.lo datastruct/libucs_la-mpmc.lo datastruct/libucs_la-mpool.lo datastruct/libucs_la-mpool_set.lo datastruct/libucs_la-pgtable.lo datastruct/libucs_la-ptr_array.lo datastruct/libucs_la-ptr_map.lo datastruct/libucs_la-strided_alloc.lo datastruct/libucs_la-string_buffer.lo datastruct/libucs_la-string_set.lo datastruct/libucs_la-conn_match.lo debug/libucs_la-assert.lo debug/libucs_la-debug.lo debug/libucs_la-log.lo debug/libucs_la-memtrack.lo memory/libucs_la-memory_type.lo memory/libucs_la-memtype_cache.lo memory/libucs_la-numa.lo memory/libucs_la-rcache.lo memory/libucs_la-rcache_vfs.lo profile/libucs_la-profile.lo stats/libucs_la-stats.lo sys/libucs_la-event_set.lo sys/libucs_la-init.lo sys/libucs_la-math.lo sys/libucs_la-module.lo sys/libucs_la-string.lo sys/libucs_la-sys.lo sys/libucs_la-iovec.lo sys/libucs_la-lib.lo sys/libucs_la-sock.lo sys/topo/base/libucs_la-topo.lo sys/libucs_la-stubs.lo sys/libucs_la-uid.lo time/libucs_la-time.lo time/libucs_la-timer_wheel.lo time/libucs_la-timerq.lo type/libucs_la-class.lo type/libucs_la-status.lo type/libucs_la-spinlock.lo type/libucs_la-thread_mode.lo vfs/base/libucs_la-vfs_obj.lo vfs/base/libucs_la-vfs_cb.lo stats/libucs_la-client_server.lo stats/libucs_la-serialization.lo stats/libucs_la-libstats.lo -lm ../../src/ucm/libucm.la -lpthread -lrt -lrt )
+libtool: install: /bin/install -c .libs/libucs.so.0.0.0T /home/xb/project/ucx/install-debug/lib/libucs.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucs.so.0.0.0 libucs.so.0 || { rm -f libucs.so.0 && ln -s libucs.so.0.0.0 libucs.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucs.so.0.0.0 libucs.so || { rm -f libucs.so && ln -s libucs.so.0.0.0 libucs.so; }; })
+libtool: install: /bin/install -c .libs/libucs.lai /home/xb/project/ucx/install-debug/lib/libucs.la
+libtool: install: /bin/install -c .libs/libucs.a /home/xb/project/ucx/install-debug/lib/libucs.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/libucs.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/libucs.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/bin'
+  /bin/sh ../../libtool   --mode=install /bin/install -c ucs_stats_parser '/home/xb/project/ucx/install-debug/bin'
+libtool: install: /bin/install -c .libs/ucs_stats_parser /home/xb/project/ucx/install-debug/bin/ucs_stats_parser
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/sys/topo/base'
+ /bin/install -c -m 644  sys/topo/base/topo.h '/home/xb/project/ucx/install-debug/include/ucs/sys/topo/base'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/config'
+ /bin/install -c -m 644  config/global_opts.h config/ini.h config/parser.h config/types.h '/home/xb/project/ucx/install-debug/include/ucs/config'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/profile'
+ /bin/install -c -m 644  profile/profile_defs.h profile/profile_off.h profile/profile_on.h '/home/xb/project/ucx/install-debug/include/ucs/profile'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/debug'
+ /bin/install -c -m 644  debug/log_def.h debug/debug.h debug/memtrack.h '/home/xb/project/ucx/install-debug/include/ucs/debug'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/type'
+ /bin/install -c -m 644  type/class.h type/param.h type/init_once.h type/spinlock.h type/status.h type/thread_mode.h type/cpu_set.h '/home/xb/project/ucx/install-debug/include/ucs/type'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/async'
+ /bin/install -c -m 644  async/async_fwd.h '/home/xb/project/ucx/install-debug/include/ucs/async'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/sys'
+ /bin/install -c -m 644  sys/event_set.h sys/compiler_def.h sys/math.h sys/preprocessor.h sys/string.h sys/sock.h sys/stubs.h sys/uid.h '/home/xb/project/ucx/install-debug/include/ucs/sys'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/arch/x86_64'
+ /bin/install -c -m 644  arch/x86_64/bitops.h arch/x86_64/global_opts.h arch/x86_64/atomic.h '/home/xb/project/ucx/install-debug/include/ucs/arch/x86_64'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/vfs/base'
+ /bin/install -c -m 644  vfs/base/vfs_obj.h vfs/base/vfs_cb.h '/home/xb/project/ucx/install-debug/include/ucs/vfs/base'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/arch/generic'
+ /bin/install -c -m 644  arch/generic/atomic.h '/home/xb/project/ucx/install-debug/include/ucs/arch/generic'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/memory'
+ /bin/install -c -m 644  memory/rcache.h memory/memory_type.h memory/memtype_cache.h '/home/xb/project/ucx/install-debug/include/ucs/memory'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/arch'
+ /bin/install -c -m 644  arch/bitops.h arch/atomic.h arch/global_opts.h '/home/xb/project/ucx/install-debug/include/ucs/arch'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/arch/ppc64'
+ /bin/install -c -m 644  arch/ppc64/bitops.h arch/ppc64/global_opts.h '/home/xb/project/ucx/install-debug/include/ucs/arch/ppc64'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/stats'
+ /bin/install -c -m 644  stats/stats_fwd.h stats/libstats.h '/home/xb/project/ucx/install-debug/include/ucs/stats'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/algorithm'
+ /bin/install -c -m 644  algorithm/crc.h algorithm/qsort_r.h algorithm/string_distance.h '/home/xb/project/ucx/install-debug/include/ucs/algorithm'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/arch/aarch64'
+ /bin/install -c -m 644  arch/aarch64/bitops.h arch/aarch64/global_opts.h '/home/xb/project/ucx/install-debug/include/ucs/arch/aarch64'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/time'
+ /bin/install -c -m 644  time/time_def.h '/home/xb/project/ucx/install-debug/include/ucs/time'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucs/datastruct'
+ /bin/install -c -m 644  datastruct/array.h datastruct/array.inl datastruct/callbackq.h datastruct/callbackq_compat.h datastruct/hlist.h datastruct/khash.h datastruct/linear_func.h datastruct/list.h datastruct/mpool.h datastruct/mpool_set.h datastruct/pgtable.h datastruct/queue_types.h datastruct/strided_alloc.h datastruct/string_buffer.h datastruct/string_set.h '/home/xb/project/ucx/install-debug/include/ucs/datastruct'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+ /bin/install -c -m 644 ucx-ucs.pc '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucs'
+Making install in vfs/fuse
+make[2]: Entering directory `/home/xb/project/ucx/src/ucs/vfs/fuse'
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs/vfs/fuse'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs/vfs/fuse'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucs/vfs/fuse'
+Making install in signal
+make[2]: Entering directory `/home/xb/project/ucx/src/ucs/signal'
+make[3]: Entering directory `/home/xb/project/ucx/src/ucs/signal'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib'
+ /bin/sh ../../../libtool   --mode=install /bin/install -c   libucs_signal.la '/home/xb/project/ucx/install-debug/lib'
+libtool: install: warning: relinking `libucs_signal.la'
+libtool: install: (cd /home/xb/project/ucx/src/ucs/signal; /bin/sh /home/xb/project/ucx/libtool  --silent --tag CC --mode=relink gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement -version-info 0:0:0 -o libucs_signal.la -rpath /home/xb/project/ucx/install-debug/lib libucs_signal_la-signal.lo ../../../src/ucs/libucs.la -lpthread -lrt -lrt )
+libtool: install: /bin/install -c .libs/libucs_signal.so.0.0.0T /home/xb/project/ucx/install-debug/lib/libucs_signal.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucs_signal.so.0.0.0 libucs_signal.so.0 || { rm -f libucs_signal.so.0 && ln -s libucs_signal.so.0.0.0 libucs_signal.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucs_signal.so.0.0.0 libucs_signal.so || { rm -f libucs_signal.so && ln -s libucs_signal.so.0.0.0 libucs_signal.so; }; })
+libtool: install: /bin/install -c .libs/libucs_signal.lai /home/xb/project/ucx/install-debug/lib/libucs_signal.la
+libtool: install: /bin/install -c .libs/libucs_signal.a /home/xb/project/ucx/install-debug/lib/libucs_signal.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/libucs_signal.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/libucs_signal.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/ucs/signal'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucs/signal'
+make[1]: Leaving directory `/home/xb/project/ucx/src/ucs'
+Making install in src/uct
+make[1]: Entering directory `/home/xb/project/ucx/src/uct'
+Making install in .
+make[2]: Entering directory `/home/xb/project/ucx/src/uct'
+make[3]: Entering directory `/home/xb/project/ucx/src/uct'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib'
+ /bin/sh ../../libtool   --mode=install /bin/install -c   libuct.la '/home/xb/project/ucx/install-debug/lib'
+libtool: install: warning: relinking `libuct.la'
+libtool: install: (cd /home/xb/project/ucx/src/uct; /bin/sh /home/xb/project/ucx/libtool  --silent --tag CC --mode=relink gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement -ldl -version-info 0:0:0 -o libuct.la -rpath /home/xb/project/ucx/install-debug/lib base/libuct_la-uct_md.lo base/libuct_la-uct_md_vfs.lo base/libuct_la-uct_mem.lo base/libuct_la-uct_component.lo base/libuct_la-uct_iface.lo base/libuct_la-uct_iface_vfs.lo base/libuct_la-uct_worker.lo base/libuct_la-uct_cm.lo base/libuct_la-uct_vfs_attr.lo sm/base/libuct_la-sm_ep.lo sm/base/libuct_la-sm_md.lo sm/base/libuct_la-sm_iface.lo sm/mm/base/libuct_la-mm_iface.lo sm/mm/base/libuct_la-mm_ep.lo sm/mm/base/libuct_la-mm_md.lo sm/mm/posix/libuct_la-mm_posix.lo sm/mm/sysv/libuct_la-mm_sysv.lo sm/scopy/base/libuct_la-scopy_iface.lo sm/scopy/base/libuct_la-scopy_ep.lo sm/self/libuct_la-self.lo tcp/libuct_la-tcp_ep.lo tcp/libuct_la-tcp_iface.lo tcp/libuct_la-tcp_md.lo tcp/libuct_la-tcp_net.lo tcp/libuct_la-tcp_cm.lo tcp/libuct_la-tcp_base.lo tcp/libuct_la-tcp_sockcm.lo tcp/libuct_la-tcp_listener.lo tcp/libuct_la-tcp_sockcm_ep.lo ../../src/ucs/libucs.la -lpthread -lrt -lrt )
+libtool: install: /bin/install -c .libs/libuct.so.0.0.0T /home/xb/project/ucx/install-debug/lib/libuct.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libuct.so.0.0.0 libuct.so.0 || { rm -f libuct.so.0 && ln -s libuct.so.0.0.0 libuct.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libuct.so.0.0.0 libuct.so || { rm -f libuct.so && ln -s libuct.so.0.0.0 libuct.so; }; })
+libtool: install: /bin/install -c .libs/libuct.lai /home/xb/project/ucx/install-debug/lib/libuct.la
+libtool: install: /bin/install -c .libs/libuct.a /home/xb/project/ucx/install-debug/lib/libuct.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/libuct.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/libuct.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/uct'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/uct/api'
+ /bin/install -c -m 644  api/tl.h api/uct_def.h api/uct.h api/version.h '/home/xb/project/ucx/install-debug/include/uct/api'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+ /bin/install -c -m 644 ucx-uct.pc '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct'
+make[2]: Leaving directory `/home/xb/project/ucx/src/uct'
+Making install in cuda
+make[2]: Entering directory `/home/xb/project/ucx/src/uct/cuda'
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/cuda'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/cuda'
+make[4]: Nothing to be done for `install-exec-am'.
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/cuda'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/cuda'
+make[2]: Leaving directory `/home/xb/project/ucx/src/uct/cuda'
+Making install in ib
+make[2]: Entering directory `/home/xb/project/ucx/src/uct/ib'
+Making install in .
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/ib'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/ib'
+make[4]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/ucx'
+ /bin/sh ../../../libtool   --mode=install /bin/install -c   libuct_ib.la '/home/xb/project/ucx/install-debug/lib/ucx'
+libtool: install: warning: relinking `libuct_ib.la'
+libtool: install: (cd /home/xb/project/ucx/src/uct/ib; /bin/sh /home/xb/project/ucx/libtool  --silent --tag CC --mode=relink gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement -libverbs -version-info 0:0:0 -lmlx5 -o libuct_ib.la -rpath /home/xb/project/ucx/install-debug/lib/ucx base/libuct_ib_la-ib_device.lo base/libuct_ib_la-ib_iface.lo base/libuct_ib_la-ib_log.lo base/libuct_ib_la-ib_md.lo mlx5/libuct_ib_la-ib_mlx5_log.lo mlx5/libuct_ib_la-ib_mlx5.lo mlx5/dv/libuct_ib_la-ib_mlx5_dv.lo mlx5/dv/libuct_ib_la-ib_mlx5dv_md.lo rc/base/libuct_ib_la-rc_ep.lo rc/base/libuct_ib_la-rc_iface.lo rc/verbs/libuct_ib_la-rc_verbs_ep.lo rc/verbs/libuct_ib_la-rc_verbs_iface.lo rc/accel/libuct_ib_la-rc_mlx5_ep.lo rc/accel/libuct_ib_la-rc_mlx5_iface.lo rc/accel/libuct_ib_la-rc_mlx5_common.lo rc/accel/libuct_ib_la-rc_mlx5_devx.lo dc/libuct_ib_la-dc_mlx5_ep.lo dc/libuct_ib_la-dc_mlx5.lo dc/libuct_ib_la-dc_mlx5_devx.lo ud/base/libuct_ib_la-ud_iface_common.lo ud/base/libuct_ib_la-ud_iface.lo ud/base/libuct_ib_la-ud_ep.lo ud/base/libuct_ib_la-ud_log.lo ud/verbs/libuct_ib_la-ud_verbs.lo ud/accel/libuct_ib_la-ud_mlx5_common.lo ud/accel/libuct_ib_la-ud_mlx5.lo ../../../src/ucs/libucs.la ../../../src/uct/libuct.la -lpthread -lrt -lrt )
+libtool: install: /bin/install -c .libs/libuct_ib.so.0.0.0T /home/xb/project/ucx/install-debug/lib/ucx/libuct_ib.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib/ucx && { ln -s -f libuct_ib.so.0.0.0 libuct_ib.so.0 || { rm -f libuct_ib.so.0 && ln -s libuct_ib.so.0.0.0 libuct_ib.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib/ucx && { ln -s -f libuct_ib.so.0.0.0 libuct_ib.so || { rm -f libuct_ib.so && ln -s libuct_ib.so.0.0.0 libuct_ib.so; }; })
+libtool: install: /bin/install -c .libs/libuct_ib.lai /home/xb/project/ucx/install-debug/lib/ucx/libuct_ib.la
+libtool: install: /bin/install -c .libs/libuct_ib.a /home/xb/project/ucx/install-debug/lib/ucx/libuct_ib.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/ucx/libuct_ib.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/ucx/libuct_ib.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib/ucx
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib/ucx
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+ /bin/install -c -m 644 ucx-ib.pc '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/ib'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/ib'
+Making install in rdmacm
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/ib/rdmacm'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/ib/rdmacm'
+make[4]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/ucx'
+ /bin/sh ../../../../libtool   --mode=install /bin/install -c   libuct_rdmacm.la '/home/xb/project/ucx/install-debug/lib/ucx'
+libtool: install: warning: relinking `libuct_rdmacm.la'
+libtool: install: (cd /home/xb/project/ucx/src/uct/ib/rdmacm; /bin/sh /home/xb/project/ucx/libtool  --silent --tag CC --mode=relink gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement -libverbs -version-info 0:0:0 -o libuct_rdmacm.la -rpath /home/xb/project/ucx/install-debug/lib/ucx libuct_rdmacm_la-rdmacm_component.lo libuct_rdmacm_la-rdmacm_cm.lo libuct_rdmacm_la-rdmacm_listener.lo libuct_rdmacm_la-rdmacm_cm_ep.lo -lrdmacm ../../../../src/ucs/libucs.la ../../../../src/uct/libuct.la ../../../../src/uct/ib/libuct_ib.la -lpthread -lrt -lrt )
+libtool: install: /bin/install -c .libs/libuct_rdmacm.so.0.0.0T /home/xb/project/ucx/install-debug/lib/ucx/libuct_rdmacm.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib/ucx && { ln -s -f libuct_rdmacm.so.0.0.0 libuct_rdmacm.so.0 || { rm -f libuct_rdmacm.so.0 && ln -s libuct_rdmacm.so.0.0.0 libuct_rdmacm.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib/ucx && { ln -s -f libuct_rdmacm.so.0.0.0 libuct_rdmacm.so || { rm -f libuct_rdmacm.so && ln -s libuct_rdmacm.so.0.0.0 libuct_rdmacm.so; }; })
+libtool: install: /bin/install -c .libs/libuct_rdmacm.lai /home/xb/project/ucx/install-debug/lib/ucx/libuct_rdmacm.la
+libtool: install: /bin/install -c .libs/libuct_rdmacm.a /home/xb/project/ucx/install-debug/lib/ucx/libuct_rdmacm.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/ucx/libuct_rdmacm.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/ucx/libuct_rdmacm.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib/ucx
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib/ucx
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+ /bin/install -c -m 644 ucx-rdmacm.pc '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/ib/rdmacm'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/ib/rdmacm'
+make[2]: Leaving directory `/home/xb/project/ucx/src/uct/ib'
+Making install in rocm
+make[2]: Entering directory `/home/xb/project/ucx/src/uct/rocm'
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/rocm'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/rocm'
+make[2]: Leaving directory `/home/xb/project/ucx/src/uct/rocm'
+Making install in sm
+make[2]: Entering directory `/home/xb/project/ucx/src/uct/sm'
+Making install in scopy
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy'
+Making install in cma
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy/cma'
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy/cma'
+make[5]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/ucx'
+ /bin/sh ../../../../../libtool   --mode=install /bin/install -c   libuct_cma.la '/home/xb/project/ucx/install-debug/lib/ucx'
+libtool: install: warning: relinking `libuct_cma.la'
+libtool: install: (cd /home/xb/project/ucx/src/uct/sm/scopy/cma; /bin/sh /home/xb/project/ucx/libtool  --silent --tag CC --mode=relink gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement -version-info 0:0:0 -o libuct_cma.la -rpath /home/xb/project/ucx/install-debug/lib/ucx libuct_cma_la-cma_iface.lo libuct_cma_la-cma_ep.lo libuct_cma_la-cma_md.lo ../../../../../src/ucs/libucs.la ../../../../../src/uct/libuct.la -lpthread -lrt -lrt )
+libtool: install: /bin/install -c .libs/libuct_cma.so.0.0.0T /home/xb/project/ucx/install-debug/lib/ucx/libuct_cma.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib/ucx && { ln -s -f libuct_cma.so.0.0.0 libuct_cma.so.0 || { rm -f libuct_cma.so.0 && ln -s libuct_cma.so.0.0.0 libuct_cma.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib/ucx && { ln -s -f libuct_cma.so.0.0.0 libuct_cma.so || { rm -f libuct_cma.so && ln -s libuct_cma.so.0.0.0 libuct_cma.so; }; })
+libtool: install: /bin/install -c .libs/libuct_cma.lai /home/xb/project/ucx/install-debug/lib/ucx/libuct_cma.la
+libtool: install: /bin/install -c .libs/libuct_cma.a /home/xb/project/ucx/install-debug/lib/ucx/libuct_cma.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/ucx/libuct_cma.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/ucx/libuct_cma.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib/ucx
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib/ucx
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+ /bin/install -c -m 644 ucx-cma.pc '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy/cma'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy/cma'
+Making install in knem
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy/knem'
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy/knem'
+make[5]: Nothing to be done for `install-exec-am'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy/knem'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy/knem'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy'
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/scopy'
+make[5]: Nothing to be done for `install-exec-am'.
+make[5]: Nothing to be done for `install-data-am'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/sm/scopy'
+Making install in mm
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm'
+Making install in xpmem
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm/xpmem'
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm/xpmem'
+make[5]: Nothing to be done for `install-exec-am'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm/xpmem'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm/xpmem'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[5]: Entering directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[5]: Nothing to be done for `install-exec-am'.
+make[5]: Nothing to be done for `install-data-am'.
+make[5]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/sm/mm'
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/sm'
+make[4]: Entering directory `/home/xb/project/ucx/src/uct/sm'
+make[4]: Nothing to be done for `install-exec-am'.
+make[4]: Nothing to be done for `install-data-am'.
+make[4]: Leaving directory `/home/xb/project/ucx/src/uct/sm'
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/sm'
+make[2]: Leaving directory `/home/xb/project/ucx/src/uct/sm'
+Making install in ugni
+make[2]: Entering directory `/home/xb/project/ucx/src/uct/ugni'
+make[3]: Entering directory `/home/xb/project/ucx/src/uct/ugni'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/uct/ugni'
+make[2]: Leaving directory `/home/xb/project/ucx/src/uct/ugni'
+make[1]: Leaving directory `/home/xb/project/ucx/src/uct'
+Making install in src/ucp
+make[1]: Entering directory `/home/xb/project/ucx/src/ucp'
+make[2]: Entering directory `/home/xb/project/ucx/src/ucp'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib'
+ /bin/sh ../../libtool   --mode=install /bin/install -c   libucp.la '/home/xb/project/ucx/install-debug/lib'
+libtool: install: warning: relinking `libucp.la'
+libtool: install: (cd /home/xb/project/ucx/src/ucp; /bin/sh /home/xb/project/ucx/libtool  --silent --tag CC --mode=relink gcc -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement -ldl -version-info 0:0:0 -o libucp.la -rpath /home/xb/project/ucx/install-debug/lib am/libucp_la-eager_single.lo am/libucp_la-eager_multi.lo am/libucp_la-rndv.lo core/libucp_la-ucp_context.lo core/libucp_la-ucp_am.lo core/libucp_la-ucp_ep.lo core/libucp_la-ucp_ep_vfs.lo core/libucp_la-ucp_listener.lo core/libucp_la-ucp_mm.lo core/libucp_la-ucp_proxy_ep.lo core/libucp_la-ucp_request.lo core/libucp_la-ucp_rkey.lo core/libucp_la-ucp_version.lo core/libucp_la-ucp_vfs.lo core/libucp_la-ucp_worker.lo dt/libucp_la-datatype_iter.lo dt/libucp_la-dt_iov.lo dt/libucp_la-dt_generic.lo dt/libucp_la-dt.lo proto/libucp_la-lane_type.lo proto/libucp_la-proto_am.lo proto/libucp_la-proto_init.lo proto/libucp_la-proto_common.lo proto/libucp_la-proto_debug.lo proto/libucp_la-proto_reconfig.lo proto/libucp_la-proto_multi.lo proto/libucp_la-proto_select.lo proto/libucp_la-proto_single.lo proto/libucp_la-proto.lo rma/libucp_la-amo_basic.lo rma/libucp_la-amo_offload.lo rma/libucp_la-amo_send.lo rma/libucp_la-amo_sw.lo rma/libucp_la-get_am.lo rma/libucp_la-get_offload.lo rma/libucp_la-put_am.lo rma/libucp_la-put_offload.lo rma/libucp_la-rma_basic.lo rma/libucp_la-rma_send.lo rma/libucp_la-rma_sw.lo rma/libucp_la-flush.lo rndv/libucp_la-proto_rndv.lo rndv/libucp_la-rndv_am.lo rndv/libucp_la-rndv_get.lo rndv/libucp_la-rndv_ppln.lo rndv/libucp_la-rndv_put.lo rndv/libucp_la-rndv_rtr.lo rndv/libucp_la-rndv_ats.lo rndv/libucp_la-rndv_rkey_ptr.lo rndv/libucp_la-rndv.lo stream/libucp_la-stream_multi.lo stream/libucp_la-stream_recv.lo stream/libucp_la-stream_send.lo tag/libucp_la-eager_multi.lo tag/libucp_la-eager_rcv.lo tag/libucp_la-eager_snd.lo tag/libucp_la-eager_single.lo tag/libucp_la-probe.lo tag/libucp_la-tag_rndv.lo tag/libucp_la-tag_match.lo tag/libucp_la-tag_recv.lo tag/libucp_la-tag_send.lo tag/libucp_la-offload.lo tag/offload/libucp_la-eager.lo tag/offload/libucp_la-rndv.lo wireup/libucp_la-address.lo wireup/libucp_la-ep_match.lo wireup/libucp_la-select.lo wireup/libucp_la-wireup_ep.lo wireup/libucp_la-wireup.lo wireup/libucp_la-wireup_cm.lo ../ucs/libucs.la ../uct/libuct.la -lpthread -lrt -lrt )
+libtool: install: /bin/install -c .libs/libucp.so.0.0.0T /home/xb/project/ucx/install-debug/lib/libucp.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucp.so.0.0.0 libucp.so.0 || { rm -f libucp.so.0 && ln -s libucp.so.0.0.0 libucp.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/install-debug/lib && { ln -s -f libucp.so.0.0.0 libucp.so || { rm -f libucp.so && ln -s libucp.so.0.0.0 libucp.so; }; })
+libtool: install: /bin/install -c .libs/libucp.lai /home/xb/project/ucx/install-debug/lib/libucp.la
+libtool: install: /bin/install -c .libs/libucp.a /home/xb/project/ucx/install-debug/lib/libucp.a
+libtool: install: chmod 644 /home/xb/project/ucx/install-debug/lib/libucp.a
+libtool: install: ranlib /home/xb/project/ucx/install-debug/lib/libucp.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/install-debug/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/install-debug/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucp'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/include/ucp/api'
+ /bin/install -c -m 644  api/ucp_compat.h api/ucp_def.h api/ucp_version.h api/ucp.h '/home/xb/project/ucx/install-debug/include/ucp/api'
+make[2]: Leaving directory `/home/xb/project/ucx/src/ucp'
+make[1]: Leaving directory `/home/xb/project/ucx/src/ucp'
+Making install in src/tools/vfs
+make[1]: Entering directory `/home/xb/project/ucx/src/tools/vfs'
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/vfs'
+make[2]: Nothing to be done for `install-data-am'.
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/vfs'
+make[1]: Leaving directory `/home/xb/project/ucx/src/tools/vfs'
+Making install in src/tools/info
+make[1]: Entering directory `/home/xb/project/ucx/src/tools/info'
+make  install-am
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/info'
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/info'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/bin'
+  /bin/sh ../../../libtool   --mode=install /bin/install -c ucx_info '/home/xb/project/ucx/install-debug/bin'
+libtool: install: /bin/install -c .libs/ucx_info /home/xb/project/ucx/install-debug/bin/ucx_info
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/info'
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/info'
+make[1]: Leaving directory `/home/xb/project/ucx/src/tools/info'
+Making install in src/tools/perf
+make[1]: Entering directory `/home/xb/project/ucx/src/tools/perf'
+Making install in cuda
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/perf/cuda'
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf/cuda'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf/cuda'
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/perf/cuda'
+Making install in rocm
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/perf/rocm'
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf/rocm'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf/rocm'
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/perf/rocm'
+Making install in lib
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/perf/lib'
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf/lib'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf/lib'
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/perf/lib'
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/perf'
+make[3]: Entering directory `/home/xb/project/ucx/src/tools/perf'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/bin'
+  /bin/sh ../../../libtool   --mode=install /bin/install -c ucx_perftest '/home/xb/project/ucx/install-debug/bin'
+libtool: install: /bin/install -c .libs/ucx_perftest /home/xb/project/ucx/install-debug/bin/ucx_perftest
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/share/ucx/perftest'
+ /bin/install -c -m 644 ../../../contrib/ucx_perftest_config/msg_pow2 ../../../contrib/ucx_perftest_config/msg_pow2_large ../../../contrib/ucx_perftest_config/README ../../../contrib/ucx_perftest_config/test_types_uct ../../../contrib/ucx_perftest_config/test_types_ucp ../../../contrib/ucx_perftest_config/transports '/home/xb/project/ucx/install-debug/share/ucx/perftest'
+make[3]: Leaving directory `/home/xb/project/ucx/src/tools/perf'
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/perf'
+make[1]: Leaving directory `/home/xb/project/ucx/src/tools/perf'
+Making install in src/tools/profile
+make[1]: Entering directory `/home/xb/project/ucx/src/tools/profile'
+make[2]: Entering directory `/home/xb/project/ucx/src/tools/profile'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/bin'
+  /bin/sh ../../../libtool   --mode=install /bin/install -c ucx_read_profile '/home/xb/project/ucx/install-debug/bin'
+libtool: install: /bin/install -c .libs/ucx_read_profile /home/xb/project/ucx/install-debug/bin/ucx_read_profile
+make[2]: Nothing to be done for `install-data-am'.
+make[2]: Leaving directory `/home/xb/project/ucx/src/tools/profile'
+make[1]: Leaving directory `/home/xb/project/ucx/src/tools/profile'
+Making install in bindings/go
+make[1]: Entering directory `/home/xb/project/ucx/bindings/go'
+make[2]: Entering directory `/home/xb/project/ucx/bindings/go'
+make  install-exec-hook
+make[3]: Entering directory `/home/xb/project/ucx/bindings/go'
+make[3]: Nothing to be done for `install-exec-hook'.
+make[3]: Leaving directory `/home/xb/project/ucx/bindings/go'
+make[2]: Nothing to be done for `install-data-am'.
+make[2]: Leaving directory `/home/xb/project/ucx/bindings/go'
+make[1]: Leaving directory `/home/xb/project/ucx/bindings/go'
+Making install in bindings/java
+make[1]: Entering directory `/home/xb/project/ucx/bindings/java'
+Making install in src/main/native
+make[2]: Entering directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make  install-am
+make[3]: Entering directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[4]: Entering directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[4]: Leaving directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[3]: Leaving directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[2]: Leaving directory `/home/xb/project/ucx/bindings/java/src/main/native'
+make[2]: Entering directory `/home/xb/project/ucx/bindings/java'
+make[3]: Entering directory `/home/xb/project/ucx/bindings/java'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/bindings/java'
+make[2]: Leaving directory `/home/xb/project/ucx/bindings/java'
+make[1]: Leaving directory `/home/xb/project/ucx/bindings/java'
+Making install in test/apps
+make[1]: Entering directory `/home/xb/project/ucx/test/apps'
+Making install in profiling
+make[2]: Entering directory `/home/xb/project/ucx/test/apps/profiling'
+make[3]: Entering directory `/home/xb/project/ucx/test/apps/profiling'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps/profiling'
+make[2]: Leaving directory `/home/xb/project/ucx/test/apps/profiling'
+Making install in iodemo
+make[2]: Entering directory `/home/xb/project/ucx/test/apps/iodemo'
+make[3]: Entering directory `/home/xb/project/ucx/test/apps/iodemo'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/bin'
+  /bin/sh ../../../libtool   --mode=install /bin/install -c io_demo '/home/xb/project/ucx/install-debug/bin'
+libtool: install: /bin/install -c .libs/io_demo /home/xb/project/ucx/install-debug/bin/io_demo
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps/iodemo'
+make[2]: Leaving directory `/home/xb/project/ucx/test/apps/iodemo'
+Making install in sockaddr
+make[2]: Entering directory `/home/xb/project/ucx/test/apps/sockaddr'
+make[3]: Entering directory `/home/xb/project/ucx/test/apps/sockaddr'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps/sockaddr'
+make[2]: Leaving directory `/home/xb/project/ucx/test/apps/sockaddr'
+make[2]: Entering directory `/home/xb/project/ucx/test/apps'
+make[3]: Entering directory `/home/xb/project/ucx/test/apps'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/test/apps'
+make[2]: Leaving directory `/home/xb/project/ucx/test/apps'
+make[1]: Leaving directory `/home/xb/project/ucx/test/apps'
+Making install in examples
+make[1]: Entering directory `/home/xb/project/ucx/examples'
+make[2]: Entering directory `/home/xb/project/ucx/examples'
+make[2]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/share/ucx/examples'
+ /bin/install -c -m 644 hello_world_util.h ucp_hello_world.c uct_hello_world.c ucp_client_server.c ucp_util.h '/home/xb/project/ucx/install-debug/share/ucx/examples'
+make[2]: Leaving directory `/home/xb/project/ucx/examples'
+make[1]: Leaving directory `/home/xb/project/ucx/examples'
+Making install in cmake
+make[1]: Entering directory `/home/xb/project/ucx/cmake'
+make[2]: Entering directory `/home/xb/project/ucx/cmake'
+make[2]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/cmake/ucx'
+ /bin/install -c -m 644 ucx-targets.cmake ucx-config.cmake ucx-config-version.cmake '/home/xb/project/ucx/install-debug/lib/cmake/ucx'
+make[2]: Leaving directory `/home/xb/project/ucx/cmake'
+make[1]: Leaving directory `/home/xb/project/ucx/cmake'
+Making install in test/gtest
+make[1]: Entering directory `/home/xb/project/ucx/test/gtest'
+Making install in ucs/test_module
+make[2]: Entering directory `/home/xb/project/ucx/test/gtest/ucs/test_module'
+make[2]: Nothing to be done for `install'.
+make[2]: Leaving directory `/home/xb/project/ucx/test/gtest/ucs/test_module'
+Making install in ucm/test_dlopen
+make[2]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+Making install in rpath-subdir
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir'
+make[4]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir'
+make[4]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst'
+ /bin/sh ../../../../../libtool   --mode=install /bin/install -c   libdlopen_test_rpath.la '/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst'
+libtool: install: /bin/install -c .libs/libdlopen_test_rpath.so.0.0.0 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst/libdlopen_test_rpath.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst && { ln -s -f libdlopen_test_rpath.so.0.0.0 libdlopen_test_rpath.so.0 || { rm -f libdlopen_test_rpath.so.0 && ln -s libdlopen_test_rpath.so.0.0.0 libdlopen_test_rpath.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst && { ln -s -f libdlopen_test_rpath.so.0.0.0 libdlopen_test_rpath.so || { rm -f libdlopen_test_rpath.so && ln -s libdlopen_test_rpath.so.0.0.0 libdlopen_test_rpath.so; }; })
+libtool: install: /bin/install -c .libs/libdlopen_test_rpath.lai /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst/libdlopen_test_rpath.la
+libtool: install: /bin/install -c .libs/libdlopen_test_rpath.a /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst/libdlopen_test_rpath.a
+libtool: install: chmod 644 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst/libdlopen_test_rpath.a
+libtool: install: ranlib /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst/libdlopen_test_rpath.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir/.noinst
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+make[4]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir'
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen/rpath-subdir'
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+make[4]: Entering directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+make[4]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst'
+ /bin/sh ../../../../libtool   --mode=install /bin/install -c   libdlopen_test_do_mmap.la libdlopen_test_do_load.la libdlopen_test_do_load_rpath.la '/home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst'
+libtool: install: /bin/install -c .libs/libdlopen_test_do_mmap.so.0.0.0 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_mmap.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst && { ln -s -f libdlopen_test_do_mmap.so.0.0.0 libdlopen_test_do_mmap.so.0 || { rm -f libdlopen_test_do_mmap.so.0 && ln -s libdlopen_test_do_mmap.so.0.0.0 libdlopen_test_do_mmap.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst && { ln -s -f libdlopen_test_do_mmap.so.0.0.0 libdlopen_test_do_mmap.so || { rm -f libdlopen_test_do_mmap.so && ln -s libdlopen_test_do_mmap.so.0.0.0 libdlopen_test_do_mmap.so; }; })
+libtool: install: /bin/install -c .libs/libdlopen_test_do_mmap.lai /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_mmap.la
+libtool: install: /bin/install -c .libs/libdlopen_test_do_load.so.0.0.0 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst && { ln -s -f libdlopen_test_do_load.so.0.0.0 libdlopen_test_do_load.so.0 || { rm -f libdlopen_test_do_load.so.0 && ln -s libdlopen_test_do_load.so.0.0.0 libdlopen_test_do_load.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst && { ln -s -f libdlopen_test_do_load.so.0.0.0 libdlopen_test_do_load.so || { rm -f libdlopen_test_do_load.so && ln -s libdlopen_test_do_load.so.0.0.0 libdlopen_test_do_load.so; }; })
+libtool: install: /bin/install -c .libs/libdlopen_test_do_load.lai /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load.la
+libtool: install: /bin/install -c .libs/libdlopen_test_do_load_rpath.so.0.0.0 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load_rpath.so.0.0.0
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst && { ln -s -f libdlopen_test_do_load_rpath.so.0.0.0 libdlopen_test_do_load_rpath.so.0 || { rm -f libdlopen_test_do_load_rpath.so.0 && ln -s libdlopen_test_do_load_rpath.so.0.0.0 libdlopen_test_do_load_rpath.so.0; }; })
+libtool: install: (cd /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst && { ln -s -f libdlopen_test_do_load_rpath.so.0.0.0 libdlopen_test_do_load_rpath.so || { rm -f libdlopen_test_do_load_rpath.so && ln -s libdlopen_test_do_load_rpath.so.0.0.0 libdlopen_test_do_load_rpath.so; }; })
+libtool: install: /bin/install -c .libs/libdlopen_test_do_load_rpath.lai /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load_rpath.la
+libtool: install: /bin/install -c .libs/libdlopen_test_do_mmap.a /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_mmap.a
+libtool: install: chmod 644 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_mmap.a
+libtool: install: ranlib /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_mmap.a
+libtool: install: /bin/install -c .libs/libdlopen_test_do_load.a /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load.a
+libtool: install: chmod 644 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load.a
+libtool: install: ranlib /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load.a
+libtool: install: /bin/install -c .libs/libdlopen_test_do_load_rpath.a /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load_rpath.a
+libtool: install: chmod 644 /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load_rpath.a
+libtool: install: ranlib /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst/libdlopen_test_do_load_rpath.a
+libtool: finish: PATH="/root/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/root/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/opt/h3c/bin:/opt/h3c/sbin:/opt/h3c/zookeeper/bin:/sbin" ldconfig -n /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/xb/project/ucx/test/gtest/ucm/test_dlopen/.noinst
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+make[4]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+make[2]: Leaving directory `/home/xb/project/ucx/test/gtest/ucm/test_dlopen'
+Making install in common/googletest
+make[2]: Entering directory `/home/xb/project/ucx/test/gtest/common/googletest'
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest/common/googletest'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest/common/googletest'
+make[2]: Leaving directory `/home/xb/project/ucx/test/gtest/common/googletest'
+make[2]: Entering directory `/home/xb/project/ucx/test/gtest'
+make[3]: Entering directory `/home/xb/project/ucx/test/gtest'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/xb/project/ucx/test/gtest'
+make[2]: Leaving directory `/home/xb/project/ucx/test/gtest'
+make[1]: Leaving directory `/home/xb/project/ucx/test/gtest'
+make[1]: Entering directory `/home/xb/project/ucx'
+make[2]: Entering directory `/home/xb/project/ucx'
+make[2]: Nothing to be done for `install-exec-am'.
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/share/ucx/perftest'
+ /bin/install -c -m 644 contrib/ucx_perftest_config/msg_pow2 contrib/ucx_perftest_config/msg_pow2_large contrib/ucx_perftest_config/README contrib/ucx_perftest_config/test_types_uct contrib/ucx_perftest_config/test_types_ucp contrib/ucx_perftest_config/test_types_ucp_rma contrib/ucx_perftest_config/test_types_ucp_amo contrib/ucx_perftest_config/transports '/home/xb/project/ucx/install-debug/share/ucx/perftest'
+ /bin/mkdir -p '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+ /bin/install -c -m 644 ucx.pc '/home/xb/project/ucx/install-debug/lib/pkgconfig'
+make[2]: Leaving directory `/home/xb/project/ucx'
+make[1]: Leaving directory `/home/xb/project/ucx'
+[root@node63 ucx]# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/xb/project/ucx/install-debug/lib
+[root@node63 ucx]# export PATH=/home/xb/project/ucx/install-debug/bin:$PATH
+[root@node63 ucx]# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/xb/project/ucx/install-debug/lib
+project/ucx/install-debug/bin:$PATH[root@node63 ucx]# export PATH=/home/xb/project/ucx/install-debug/bin:$PATH
+[root@node63 ucx]# 
+[root@node63 ucx]# 
+[root@node63 ucx]# 
+[root@node63 ucx]# ucx_perftest -c 0
+Waiting for connection...
+

@@ -76,7 +76,7 @@ main -> run_test -> ucs_status_t run_test(struct perftest_context *ctx) -> run_t
   status = ucx_perf_funcs[params->api].setup(perf) -> static ucs_status_t ucp_perf_setup
   
 server:
-[root@node61 bin]# gdb --args ucx_perftest -c 0^C
+[root@node61 bin]# gdb --args ucx_perftest -c 0
 [root@node61 bin]# ./ucx_perftest -c 0
 Waiting for connection...
 Accepted connection from 182.200.53.62:43696
