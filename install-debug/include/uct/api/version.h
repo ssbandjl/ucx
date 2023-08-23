@@ -13,7 +13,7 @@
 #define UCT_VERNO_PATCH            0
 #define UCT_VERNO_EXTRA            ""
 #define UCT_VERNO_STRING           "1.16.0"
-#define UCT_SCM_VERSION            "3a09bb5"
+#define UCT_SCM_VERSION            "f0586c9"
 #define UCT_SCM_BRANCH             "master"
 
 #define UCT_MINOR_BIT              (16UL)

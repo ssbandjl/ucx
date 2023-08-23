@@ -4,7 +4,7 @@
 # See file LICENSE for terms.
 #
 
-set(prefix "/root/project/net/ucx/ucx/install-debug")
+set(prefix "/home/xb/project/ucx/install-debug")
 set(exec_prefix "${prefix}")
 
 add_library(ucx::ucs SHARED IMPORTED)

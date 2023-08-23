@@ -105,5 +105,3 @@ cmake/*.cmake
 *.gcno
 *.gcda
 lcov_data/
-
-install-debug/
