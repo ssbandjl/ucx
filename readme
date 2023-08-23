@@ -1,5 +1,10 @@
 https://github.com/ssbandjl/ucx.git
 
+git remote add upstream https://github.com/openucx/ucx.git
+git fetch upstream
+git merge upstream/master
+
+
 build
 ./autogen.sh
 close vagrind
