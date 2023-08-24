@@ -1,4 +1,11 @@
 https://github.com/ssbandjl/ucx.git
+文档: https://openucx.readthedocs.io/en/master/
+API文档: https://openucx.readthedocs.io/en/master/api.html
+术语: https://openucx.readthedocs.io/en/master/glossaries.html
+cuda: 计算统一设备架构
+代码规范: https://github.com/openucx/ucx/blob/master/docs/CodeStyle.md
+
+
 
 git remote add upstream https://github.com/openucx/ucx.git
 git fetch upstream
@@ -16,16 +23,13 @@ uct_ib_mem_reg
 uct_ib_mem_reg_internal -> uct_ib_md_reg_mr -> uct_ib_verbs_md_ops -> .reg_key -> uct_ib_verbs_reg_key -> uct_ib_reg_key_impl -> uct_ib_reg_mr -> ibv_reg_mr
 
 
-./src/tools/perf/ucx_perftest -c 0
-./src/tools/perf/ucx_perftest <server-hostname> -t tag_lat -c 1
-./ucx_perftest 182.200.53.61 -t tag_lat -c 1
-
 --with-java=no
+
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/xb/project/net/ucx/ucx/install-debug/lib
 cd bin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../lib
-gdb --args ucx_perftest -c 0
-perf server src/tools/perf/perftest.c main
+gdb --args ucx_perftest -c 0 -> perf server src/tools/perf/perftest.c main
+
 
 
 
@@ -109,7 +113,7 @@ Final:               1000000      2.079     2.111     2.109        3.61       3.
 
 (gdb) bt
 #0  0x00007ffff51ce130 in ibv_modify_qp () from /lib64/libibverbs.so.1
-#1  0x00007ffff53ff2a4 in uct_ud_iface_create_qp (self=self@entry=0x6fa500, config=config@entry=0x6a0f90) at ud/base/ud_iface.c:215
+#1  0x00007ffff53ff2a4 in uct_ud_iface_create_qp (self=self@entry=0x6fa500, config=config@entry=0x6a0f90) at ud/base/ud_iface.c:215 -> 队列对类型 -> qp_init_attr.qp_type             = IBV_QPT_UD
 #2  0x00007ffff53ff960 in uct_ud_iface_t_init (self=self@entry=0x6fa500, _myclass=0x7ffff5622640 <uct_ud_iface_t_class>, _init_count=_init_count@entry=0x7fffffffc3f0, 
     ops=ops@entry=0x7ffff5622940 <uct_ud_verbs_iface_ops>, tl_ops=tl_ops@entry=0x7ffff56227a0 <uct_ud_verbs_iface_tl_ops>, md=md@entry=0x6b0710, worker=worker@entry=0x6a1f00, 
     params=params@entry=0x7fffffffc700, config=config@entry=0x6a0f90, init_attr=0x7fffffffc400) at ud/base/ud_iface.c:513
@@ -184,7 +188,6 @@ wc = {{
     }, 
     qp_num = 32767, 
     src_qp = 7014160, 
----Type <return> to continue, or q <return> to quit---  
     wc_flags = 0, 
     pkey_index = 29472, 
     slid = 109, 
@@ -215,7 +218,6 @@ wc = {{
     byte_len = 0, 
     {
       imm_data = 4155732096, 
----Type <return> to continue, or q <return> to quit---
       invalidated_rkey = 4155732096
     }, 
     qp_num = 32767, 
@@ -246,7 +248,6 @@ wc = {{
     wr_id = 8256, 
     status = IBV_WC_SUCCESS, 
     opcode = IBV_WC_SEND, 
----Type <return> to continue, or q <return> to quit---
     vendor_err = 1073741824, 
     byte_len = 0, 
     {
@@ -277,7 +278,6 @@ wc = {{
     slid = 0, 
     sl = 0 '\000', 
     dlid_path_bits = 0 '\000'
----Type <return> to continue, or q <return> to quit---
   }, {
     wr_id = 5, 
     status = 123, 
@@ -308,7 +308,6 @@ wc = {{
     qp_num = 0, 
     src_qp = 0, 
     wc_flags = 0, 
----Type <return> to continue, or q <return> to quit---
     pkey_index = 0, 
     slid = 0, 
     sl = 0 '\000', 
@@ -339,7 +338,6 @@ wc = {{
     {
       imm_data = 0, 
       invalidated_rkey = 0
----Type <return> to continue, or q <return> to quit---
     }, 
     qp_num = 0, 
     src_qp = 1, 
@@ -370,7 +368,6 @@ wc = {{
     status = IBV_WC_SUCCESS, 
     opcode = IBV_WC_SEND, 
     vendor_err = 0, 
----Type <return> to continue, or q <return> to quit---
     byte_len = 0, 
     {
       imm_data = 0, 
@@ -401,7 +398,6 @@ wc = {{
     sl = 0 '\000', 
     dlid_path_bits = 0 '\000'
   }, {
----Type <return> to continue, or q <return> to quit---
     wr_id = 0, 
     status = IBV_WC_SUCCESS, 
     opcode = IBV_WC_SEND, 
@@ -432,7 +428,6 @@ wc = {{
     src_qp = 256, 
     wc_flags = 0, 
     pkey_index = 1, 
----Type <return> to continue, or q <return> to quit---
     slid = 0, 
     sl = 0 '\000', 
     dlid_path_bits = 0 '\000'
@@ -693,3 +688,44 @@ UCX_TLS=rc;UCX_NET_DEVICES=mlx5_0:1;gdb --args ./ucx_perftest 175.16.53.62 -t uc
 #19 0x0000000000405ccb in run_test_recurs (ctx=ctx@entry=0x7fffffffce60, parent_params=parent_params@entry=0x7fffffffce60, depth=depth@entry=0) at perftest_run.c:273
 #20 0x00000000004063f2 in run_test (ctx=ctx@entry=0x7fffffffce60) at perftest_run.c:332
 #21 0x0000000000404884 in main (argc=<optimized out>, argv=<optimized out>) at perftest.c:854
+
+
+
+
+example, ucp_client_server, 
+gcc examples/ucp_client_server.c -lucp -lucs -o ucp_client_server -Iinstall-debug/include -Linstall-debug/lib
+export LD_LIBRARY_PATH=$PWD/install-debug/lib
+./ucp_client_server &
+./ucp_client_server -a <ip-addr>   # <ip-addr>: IP address of a local RoCE or IPoIB interface
+./ucp_client_server -a 172.17.29.63:13337
+
+
+文档列表:
+File list
+File async_fwd.h
+File callbackq.h
+File callbackq_compat.h
+File compiler_def.h
+File conventions.md
+File design.md
+File intro.md
+File memory_type.h
+File preface.md
+File status.h
+File thread_mode.h
+File time_def.h
+File types.h
+File ucp.h
+File ucp_compat.h
+File ucp_def.h
+
+
+
+
+perf, server, -> gdb --args /home/xb/project/ucx/install-debug/bin/ucx_perftest -c 0 -> perftest.c:844 -> main
+parse_opts(&ctx, mpi_initialized, argc, argv) -> 检查返回值, 错误码定义: UCS_S_PACKED ucs_status_t
+status = check_system(&ctx) -> 检查系统, cpu亲和性
+status = setup_rte(&ctx)
+
+
+
