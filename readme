@@ -725,7 +725,55 @@ File ucp_def.h
 perf, server, -> gdb --args /home/xb/project/ucx/install-debug/bin/ucx_perftest -c 0 -> perftest.c:844 -> main
 parse_opts(&ctx, mpi_initialized, argc, argv) -> 检查返回值, 错误码定义: UCS_S_PACKED ucs_status_t
 status = check_system(&ctx) -> 检查系统, cpu亲和性
-status = setup_rte(&ctx)
+  ucs_sys_get_num_cpus
+  nr_cpus 64
+  ucs_sys_setaffinity(&cpuset)
+status = setup_rte(&ctx) -> return setup_sock_rte(ctx) -> setup_sock_rte_p2p
+  socket -> bind -> listen  <- client connect
+  accept
+status = run_test(&ctx)
+  ucs_trace_func("")
+  adjust_test_params
+  status = run_test_recurs(ctx, &ctx->params, 0)
+  return ucx_perf_run(&parent_params->super, &result)
+    ucx_perf_global_init
+      UCS_MODULE_FRAMEWORK_LOAD(ucx_perftest, UCS_MODULE_LOAD_FLAG_GLOBAL) -> 动态库 dlsym() -> ucs_load_modules
+        ucs_module_loader_init_paths -> dlopen
+    ucx_perf_test_init
+    status = perf->send_allocator->init(perf) -> .init      = ucs_empty_function_return_success
+    status = ucx_perf_funcs[params->api].setup(perf) -> static ucs_status_t ucp_perf_setup
+      status = ucp_perf_test_fill_params(&perf->params, &ucp_params)
+        UCX_PERF_CMD_TAG
+      ucp_config_read
+        ucs_config_parser_fill_opts
+          ucs_config_parser_set_default_values
+          ucs_config_parser_get_sub_prefix
+        ucs_list_head_init
+      ucp_init
+      ucp_perf_test_alloc_mem
+
+
+内存类型:
+typedef enum ucs_memory_type {
+    UCS_MEMORY_TYPE_HOST,          /**< Default system memory */
+    UCS_MEMORY_TYPE_CUDA,          /**< NVIDIA CUDA memory */
+    UCS_MEMORY_TYPE_CUDA_MANAGED,  /**< NVIDIA CUDA managed (or unified) memory */
+    UCS_MEMORY_TYPE_ROCM,          /**< AMD ROCM memory */
+    UCS_MEMORY_TYPE_ROCM_MANAGED,  /**< AMD ROCM managed system memory */
+    UCS_MEMORY_TYPE_RDMA,          /**< RDMA device memory */
+    UCS_MEMORY_TYPE_LAST,
+    UCS_MEMORY_TYPE_UNKNOWN = UCS_MEMORY_TYPE_LAST
+} ucs_memory_type_t;
+
+跟踪内存:
+void *ucs_malloc(size_t size, const char *name)
+{
+    void *ptr = malloc(size);
+    UCS_MEMTRACK_LOG_ZERO_SIZE_ALLOACTION(size, ptr, name);
+    ucs_memtrack_allocated_internal(ptr, size, name);
+    return ptr;
+}
+
 
 
 
