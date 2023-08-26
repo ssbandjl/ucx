@@ -426,8 +426,8 @@ static ucs_status_t setup_sock_rte_p2p(struct perftest_context *ctx)
     }
 
     if (sockfd < 0) {
-        ucs_error("%s failed. %s",
-                  (ctx->server_addr != NULL) ? "client" : "server", err_str);
+        ucs_error("%s failed. %s, port:%d",
+                  (ctx->server_addr != NULL) ? "client" : "server", err_str, ctx->port);
         status = UCS_ERR_IO_ERROR;
         goto out_free_res;
     }

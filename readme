@@ -439,7 +439,7 @@ num_wcs = 16
 $8 = 16
 
 (gdb) bt
-#0  uct_ud_verbs_post_send (max_log_sge=1, send_flags=<optimized out>, wr=0x6fad90, ep=<optimized out>, iface=0x6fa500) at ud/verbs/ud_verbs.c:92
+#0  uct_ud_verbs_post_send (max_log_sge=1, send_flags=<optimized out>, wr=0x6fad90, ep=<optimized out>, iface=0x6fa500) at ud/verbs/ud_verbs.c:92 -> ibv_post_send
 #1  uct_ud_verbs_ep_tx_skb (max_log_sge=1, send_flags=<optimized out>, skb=<optimized out>, ep=<optimized out>, iface=0x6fa500) at ud/verbs/ud_verbs.c:119
 #2  uct_ud_verbs_ep_send_ctl (ud_ep=<optimized out>, skb=<optimized out>, iov=<optimized out>, iovcnt=<optimized out>, flags=<optimized out>, max_log_sge=1) at ud/verbs/ud_verbs.c:155
 #3  0x00007ffff5405270 in uct_ud_iface_send_ctl (iface=0x6fa500, max_log_sge=1, flags=2, iovcnt=0, iov=0x0, skb=0x7fffe3bff9c0, ep=0x82a430) at ud/base/ud_iface.h:536
@@ -741,7 +741,7 @@ status = run_test(&ctx)
         ucs_module_loader_init_paths -> dlopen
     ucx_perf_test_init
     status = perf->send_allocator->init(perf) -> .init      = ucs_empty_function_return_success
-    status = ucx_perf_funcs[params->api].setup(perf) -> static ucs_status_t ucp_perf_setup
+    status = ucx_perf_funcs[params->api].setup(perf) -> static ucs_status_t ucp_perf_setup -> 初始化: ucx_perf_funcs_t ucx_perf_funcs[]
       status = ucp_perf_test_fill_params(&perf->params, &ucp_params)
         UCX_PERF_CMD_TAG
       ucp_config_read
@@ -775,5 +775,30 @@ void *ucs_malloc(size_t size, const char *name)
 }
 
 
+perf.c, client: main
+...
+socket -> connect
+ucx_perf_do_warmup -> 热身时间
+  status = ucx_perf_funcs[params->api].run(perf) -> ucp_perf_test_dispatch
+  ucx_perf_funcs[params->api].barrier(perf) ->   void ucp_perf_thread_barrier -> rte_call(perf, barrier, (void(*)(void*))ucp_worker_progress -> .barrier       = sock_rte_barrier
+    safe_send(group->sendfd, &snc, sizeof(unsigned), progress, arg)
+status = ucx_perf_funcs[params->api].run(perf)
+ucx_perf_funcs[params->api].barrier(perf)
+ucx_perf_calc_result(perf, result)
+cleanup_rte(&ctx)
+ctx_free(&ctx)
 
+
+#define TEST_CASE -> 测试用例宏 -> template <ucx_perf_cmd_t CMD, ucx_perf_test_type_t TYPE, unsigned FLAGS> -> 泛型 -> test_type_t tests -> tag_lat
+
+ucx_perftest 172.17.29.63 -t ucp_put_bw -c 1
+
+
+
+static UCS_CLASS_INIT_FUNC(uct_rc_verbs_iface_t, -> 设置rdma参数
+uct_rc_verbs_iface_init_inl_wrs
+  iface->inl_am_wr.opcode         = IBV_WR_SEND
+  iface->inl_rwrite_wr.opcode     = IBV_WR_RDMA_WRITE
+uct_rc_iface_qp_create
+uct_rc_verbs_ep_post_flush
 
