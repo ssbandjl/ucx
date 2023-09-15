@@ -1011,7 +1011,8 @@ static double ucp_wireup_aux_score_func(const ucp_worker_iface_t *wiface,
 }
 
 static void ucp_wireup_fill_aux_criteria(ucp_wireup_criteria_t *criteria,
-                                         unsigned ep_init_flags)
+                                         unsigned ep_init_flags,
+                                         uint64_t mandatory_flags)
 {
     criteria->title          = "auxiliary";
     criteria->local_md_flags = 0;
@@ -1026,8 +1027,7 @@ static void ucp_wireup_fill_aux_criteria(ucp_wireup_criteria_t *criteria,
         criteria->local_iface_flags.mandatory  |=
                 UCT_IFACE_FLAG_CONNECT_TO_IFACE;
         criteria->remote_iface_flags.mandatory |=
-                UCP_ADDR_IFACE_FLAG_CONNECT_TO_IFACE |
-                UCP_ADDR_IFACE_FLAG_CB_ASYNC;
+                UCP_ADDR_IFACE_FLAG_CONNECT_TO_IFACE | mandatory_flags;
     }
     criteria->local_cmpt_flags   = 0;
     criteria->local_event_flags  = 0;
@@ -1241,15 +1241,20 @@ ucp_wireup_iface_avail_bandwidth(const ucp_worker_iface_t *wiface,
     double eps                = 1e-3;
     double local_bw, remote_bw;
 
-    local_bw = ucp_wireup_iface_bw_distance(wiface) *
-         ucp_tl_iface_bandwidth_ratio(context, local_dev_count[dev_index],
-                                      wiface->attr.dev_num_paths);
+    local_bw = ucp_wireup_iface_bw_distance(wiface);
 
     if (unpacked_addr->addr_version == UCP_OBJECT_VERSION_V2) {
         /* FP8 is a lossy compression method, so in order to create a symmetric
          * calculation we pack/unpack the local bandwidth as well */
         local_bw = ucp_wireup_fp8_pack_unpack_bw(local_bw);
     }
+
+    /* Apply dev num paths ratio after fp8 pack/unpack to make sure it is not
+     * neglected because of fp8 inaccuracy
+     */
+    local_bw *= ucp_tl_iface_bandwidth_ratio(
+                   context, local_dev_count[dev_index],
+                   wiface->attr.dev_num_paths);
 
     remote_bw = remote_addr->iface_attr.bandwidth *
                 ucp_tl_iface_bandwidth_ratio(
@@ -1446,7 +1451,7 @@ ucp_wireup_am_bw_score_func(const ucp_worker_iface_t *wiface,
 
 static double ucp_wireup_get_lane_bw(ucp_worker_h worker,
                                      const ucp_wireup_select_info_t *sinfo,
-                                     const ucp_address_entry_t *address)
+                                     const ucp_unpacked_address_t *address)
 {
     ucp_context_h context = worker->context;
     const uct_iface_attr_t *iface_attr;
@@ -1454,7 +1459,13 @@ static double ucp_wireup_get_lane_bw(ucp_worker_h worker,
 
     iface_attr = ucp_worker_iface_get_attr(worker, sinfo->rsc_index);
     bw_local   = ucp_tl_iface_bandwidth(context, &iface_attr->bandwidth);
-    bw_remote  = address[sinfo->addr_index].iface_attr.bandwidth;
+    bw_remote  = address->address_list[sinfo->addr_index].iface_attr.bandwidth;
+
+    if (address->addr_version == UCP_OBJECT_VERSION_V2) {
+        /* FP8 is a lossy compression method, so in order to create a symmetric
+         * calculation we pack/unpack the local bandwidth as well */
+        bw_local = ucp_wireup_fp8_pack_unpack_bw(bw_local);
+    }
 
     return ucs_min(bw_local, bw_remote);
 }
@@ -1470,22 +1481,19 @@ ucp_wireup_add_fast_lanes(ucp_worker_h worker,
     double max_bw              = 0;
     ucp_context_h context      = worker->context;
     const double max_ratio     = 1. / context->config.ext.multi_lane_max_ratio;
-    const ucp_address_entry_t *address_list;
     ucs_status_t status;
     double lane_bw;
     const ucp_wireup_select_info_t *sinfo;
 
-    address_list = select_params->address->address_list;
-
     /* Iterate over all elements and calculate max BW */
     ucs_array_for_each(sinfo, sinfo_array) {
-        lane_bw = ucp_wireup_get_lane_bw(worker, sinfo, address_list);
+        lane_bw = ucp_wireup_get_lane_bw(worker, sinfo, select_params->address);
         max_bw  = ucs_max(lane_bw, max_bw);
     }
 
     /* Compare each element to max BW and filter only fast lanes */
     ucs_array_for_each(sinfo, sinfo_array) {
-        lane_bw = ucp_wireup_get_lane_bw(worker, sinfo, address_list);
+        lane_bw = ucp_wireup_get_lane_bw(worker, sinfo, select_params->address);
 
         if (lane_bw < (max_bw * max_ratio)) {
             ucs_trace(UCT_TL_RESOURCE_DESC_FMT
@@ -1509,6 +1517,28 @@ ucp_wireup_add_fast_lanes(ucp_worker_h worker,
 }
 
 static unsigned
+ucp_wireup_get_current_num_lanes(ucp_ep_h ep, ucp_lane_type_t type)
+{
+    unsigned current_num_lanes = 0;
+    ucp_lane_index_t lane;
+
+    /* First initialization (current lanes weren't chosen yet) or
+     * CM is enabled (so we can reconfigure the endpoint).
+     */
+    if ((ep->cfg_index == UCP_WORKER_CFG_INDEX_NULL) ||
+        ucp_ep_has_cm_lane(ep)) {
+        return UCP_PROTO_MAX_LANES;
+    }
+
+    for (lane = 0; lane < ucp_ep_config(ep)->key.num_lanes; ++lane) {
+        if (ucp_ep_config(ep)->key.lanes[lane].lane_types & UCS_BIT(type)) {
+            ++current_num_lanes;
+        }
+    }
+    return current_num_lanes;
+}
+
+static unsigned
 ucp_wireup_add_bw_lanes(const ucp_wireup_select_params_t *select_params,
                         ucp_wireup_select_bw_info_t *bw_info,
                         ucp_tl_bitmap_t tl_bitmap, ucp_lane_index_t excl_lane,
@@ -1527,15 +1557,24 @@ ucp_wireup_add_bw_lanes(const ucp_wireup_select_params_t *select_params,
     ucp_rsc_index_t rsc_index;
     unsigned addr_index;
     ucp_wireup_select_info_t *sinfo;
+    unsigned max_lanes;
 
     local_dev_bitmap      = bw_info->local_dev_bitmap;
     remote_dev_bitmap     = bw_info->remote_dev_bitmap;
     bw_info->criteria.arg = &dev_count;
 
+    /* Restrict choosing more lanes that were already chosen when CM is disabled
+     * to prevent EP reconfiguration in case of dropping lanes due to low BW.
+     * TODO: Remove when endpoint reconfiguration is supported.
+     */
+    max_lanes = ucp_wireup_get_current_num_lanes(select_params->ep,
+                                                 bw_info->criteria.lane_type);
+    max_lanes = ucs_min(max_lanes, bw_info->max_lanes);
+
     /* lookup for requested number of lanes or limit of MD map
      * (we have to limit MD's number to avoid malloc in
      * memory registration) */
-    while (ucs_array_length(&sinfo_array) < bw_info->max_lanes) {
+    while (ucs_array_length(&sinfo_array) < max_lanes) {
         if (excl_lane == UCP_NULL_LANE) {
             sinfo  = ucs_array_append_fixed(select_info, &sinfo_array);
             status = ucp_wireup_select_transport(select_ctx, select_params,
@@ -1913,7 +1952,8 @@ ucp_wireup_select_wireup_msg_lane(ucp_worker_h worker,
     ucp_lane_index_t lane;
     unsigned addr_index;
 
-    ucp_wireup_fill_aux_criteria(&criteria, ep_init_flags);
+    ucp_wireup_fill_aux_criteria(&criteria, ep_init_flags,
+                                 UCP_ADDR_IFACE_FLAG_CB_ASYNC);
     for (lane = 0; lane < num_lanes; ++lane) {
         if (lane_descs[lane].rsc_index == UCP_NULL_RESOURCE) {
             continue;
@@ -2394,10 +2434,25 @@ ucp_wireup_select_aux_transport(ucp_ep_h ep, unsigned ep_init_flags,
     ucp_wireup_select_context_t select_ctx = {};
     ucp_wireup_criteria_t criteria         = {};
     ucp_wireup_select_params_t select_params;
+    ucs_status_t status;
 
     ucp_wireup_select_params_init(&select_params, ep, ep_init_flags,
                                   remote_address, tl_bitmap, 1);
-    ucp_wireup_fill_aux_criteria(&criteria, ep_init_flags);
+
+    /* Select auxiliary transport that supports async active message callback */
+    ucp_wireup_fill_aux_criteria(&criteria, ep_init_flags,
+                                 UCP_ADDR_IFACE_FLAG_CB_ASYNC);
+    status = ucp_wireup_select_transport(&select_ctx, &select_params, &criteria,
+                                         ucp_tl_bitmap_max, UINT64_MAX,
+                                         UINT64_MAX, UINT64_MAX, 0,
+                                         select_info);
+    if (status == UCS_OK) {
+        return UCS_OK;
+    }
+
+    /* Fallback to an auxiliary transport without async active message callback
+     * requirement */
+    ucp_wireup_fill_aux_criteria(&criteria, ep_init_flags, 0);
     return ucp_wireup_select_transport(&select_ctx, &select_params, &criteria,
                                        ucp_tl_bitmap_max, UINT64_MAX,
                                        UINT64_MAX, UINT64_MAX, 1, select_info);

@@ -150,22 +150,20 @@ ucs_status_t ucp_mem_rereg_mds(ucp_context_h context, ucp_md_map_t reg_md_map,
 
 ucs_status_t ucp_mem_type_reg_buffers(ucp_worker_h worker, void *remote_addr,
                                       size_t length, ucs_memory_type_t mem_type,
-                                      ucp_md_index_t md_index, uct_mem_h *memh,
-                                      ucp_md_map_t *md_map,
+                                      ucp_md_index_t md_index, ucp_mem_h *memh_p,
                                       uct_rkey_bundle_t *rkey_bundle);
 
-void ucp_mem_type_unreg_buffers(ucp_worker_h worker, ucs_memory_type_t mem_type,
-                                ucp_md_index_t md_index, uct_mem_h *memh,
-                                ucp_md_map_t *md_map,
-                                uct_rkey_bundle_t *rkey_bundle);
+void ucp_mem_type_unreg_buffers(ucp_worker_h worker, ucp_md_index_t md_index,
+                                ucp_mem_h memh, uct_rkey_bundle_t *rkey_bundle);
 
 ucs_status_t ucp_memh_get_slow(ucp_context_h context, void *address,
                                size_t length, ucs_memory_type_t mem_type,
                                ucp_md_map_t reg_md_map, unsigned uct_flags,
-                               ucp_mem_h *memh_p);
+                               const char *alloc_name, ucp_mem_h *memh_p);
 
 ucs_status_t ucp_memh_register(ucp_context_h context, ucp_mem_h memh,
-                               ucp_md_map_t md_map, unsigned uct_flags);
+                               ucp_md_map_t md_map, unsigned uct_flags,
+                               const char *alloc_name);
 
 void ucp_memh_invalidate(ucp_context_h context, ucp_mem_h memh,
                          ucs_rcache_invalidate_comp_func_t cb, void *arg,
