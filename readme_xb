@@ -751,6 +751,38 @@ status = run_test(&ctx)
         ucs_list_head_init
       ucp_init
       ucp_perf_test_alloc_mem
+        ...
+        status = ucp_perf_mem_alloc(perf, buffer_size * params->thread_count,params->send_mem_type,  perf->send_buffer, &perf->ucp.send_memh) -> typedef struct ucp_mem                   *ucp_mem_h -> UCP 内存句柄 内存句柄是一个不透明对象，表示通过 UCP 库分配的内存区域，它针对远程内存访问操作（零复制操作）进行了优化。内存句柄是一个自包含的对象，其中包含本地访问内存区域所需的信息，而ucp_rkey_h“远程密钥”用于远程访问它。 内存可以注册到 UCP 支持的一个或多个网络资源，例如 InfiniBand、Gemini 等
+          status = ucp_mem_map(perf->ucp.context, &params, memh_p) -> 为零拷贝操作映射或分配内存。 该例程使用 * ucp_context_h“UCP 应用程序上下文”映射或/和分配用户指定的内存段以及与其关联的网络资源。 如果应用程序指定 NULL 作为内存段的地址，则例程将分配映射的内存段并在 address_p 参数中返回其地址。 与应用程序上下文关联的网络堆栈通常可以在没有 CPU 干预的情况下从映射内存发送和接收数据； 某些设备和关联的网络堆栈需要映射内存以发送和接收数据。 ucp_mem_h“内存句柄”包括使用 UCP 例程本地访问内存所需的所有信息，而 ucp_rkey_h“远程注册句柄”提供远程内存访问所需的信息
+
+          status          = ucp_mem_query(*memh_p, &attr)
+          *address_p = attr.address;
+
+分配内存: return md->ops->mem_alloc
+
+
+struct ucx_perf_context -> 性能测试上下文
+/* Buffers */
+void                         *send_buffer; // 发送BUF
+void                         *recv_buffer; // 接收BUF
+
+
+
+内存, 行为矩阵
+/* Matrix of behavior 
+ * |--------------------------------------------------------------------------------|
+ * | parameter |                             value                                  |
+ * |-----------|--------------------------------------------------------------------|
+ * | ALLOCATE  |  0     |     1     |  0  |  0  |  1  |     1     |  0  |     1     |
+ * | FIXED     |  0     |     0     |  1  |  0  |  1  |     0     |  1  |     1     |
+ * | addr      |  0     |     0     |  0  |  1  |  0  |     1     |  1  |     1     |
+ * |-----------|--------|-----------|-----|-----|-----|-----------|-----|-----------|
+ * | result    | err if | alloc/reg | err | reg | err | alloc/reg | err | alloc/reg |
+ * |           | len >0 |           |     |     |     |  (hint)   |     | (fixed)   |
+ * |--------------------------------------------------------------------------------|
+ */
+
+
 
 
 内存类型:
@@ -766,14 +798,22 @@ typedef enum ucs_memory_type {
 } ucs_memory_type_t;
 
 跟踪内存:
-void *ucs_malloc(size_t size, const char *name)
+void *ucs_malloc(size_t size, const char *name) | ucs_calloc
 {
     void *ptr = malloc(size);
     UCS_MEMTRACK_LOG_ZERO_SIZE_ALLOACTION(size, ptr, name);
     ucs_memtrack_allocated_internal(ptr, size, name);
+      ucs_memtrack_do_allocated(ptr, size, name)
     return ptr;
 }
 
+
+
+ucs_memtrack_entry_get -> UCS/MEMTRACK：改进 memtrack 服务以避免更改分配大小，启用内存分配跟踪 (memtrack) 时，不是在每个缓冲区中为元数据分配额外空间，而是将其保留在外部哈希表中（使用 khash）。 这简化了自定义分配器（例如共享内存）的使用，并允许使用固定地址分配器（例如 MMAP_FIXED）而无需覆盖附近的页面。 这是为使用户分配的内存可共享而做的准备
+
+
+KHASH_MAP_INIT_STR(ucs_memtrack_entry_hash, ucs_memtrack_entry_t*)
+kh_put(ucs_memtrack_entry_hash, &ucs_memtrack_context.entries
 
 perf.c, client: main
 ...
@@ -798,7 +838,34 @@ ucx_perftest 172.17.29.63 -t ucp_put_bw -c 1
 static UCS_CLASS_INIT_FUNC(uct_rc_verbs_iface_t, -> 设置rdma参数
 uct_rc_verbs_iface_init_inl_wrs
   iface->inl_am_wr.opcode         = IBV_WR_SEND
-  iface->inl_rwrite_wr.opcode     = IBV_WR_RDMA_WRITE
+  iface->inl_rwrite_wr.opcode     = IBV_WR_RDMA_WRITE | 
 uct_rc_iface_qp_create
 uct_rc_verbs_ep_post_flush
 
+---------- put_bw rdma read/write ----------
+test_type_t tests[] = { -> 测试类型 -> 命令 UCX_PERF_CMD_PUT 推
+{"put_bw", UCX_PERF_API_UCT, UCX_PERF_CMD_PUT, UCX_PERF_TEST_TYPE_STREAM_UNI,
+     "put bandwidth / message rate", "overhead", 1},
+
+
+
+---------- put_bw rdma read/write ----------
+
+uct_rc_verbs_ep_post_send
+  IBV_WR_RDMA_READ
+
+
+内存免拷贝: uct_rc_verbs_ep_rdma_zcopy
+
+
+创建内存, 先创建后注册
+ucp_memh_create
+  memh = ucs_calloc(1, ucp_memh_size(context), "ucp_memh")
+    void *ptr = calloc(nmemb, size)
+    ucs_memtrack_allocated_internal(ptr, nmemb * size, name)
+    return ptr
+  ucp_memh_set(memh, context, address, length, mem_type, memh_flags, method)
+  *memh_p = memh
+
+
+uct_ib_md_open -> 打开设备
