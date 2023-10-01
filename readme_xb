@@ -12,6 +12,12 @@ git fetch upstream
 git merge upstream/master
 
 
+git remote add upstream https://github.com/openucx/ucx.git
+git remote -v
+git fetch upstream
+git merge upstream/master
+
+
 build
 ./autogen.sh
 close vagrind
@@ -869,3 +875,6 @@ ucp_memh_create
 
 
 uct_ib_md_open -> 打开设备
+send:
+ucp_am_send_nbx -> UCS_PROFILE_FUNC(ucs_status_ptr_t, ucp_am_send_nbx
+  ucp_request_imm_cmpl_param(param, req, send)
