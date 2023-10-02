@@ -1,0 +1,4591 @@
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# UCS global configuration
+#
+
+#
+# UCS logging level. Messages with a level higher or equal to the selected will be printed.
+# Possible values are: fatal, error, warn, info, debug, trace, data, func, poll.
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+#
+UCX_LOG_LEVEL=WARN
+
+#
+# Set a filter for log message according to source file path. See glob (7) for
+# pattern syntax.
+# NOTE: The source file path must fully match the given pattern.
+#
+# syntax:    string
+#
+UCX_LOG_FILE_FILTER=*
+
+#
+# Buffer size for a single log message.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_LOG_BUFFER=1K
+
+#
+# How much packet payload to print, at most, in data mode.
+#
+# syntax:    unsigned long
+#
+UCX_LOG_DATA_SIZE=0
+
+#
+# Enable output of ucs_print(). This option is intended for use by the library developers.
+#
+# syntax:    <y|n>
+#
+UCX_LOG_PRINT_ENABLE=n
+
+#
+# Error signal handling mode. Either 'none' to disable signal interception,
+# or a combination of:
+#  - 'bt'     : Print backtrace
+#  - 'freeze' : Freeze and wait for a debugger
+#  - 'debug'  : Attach a debugger
+#
+# syntax:    comma-separated list of: [bt|freeze|debug|none]
+#
+UCX_HANDLE_ERRORS=bt
+
+#
+# If non-empty, send mail notification for fatal errors.
+#
+# syntax:    string
+#
+UCX_ERROR_MAIL_TO=
+
+#
+# Footer for error report email
+#
+# syntax:    string
+#
+UCX_ERROR_MAIL_FOOTER=
+
+#
+# If non-empty, attaches a gdb to the process in case of error, using the provided command.
+#
+# syntax:    string
+#
+UCX_GDB_COMMAND=gdb -quiet
+
+#
+# Signal number which causes UCS to enter debug mode. Set to 0 to disable.
+#
+# syntax:    system signal (number or SIGxxx)
+#
+UCX_DEBUG_SIGNO=HUP
+
+#
+# Log level to trigger error handling.
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+#
+UCX_LOG_LEVEL_TRIGGER=FATAL
+
+#
+# Issue warning about UCX_ environment variables which were not used by the
+# configuration parser.
+#
+# syntax:    <y|n>
+#
+UCX_WARN_UNUSED_ENV_VARS=y
+
+#
+# Enable memory type (cuda/rocm) cache
+#
+# syntax:    <yes|no|try>
+#
+UCX_MEMTYPE_CACHE=try
+
+#
+# Maximal number of events which can be handled from one context
+#
+# syntax:    unsigned integer
+#
+UCX_ASYNC_MAX_EVENTS=1024
+
+#
+# Signal number used for async signaling.
+#
+# syntax:    system signal (number or SIGxxx)
+#
+UCX_ASYNC_SIGNO=ALRM
+
+#
+# Memory limit allocated by memtrack. In case if limit is reached then
+# memtrack report is generated and process is terminated.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_MEMTRACK_LIMIT=inf
+
+#
+# Registration cache to check that the physical pages frame number of a found
+# memory region were not changed since the time the region was registered.
+# Number of pages to check, 0 - disable checking.
+#
+# syntax:    unsigned integer
+#
+UCX_RCACHE_CHECK_PFN=0
+
+#
+# Directory to search for loadable modules
+#
+# syntax:    string
+#
+UCX_MODULE_DIR=/usr/lib64/ucx
+
+#
+# Logging level for module loader
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+#
+UCX_MODULE_LOG_LEVEL=TRACE
+
+#
+# Comma-separated list of glob patterns specifying which module to load.
+# The order is not meaningful. For example:
+#  *     - load all modules
+#  ^cu*  - do not load modules that begin with 'cu'
+#
+# syntax:    comma-separated list (use "all" for including all items or '^' for negation) of: string
+#
+UCX_MODULES=all
+
+#
+# Comma-separated list of methods of detecting system topology.
+# The list order decides the priority of methods used.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_TOPO_PRIO=sysfs,default
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# UCS global (runtime read-only) configuration
+#
+
+#
+# If not empty, UCS will print log messages to the specified file instead of stdout.
+# The following substitutions are performed on this string:
+#   %p - Replaced with process ID
+#   %h - Replaced with host name
+#
+# syntax:    string
+#
+UCX_LOG_FILE=
+
+#
+# The maximal size of log file. The maximal log file size has to be >= LOG_BUFFER.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_LOG_FILE_SIZE=inf
+
+#
+# The maximal number of backup log files that could be created to save logs
+# after the previous ones (if any) are completely filled. The value has to be
+# less than the maximal signed integer value.
+#
+# syntax:    unsigned integer
+#
+UCX_LOG_FILE_ROTATE=0
+
+#
+# Signals which are considered an error indication and trigger error handling.
+#
+# syntax:    comma-separated list of: system signal (number or SIGxxx)
+#
+UCX_ERROR_SIGNALS=ILL,SEGV,BUS,FPE
+
+#
+# Enable virtual monitoring filesystem
+#
+# syntax:    <y|n>
+#
+UCX_VFS_ENABLE=y
+
+#
+# Enable inheriting main process affinity for virtual monitoring filesystem
+# service thread. Setting this value to 'n' will allow the service thread to
+# run on any CPU core.
+#
+# syntax:    <y|n>
+#
+UCX_VFS_THREAD_AFFINITY=n
+
+#
+# Destination to output memory tracking report to. If the value is empty,
+# results are not reported. Possible values are:
+#   file:<filename>   - save to a file (%h: host, %p: pid, %c: cpu, %t: time, %u: user, %e: exe)
+#   stdout            - print to standard output.
+#   stderr            - print to standard error.
+#
+# syntax:    string
+#
+UCX_MEMTRACK_DEST=
+
+#
+# Profile collection modes. If none is specified, profiling is disabled.
+#  - log   - Record all timestamps.
+#  - accum - Accumulate measurements per location.
+#
+# syntax:    comma-separated list of: [accum|log]
+#
+UCX_PROFILE_MODE=
+
+#
+# File name to dump profiling data to.
+# Substitutions: %h: host, %p: pid, %c: cpu, %t: time, %u: user, %e: exe.
+#
+# syntax:    string
+#
+UCX_PROFILE_FILE=ucx_%h_%p.prof
+
+#
+# Maximal size of profiling log. New records will replace old records.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_PROFILE_LOG_SIZE=4M
+
+#
+# Registration cache minimum region size, for power-of-2 size distribution statistics.
+# Statistics about smaller regions will be attributed to this specified minimal size.
+# Rounded up to the next power-of-2 value.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RCACHE_STAT_MIN=4K
+
+#
+# Registration cache maximum region size, for power-of-2 size distribution statistics.
+# Statistics about larger regions will be attributed to 'max' bucket.
+# Rounded up to the next power-of-2 value.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RCACHE_STAT_MAX=1M
+
+#
+# Minimal threshold of buffer length for using built-in memcpy.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_BUILTIN_MEMCPY_MIN=auto
+
+#
+# Maximal threshold of buffer length for using built-in memcpy.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_BUILTIN_MEMCPY_MAX=auto
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# UCM configuration
+#
+
+#
+# Logging level for memory events
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE]
+#
+UCX_MEM_LOG_LEVEL=WARN
+
+#
+# Minimal alignment of allocated blocks
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_MEM_ALLOC_ALIGN=16
+
+#
+# Enable memory events
+#
+# syntax:    <y|n>
+#
+UCX_MEM_EVENTS=y
+
+#
+# MMAP hook mode
+#  none   - Don't set mmap hooks.
+#  reloc  - Use ELF relocation table to set hooks.
+#  bistro - Use binary instrumentation to set hooks.
+# 
+#
+# syntax:    [none|reloc|bistro]
+#
+UCX_MEM_MMAP_HOOK_MODE=bistro
+
+#
+# Enable using glibc malloc hooks
+#
+# syntax:    <y|n>
+#
+UCX_MEM_MALLOC_HOOKS=y
+
+#
+# Enable installing malloc symbols in the relocation table.
+# This is unsafe and off by default, because sometimes glibc
+# calls malloc/free without going through the relocation table,
+# which would use the original implementation and not ours.
+#
+# syntax:    <y|n>
+#
+UCX_MEM_MALLOC_RELOC=y
+
+#
+# Cuda memory hook modes. A combination of:
+#  none   - Don't set Cuda hooks.
+#  reloc  - Use ELF relocation table to set hooks. In this mode, if any
+#           part of the application is linked with Cuda runtime statically,
+#           some memory events may be missed and not reported. bistro - Use binary instrumentation to set hooks. In this mode, it's
+#           possible to intercept calls from the Cuda runtime library to
+#           Cuda driver APIs, so memory events are reported properly even
+#           for statically-linked applications.
+#
+# syntax:    comma-separated list of: [none|reloc|bistro]
+#
+UCX_MEM_CUDA_HOOK_MODE=bistro
+
+#
+# Enable dynamic mmap threshold: for every released block, the
+# mmap threshold is adjusted upward to the size of the size of
+# the block, and trim threshold is adjust to twice the size of
+# the dynamic mmap threshold.
+# Note: dynamic mmap threshold is disabled when running on valgrind.
+#
+# syntax:    <y|n>
+#
+UCX_MEM_DYNAMIC_MMAP_THRESH=y
+
+#
+# Process RPATH section of caller module during dynamic libraries opening.
+#
+# syntax:    <y|n>
+#
+UCX_MEM_DLOPEN_PROCESS_RPATH=y
+
+#
+# Module unload prevention mode
+#  lazy - use RTLD_LAZY flag to add reference to module.
+#  now  - use RTLD_NOW flag to add reference to module.
+#  none - don't prevent module unload, use it for debug purposes only.
+#
+# syntax:    [lazy|now|none]
+#
+UCX_MEM_MODULE_UNLOAD_PREVENT_MODE=lazy
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# Self memory domain configuration
+#
+
+#
+# Number of "self" devices to create
+#
+# syntax:    integer
+#
+UCX_SELF_NUM_DEVICES=1
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# self transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_ALLOC
+#
+UCX_SELF_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_FAILURE
+#
+UCX_SELF_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MAX_NUM_EPS
+#
+UCX_SELF_MAX_NUM_EPS=inf
+
+#
+# Size of copy-out buffer
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_SELF_SEG_SIZE=8K
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# TCP memory domain configuration
+#
+
+#
+# Priority of address families used for socket connections
+#
+# syntax:    comma-separated list of: string
+#
+UCX_TCP_AF_PRIO=inet,inet6
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# TCP-SOCKCM connection manager configuration
+#
+
+#
+# Log level of network errors for the connection manager
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_CM_FAILURE
+#
+UCX_TCP_CM_FAILURE=DIAG
+
+#
+# Allow using an address that is already in use.
+#
+# syntax:    <y|n>
+# inherits:  UCX_CM_REUSEADDR
+#
+UCX_TCP_CM_REUSEADDR=n
+
+#
+# TCP CM private data length
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_CM_PRIV_DATA_LEN=2K
+
+#
+# Socket send buffer size
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_CM_SNDBUF=auto
+
+#
+# Socket receive buffer size
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_CM_RCVBUF=auto
+
+#
+# Number of SYN retransmits that TCP should send before aborting the attempt
+# to connect. It cannot exceed 255. auto means to use the system default.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+#
+UCX_TCP_CM_SYN_CNT=auto
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# tcp transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_ALLOC
+#
+UCX_TCP_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_FAILURE
+#
+UCX_TCP_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MAX_NUM_EPS
+#
+UCX_TCP_MAX_NUM_EPS=256
+
+#
+# Size of send copy-out buffer
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_TX_SEG_SIZE=8K
+
+#
+# Size of receive copy-out buffer
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_RX_SEG_SIZE=64K
+
+#
+# Maximum IOV count that can contain user-defined payload in a single
+# call to non-blocking vector socket send
+#
+# syntax:    unsigned long
+#
+UCX_TCP_MAX_IOV=6
+
+#
+# Threshold for switching from send() to sendmsg() for short active messages
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_SENDV_THRESH=2K
+
+#
+# Give higher priority to the default network interface on the host
+#
+# syntax:    <y|n>
+#
+UCX_TCP_PREFER_DEFAULT=y
+
+#
+# Enable PUT Zcopy support
+#
+# syntax:    <y|n>
+#
+UCX_TCP_PUT_ENABLE=y
+
+#
+# Enable non-blocking connection establishment. It may improve startup time, but can lead to connection resets due to high load on TCP/IP stack
+#
+# syntax:    <y|n>
+#
+UCX_TCP_CONN_NB=n
+
+#
+# Number of times to poll on a ready socket. 0 - no polling, -1 - until drained
+#
+# syntax:    unsigned integer
+#
+UCX_TCP_MAX_POLL=16
+
+#
+# How many connection establishment attempts should be done if dropped connection was detected due to lack of system resources
+#
+# syntax:    unsigned integer
+#
+UCX_TCP_MAX_CONN_RETRIES=25
+
+#
+# Set TCP_NODELAY socket option to disable Nagle algorithm. Setting this
+# option usually provides better performance
+#
+# syntax:    <y|n>
+#
+UCX_TCP_NODELAY=y
+
+#
+# Socket send buffer size
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_SNDBUF=auto
+
+#
+# Socket receive buffer size
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TCP_RCVBUF=auto
+
+#
+# Number of SYN retransmits that TCP should send before aborting the attempt
+# to connect. It cannot exceed 255. auto means to use the system default.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+#
+UCX_TCP_SYN_CNT=auto
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+#
+UCX_TCP_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+#
+UCX_TCP_TX_BUFS_GROW=8
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+#
+UCX_TCP_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+#
+UCX_TCP_RX_BUFS_GROW=8
+
+#
+# Generate a random TCP port number from that range. A value of zero means
+# let the operating system select the port number.
+#
+# syntax:    numbers range: <number>-<number>
+#
+UCX_TCP_PORT_RANGE=0
+
+#
+# The time the connection needs to remain idle before TCP starts sending keepalive probes. Specifying "inf" disables keepalive.
+#
+# syntax:    time value: <number>[s|us|ms|ns], "inf", or "auto"
+#
+UCX_TCP_KEEPIDLE=10000000.00us
+
+#
+# The maximum number of keepalive probes TCP should send before dropping the connection. Specifying "inf" disables keepalive.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+#
+UCX_TCP_KEEPCNT=auto
+
+#
+# The time between individual keepalive probes. Specifying "inf" disables keepalive.
+#
+# syntax:    time value: <number>[s|us|ms|ns], "inf", or "auto"
+#
+UCX_TCP_KEEPINTVL=2000000.00us
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# sysv memory domain configuration
+#
+
+#
+# Enable using huge pages for internal buffers. Possible values are:
+#  y   - Allocate memory using huge pages only.
+#  n   - Allocate memory using regular pages only.
+#  try - Try to allocate memory using huge pages and if it fails, allocate regular pages.
+# 
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_MM_HUGETLB_MODE
+#
+UCX_SYSV_HUGETLB_MODE=try
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# sysv transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_MM_ALLOC, UCX_SM_ALLOC, UCX_ALLOC
+#
+UCX_SYSV_ALLOC=md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_MM_FAILURE, UCX_SM_FAILURE, UCX_FAILURE
+#
+UCX_SYSV_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MM_MAX_NUM_EPS, UCX_SM_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_SYSV_MAX_NUM_EPS=inf
+
+#
+# Effective memory bandwidth
+#
+# syntax:    bandwidth value: <number>[T|G|M|K]B|b[[p|/]s] or "auto"
+# inherits:  UCX_MM_BW, UCX_SM_BW
+#
+UCX_SYSV_BW=12179.00MBps
+
+#
+# Size of the receive FIFO in the memory-map UCTs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_FIFO_SIZE
+#
+UCX_SYSV_FIFO_SIZE=64
+
+#
+# Size of send/receive buffers for copy-out sends.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_MM_SEG_SIZE
+#
+UCX_SYSV_SEG_SIZE=8256
+
+#
+# Frequency of resource releasing on the receiver's side in the MM UCT.
+# This value refers to the percentage of the FIFO size. (must be >= 0 and < 1).
+#
+# syntax:    floating point number
+# inherits:  UCX_MM_FIFO_RELEASE_FACTOR
+#
+UCX_SYSV_FIFO_RELEASE_FACTOR=0.500
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_MM_RX_MAX_BUFS
+#
+UCX_SYSV_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_RX_BUFS_GROW
+#
+UCX_SYSV_RX_BUFS_GROW=512
+
+#
+# Enable using huge pages for internal shared memory buffers.Possible values are:
+#  y   - Allocate memory using huge pages only.
+#  n   - Allocate memory using regular pages only.
+#  try - Try to allocate memory using huge pages and if it fails, allocate regular pages.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_MM_FIFO_HUGETLB
+#
+UCX_SYSV_FIFO_HUGETLB=n
+
+#
+# Size of the FIFO element size (data + header) in the MM UCTs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_FIFO_ELEM_SIZE
+#
+UCX_SYSV_FIFO_ELEM_SIZE=128
+
+#
+# Maximal number of receive completions to pick during RX poll
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MM_FIFO_MAX_POLL
+#
+UCX_SYSV_FIFO_MAX_POLL=16
+
+#
+# Expose error handling support capability
+#
+# syntax:    <y|n>
+# inherits:  UCX_MM_ERROR_HANDLING
+#
+UCX_SYSV_ERROR_HANDLING=n
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# posix memory domain configuration
+#
+
+#
+# Enable using huge pages for internal buffers. Possible values are:
+#  y   - Allocate memory using huge pages only.
+#  n   - Allocate memory using regular pages only.
+#  try - Try to allocate memory using huge pages and if it fails, allocate regular pages.
+# 
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_MM_HUGETLB_MODE
+#
+UCX_POSIX_HUGETLB_MODE=try
+
+#
+# The path to the backing file. If it's equal to /dev/shm then 
+# shm_open() is used. Otherwise, open() is used.
+#
+# syntax:    string
+#
+UCX_POSIX_DIR=/dev/shm
+
+#
+# Use /proc/<pid>/fd/<fd> to share posix file.
+#  y   - Use /proc/<pid>/fd/<fd> to share posix file.
+#  n   - Use original file path to share posix file.
+# 
+#
+# syntax:    <y|n>
+#
+UCX_POSIX_USE_PROC_LINK=y
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# posix transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_MM_ALLOC, UCX_SM_ALLOC, UCX_ALLOC
+#
+UCX_POSIX_ALLOC=md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_MM_FAILURE, UCX_SM_FAILURE, UCX_FAILURE
+#
+UCX_POSIX_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MM_MAX_NUM_EPS, UCX_SM_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_POSIX_MAX_NUM_EPS=inf
+
+#
+# Effective memory bandwidth
+#
+# syntax:    bandwidth value: <number>[T|G|M|K]B|b[[p|/]s] or "auto"
+# inherits:  UCX_MM_BW, UCX_SM_BW
+#
+UCX_POSIX_BW=12179.00MBps
+
+#
+# Size of the receive FIFO in the memory-map UCTs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_FIFO_SIZE
+#
+UCX_POSIX_FIFO_SIZE=64
+
+#
+# Size of send/receive buffers for copy-out sends.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_MM_SEG_SIZE
+#
+UCX_POSIX_SEG_SIZE=8256
+
+#
+# Frequency of resource releasing on the receiver's side in the MM UCT.
+# This value refers to the percentage of the FIFO size. (must be >= 0 and < 1).
+#
+# syntax:    floating point number
+# inherits:  UCX_MM_FIFO_RELEASE_FACTOR
+#
+UCX_POSIX_FIFO_RELEASE_FACTOR=0.500
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_MM_RX_MAX_BUFS
+#
+UCX_POSIX_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_RX_BUFS_GROW
+#
+UCX_POSIX_RX_BUFS_GROW=512
+
+#
+# Enable using huge pages for internal shared memory buffers.Possible values are:
+#  y   - Allocate memory using huge pages only.
+#  n   - Allocate memory using regular pages only.
+#  try - Try to allocate memory using huge pages and if it fails, allocate regular pages.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_MM_FIFO_HUGETLB
+#
+UCX_POSIX_FIFO_HUGETLB=n
+
+#
+# Size of the FIFO element size (data + header) in the MM UCTs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_FIFO_ELEM_SIZE
+#
+UCX_POSIX_FIFO_ELEM_SIZE=128
+
+#
+# Maximal number of receive completions to pick during RX poll
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MM_FIFO_MAX_POLL
+#
+UCX_POSIX_FIFO_MAX_POLL=16
+
+#
+# Expose error handling support capability
+#
+# syntax:    <y|n>
+# inherits:  UCX_MM_ERROR_HANDLING
+#
+UCX_POSIX_ERROR_HANDLING=n
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# UCP context configuration
+#
+
+#
+# Specifies which network device(s) to use. The order is not meaningful.
+# "all" would use all available devices.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_NET_DEVICES=all
+
+#
+# Specifies which intra-node device(s) to use. The order is not meaningful.
+# "all" would use all available devices.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_SHM_DEVICES=all
+
+#
+# Specifies which accelerator device(s) to use. The order is not meaningful.
+# "all" would use all available devices.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_ACC_DEVICES=all
+
+#
+# Specifies which loop-back device(s) to use. The order is not meaningful.
+# "all" would use all available devices.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_SELF_DEVICES=all
+
+#
+# Comma-separated list of transports to use. The order is not meaningful.
+#  - all     : use all the available transports.
+#  - sm/shm  : all shared memory transports (mm, cma, knem).
+#  - mm      : shared memory transports - only memory mappers.
+#  - ugni    : ugni_smsg and ugni_rdma (uses ugni_udt for bootstrap).
+#  - ib      : all infiniband transports (rc/rc_mlx5, ud/ud_mlx5, dc_mlx5).
+#  - rc_v    : rc verbs (uses ud for bootstrap).
+#  - rc_x    : rc with accelerated verbs (uses ud_mlx5 for bootstrap).
+#  - rc      : rc_v and rc_x (preferably if available).
+#  - ud_v    : ud verbs.
+#  - ud_x    : ud with accelerated verbs.
+#  - ud      : ud_v and ud_x (preferably if available).
+#  - dc/dc_x : dc with accelerated verbs.
+#  - tcp     : sockets over TCP/IP.
+#  - cuda    : CUDA (NVIDIA GPU) memory support.
+#  - rocm    : ROCm (AMD GPU) memory support.
+#  Using a \ prefix before a transport name treats it as an explicit transport name
+#  and disables aliasing.
+#
+# syntax:    comma-separated list (use "all" for including all items or '^' for negation) of: string
+#
+UCX_TLS=all
+
+#
+# Comma-separated list of glob patterns specifying protocols to use.
+# The order is not meaningful.
+# Each expression in the list may contain any of the following wildcard:
+#   *     - matches any number of any characters including none.
+#   ?     - matches any single character.
+#   [abc] - matches one character given in the bracket.
+#   [a-z] - matches one character from the range given in the bracket.
+#
+# syntax:    comma-separated list (use "all" for including all items or '^' for negation) of: string
+#
+UCX_PROTOS=all
+
+#
+# Priority of memory allocation methods. Each item in the list can be either
+# an allocation method (huge, thp, mmap, libc) or md:<NAME> which means to use the
+# specified memory domain for allocation. NAME can be either a UCT component
+# name, or a wildcard - '*' - which is equivalent to all UCT components.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_ALLOC_PRIO=md:sysv,md:posix,huge,thp,md:*,mmap,heap
+
+#
+# Priority of sockaddr transports for client/server connection establishment.
+# The '*' wildcard expands to all the available sockaddr transports.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_SOCKADDR_TLS_PRIORITY=rdmacm,tcp,sockcm
+
+#
+# MD whose distance is queried when evaluating transport selection score
+#
+# syntax:    string
+#
+UCX_SELECT_DISTANCE_MD=cuda_cpy
+
+#
+# Memory types which have whole allocations registered.
+# Allowed memory types: cuda, rocm, rocm-managed
+#
+# syntax:    comma-separated list of: [host|cuda|cuda-managed|rocm|rocm-managed|unknown]
+#
+UCX_MEMTYPE_REG_WHOLE_ALLOC_TYPES=cuda
+
+#
+# Maximum size for mem type direct in rendezvous protocol
+# 
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RNDV_MEMTYPE_DIRECT_SIZE=inf
+
+#
+# Issue a warning in case of invalid device and/or transport configuration.
+#
+# syntax:    <y|n>
+#
+UCX_WARN_INVALID_CONFIG=y
+
+#
+# Threshold for switching from short to bcopy protocol
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_BCOPY_THRESH=auto
+
+#
+# Threshold for switching from eager to rendezvous protocol
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RNDV_THRESH=auto
+
+#
+# Threshold for switching from eager to rendezvous protocol in ucp_tag_send_nbr().
+# Relevant only if UCX_RNDV_THRESH is set to "auto".
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RNDV_SEND_NBR_THRESH=256K
+
+#
+# Message size to start using the rendezvous protocol in case the calculated threshold
+# is zero or negative
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RNDV_THRESH_FALLBACK=inf
+
+#
+# The percentage allowed for performance difference between rendezvous and the eager_zcopy protocol
+#
+# syntax:    floating point number
+#
+UCX_RNDV_PERF_DIFF=1.000
+
+#
+# Maximal allowed ratio between slowest and fastest lane in a multi-lane
+# protocol. Lanes slower than the specified ratio will not be used.
+#
+# syntax:    floating point number
+#
+UCX_MULTI_LANE_MAX_RATIO=4.000
+
+#
+# Maximal number of devices on which an eager operation may be executed in parallel
+#
+# syntax:    unsigned integer
+#
+UCX_MAX_EAGER_RAILS=1
+
+#
+# Maximal number of devices on which a rendezvous operation may be executed in parallel
+#
+# syntax:    unsigned integer
+#
+UCX_MAX_RNDV_RAILS=2
+
+#
+# Communication scheme in RNDV protocol.
+#  get_zcopy - use get_zcopy scheme in RNDV protocol.
+#  put_zcopy - use put_zcopy scheme in RNDV protocol.
+#  rkey_ptr  - use rket_ptr in RNDV protocol.
+#  auto      - runtime automatically chooses optimal scheme to use.
+#
+# syntax:    [auto|get_zcopy|put_zcopy|get_ppln|put_ppln|am|rkey_ptr]
+#
+UCX_RNDV_SCHEME=auto
+
+#
+# Segment size that is used to perform data transfer when doing RKEY PTR progress
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RKEY_PTR_SEG_SIZE=512K
+
+#
+# Threshold for switching from buffer copy to zero copy protocol
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_ZCOPY_THRESH=auto
+
+#
+# Estimation of buffer copy bandwidth
+#
+# syntax:    bandwidth value: <number>[T|G|M|K]B|b[[p|/]s] or "auto"
+#
+UCX_BCOPY_BW=auto
+
+#
+# Atomic operations synchronization mode.
+#  cpu    - atomic operations are consistent with respect to the CPU.
+#  device - atomic operations are performed on one of the transport devices,
+#           and there is guarantee of consistency with respect to the CPU. guess  - atomic operations mode is configured based on underlying
+#           transport capabilities. If one of active transports supports
+#           the DEVICE atomic mode, the DEVICE mode is selected.
+#           Otherwise the CPU mode is selected.
+#
+# syntax:    [cpu|device|guess]
+#
+UCX_ATOMIC_MODE=guess
+
+#
+# Add debugging information to worker address.
+#
+# syntax:    <y|n>
+#
+UCX_ADDRESS_DEBUG_INFO=n
+
+#
+# Maximal length of worker address name. Sent to remote peer as part of
+# worker address if UCX_ADDRESS_DEBUG_INFO is set to 'yes'
+#
+# syntax:    unsigned integer
+#
+UCX_MAX_WORKER_ADDRESS_NAME=32
+
+#
+# Use mutex for multithreading support in UCP.
+# n      - Not use mutex for multithreading support in UCP (use spinlock by default).
+# y      - Use mutex for multithreading support in UCP.
+#
+# syntax:    <y|n>
+#
+UCX_USE_MT_MUTEX=n
+
+#
+# Enable adaptive progress mechanism, which turns on polling only on active
+# transport interfaces.
+#
+# syntax:    <y|n>
+#
+UCX_ADAPTIVE_PROGRESS=y
+
+#
+# Size of a segment in the worker preregistered memory pool.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_SEG_SIZE=8K
+
+#
+# Threshold for using tag matching offload capabilities.
+# Smaller buffers will not be posted to the transport.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TM_THRESH=1K
+
+#
+# Maximal size for posting "bounce buffer" (UCX internal preregistered memory) for
+# tag offload receives. When message arrives, it is copied into the user buffer (similar
+# to eager protocol). The size values has to be equal or less than segment size.
+# Also the value has to be bigger than UCX_TM_THRESH to take an effect.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TM_MAX_BB_SIZE=1K
+
+#
+# Threshold for forcing tag matching offload mode. Every tag receive operation
+# with buffer bigger than this threshold would force offloading of all uncompleted
+# non-offloaded receive operations to the transport (e. g. operations with
+# buffers below the UCX_TM_THRESH value). Offloading may be unsuccessful in certain
+# cases (non-contig buffer, or sender wildcard).
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_TM_FORCE_THRESH=8K
+
+#
+# Use software rendezvous protocol with tag offload. If enabled, tag offload
+# mode will be used for messages sent with eager protocol only.
+#
+# syntax:    <y|n>
+#
+UCX_TM_SW_RNDV=n
+
+#
+# An optimization hint of how many endpoints would be created on this context.
+# Does not affect semantics, but only transport selection criteria and the
+# resulting performance.
+#  If set to a value different from "auto" it will override the value passed
+# to ucp_init()
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+#
+UCX_NUM_EPS=auto
+
+#
+# An optimization hint for the number of processes expected to be launched
+# on a single node. Does not affect semantics, only transport selection criteria
+# and the resulting performance.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+#
+UCX_NUM_PPN=auto
+
+#
+# Comma-separated list of memory types and associated fragment sizes.
+# The memory types in the list is used for rendezvous bounce buffers.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_RNDV_FRAG_SIZE=host:512K,cuda:4M
+
+#
+# Comma separated list of memory pool allocation granularity per memory type.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_RNDV_FRAG_ALLOC_COUNT=host:128,cuda:128
+
+#
+# Memory type of fragments used for RNDV pipeline protocol.
+# Allowed memory types is one of: host, cuda, rocm
+#
+# syntax:    [host|cuda|cuda-managed|rocm|rocm-managed|unknown]
+#
+UCX_RNDV_FRAG_MEM_TYPE=host
+
+#
+# RNDV size threshold to enable sender side pipeline for mem type
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RNDV_PIPELINE_SEND_THRESH=inf
+
+#
+# Use two stage pipeline rendezvous protocol for intra-node GPU to GPU transfers
+#
+# syntax:    <y|n>
+#
+UCX_RNDV_PIPELINE_SHM_ENABLE=y
+
+#
+# Enable flushing the worker by flushing its endpoints. Allows completing
+# the flush operation in a bounded time even if there are new requests on
+# another thread, or incoming active messages, but consumes more resources.
+#
+# syntax:    <y|n>
+#
+UCX_FLUSH_WORKER_EPS=y
+
+#
+# Enable various optimizations intended for homogeneous environment.
+# Enabling this mode implies that the local transport resources/devices
+# of all entities which connect to each other are the same.
+#
+# syntax:    <y|n>
+#
+UCX_UNIFIED_MODE=n
+
+#
+# When creating client/server endpoints, use all available devices.
+# If disabled, use only the one device on which the connection
+# establishment is done
+#
+# syntax:    <y|n>
+#
+UCX_CM_USE_ALL_DEVICES=y
+
+#
+# 'auto' means that each transport would use its maximal allowed value.
+# If a value larger than what a transport supports is set, the backlog value
+# would be cut to that maximal value.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+#
+UCX_LISTENER_BACKLOG=auto
+
+#
+# Experimental: enable new protocol selection logic
+#
+# syntax:    <y|n>
+#
+UCX_PROTO_ENABLE=n
+
+#
+# Time interval between keepalive rounds.
+#
+# syntax:    time value: <number>[s|us|ms|ns], "inf", or "auto"
+#
+UCX_KEEPALIVE_INTERVAL=20000000.00us
+
+#
+# Maximal number of endpoints to check on every keepalive round
+# (inf - check all endpoints on every round, must be greater than 0)
+#
+# syntax:    unsigned integer
+#
+UCX_KEEPALIVE_NUM_EPS=128
+
+#
+# Defines whether resolving remote endpoint ID is required or not when
+# creating a local endpoint. 'auto' means resolving remote endpint ID only
+# in case of error handling and keepalive enabled.
+#
+# syntax:    <on|off|auto>
+#
+UCX_RESOLVE_REMOTE_EP_ID=off
+
+#
+# Enable indirect IDs to object pointers (endpoint, request) in wire protocols.
+# A value of 'auto' means to enable only if error handling is enabled on the
+# endpoint.
+#
+# syntax:    <on|off|auto>
+#
+UCX_PROTO_INDIRECT_ID=auto
+
+#
+# When using rendezvous put protocol, force using a flush operation to ensure
+# remote data delivery before sending ATP message.
+# If flush mode is not forced, and the underlying transport supports both active
+# messages and put operations, the protocol will do {put,fence,ATP} on the same
+# lane without waiting for remote completion.
+#
+# syntax:    <y|n>
+#
+UCX_RNDV_PUT_FORCE_FLUSH=n
+
+#
+# Defines the minimal header version the client will use for establishing
+# client/server connection
+#
+# syntax:    [v1|v2]
+#
+UCX_SA_DATA_VERSION=v1
+
+#
+# Maximum number of UCP rkey MDs which can be unpacked into memory pool
+# element. UCP rkeys containing larger number of MDs will be unpacked to
+# dynamically allocated memory.
+#
+# syntax:    integer
+#
+UCX_RKEY_MPOOL_MAX_MD=2
+
+#
+# List of worker mpool sizes separated by comma. The values must be power of 2
+# Values larger than the maximum UCT transport segment size will be ignored.
+# These pools are used for UCP AM and unexpected TAG messages. When assigning
+# pool sizes, note that the data may be stored with some header.
+#
+# syntax:    comma-separated list of: memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RX_MPOOL_SIZES=64,1K
+
+#
+# Defines UCP worker address format obtained with ucp_worker_get_address() or
+# ucp_worker_query() routines.
+#
+# syntax:    [v1|v2]
+#
+UCX_ADDRESS_VERSION=v1
+
+#
+# Use user space memory registration cache.
+#
+# syntax:    <yes|no|try>
+#
+UCX_RCACHE_ENABLE=try
+
+#
+# Enable printing protocols information.
+#
+# syntax:    <y|n>
+#
+UCX_PROTO_INFO=n
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# IB memory domain configuration
+#
+
+#
+# List of registration methods in order of preference. Supported methods are:
+#   odp         - implicit on-demand paging
+#   rcache      - userspace registration cache
+#   direct      - direct registration
+# 
+#
+# syntax:    comma-separated list of: string
+#
+UCX_IB_REG_METHODS=rcache,odp,direct
+
+#
+# Registration cache memory event priority
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RCACHE_MEM_PRIO
+#
+UCX_IB_RCACHE_MEM_PRIO=1000
+
+#
+# Registration cache lookup overhead
+#
+# syntax:    time value: <number>[s|us|ms|ns], "inf", or "auto"
+# inherits:  UCX_RCACHE_OVERHEAD
+#
+UCX_IB_RCACHE_OVERHEAD=auto
+
+#
+# Registration cache address alignment, must be power of 2
+# between (1ul << 4)and system page size
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RCACHE_ADDR_ALIGN
+#
+UCX_IB_RCACHE_ADDR_ALIGN=16
+
+#
+# Maximal number of regions in the registration cache
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RCACHE_MAX_REGIONS
+#
+UCX_IB_RCACHE_MAX_REGIONS=inf
+
+#
+# Maximal total size of registration cache regions
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RCACHE_MAX_SIZE
+#
+UCX_IB_RCACHE_MAX_SIZE=inf
+
+#
+# Maximal size of total memory regions in invalidate queue and garbage,
+# after which a cleanup is triggered.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RCACHE_MAX_UNRELEASED
+#
+UCX_IB_RCACHE_MAX_UNRELEASED=512M
+
+#
+# Purge registration cache upon fork
+#
+# syntax:    <y|n>
+# inherits:  UCX_RCACHE_PURGE_ON_FORK
+#
+UCX_IB_RCACHE_PURGE_ON_FORK=y
+
+#
+# Memory registration overhead
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+#
+UCX_IB_MEM_REG_OVERHEAD=16.00us
+
+#
+# Memory registration growth rate
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+#
+UCX_IB_MEM_REG_GROWTH=0.00us
+
+#
+# Initialize a fork-safe IB library with ibv_fork_init().
+#
+# syntax:    <yes|no|try>
+#
+UCX_IB_FORK_INIT=try
+
+#
+# Enable listening for async events on the device
+#
+# syntax:    <y|n>
+#
+UCX_IB_ASYNC_EVENTS=y
+
+#
+# Whether or not 'Pause Frame' is enabled on an Ethernet network.
+# Pause frame is a mechanism for temporarily stopping the transmission of data to
+# ensure zero loss under congestion on Ethernet family computer networks.
+# This parameter, if set to 'no', will disqualify IB transports that may not perform
+# well on a lossy fabric when working with RoCE.
+#
+# syntax:    <y|n>
+#
+UCX_IB_ETH_PAUSE_ON=y
+
+#
+# Override NUMA policy for ODP regions, to avoid extra page migrations.
+#  - default: Do no change existing policy.
+#  - preferred/bind:
+#      Unless the memory policy of the current thread is MPOL_BIND, set the
+#      policy of ODP regions to MPOL_PREFERRED/MPOL_BIND, respectively.
+#      If the numa node mask of the current thread is not defined, use the numa
+#      nodes which correspond to its cpu affinity mask.
+#
+# syntax:    [default|bind|preferred]
+#
+UCX_IB_ODP_NUMA_POLICY=preferred
+
+#
+# Force prefetch of memory regions created with ODP.
+# 
+#
+# syntax:    <y|n>
+#
+UCX_IB_ODP_PREFETCH=n
+
+#
+# Maximal memory region size to enable ODP for. 0 - disable.
+# 
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_IB_ODP_MAX_SIZE=auto
+
+#
+# Array of custom device specification. Each element is a string of the following format:
+#   <vendor-id>:<device-id>[:name[:<flags>[:<priority>]]]
+# where:
+#   <vendor-id> - (mandatory) pci vendor id, integer or hexadecimal.
+#   <device-id> - (mandatory) pci device id, integer or hexadecimal.
+#   <name>      - (optional) device name.
+#   <flags>     - (optional) empty, or a combination of:
+#                              '4' - mlx4 device
+#                              '5' - mlx5 device
+#                              'd' - DC version 1 (Connect-IB, ConnectX-4)
+#                              'D' - DC version 2 (ConnectX-5 and above)
+#                              'a' - Compact address vector support
+#   <priority>  - (optional) device priority, integer.
+# 
+# Example: The value '0x02c9:4115:ConnectX4:5d' would specify a device named ConnectX-4
+# to match vendor id 0x2c9, device id 4115, with DC version 1 support.
+#
+# syntax:    comma-separated list of: string
+#
+UCX_IB_DEVICE_SPECS=
+
+#
+# Prefer nearest device to cpu when selecting a device from NET_DEVICES list.
+# 
+#
+# syntax:    <y|n>
+#
+UCX_IB_PREFER_NEAREST_DEVICE=y
+
+#
+# Use indirect atomic
+# 
+#
+# syntax:    <y|n>
+#
+UCX_IB_INDIRECT_ATOMIC=y
+
+#
+# Port GID index to use.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+#
+UCX_IB_GID_INDEX=auto
+
+#
+# Infiniband subnet prefix to filter ports by, empty means no filter. Relevant for IB link layer only
+# For example a filter for the default subnet prefix can be specified as: fe80:0:0:0
+#
+# syntax:    string
+#
+UCX_IB_SUBNET_PREFIX=
+
+#
+# Use GPU Direct RDMA for HCA to access GPU pages directly
+# 
+#
+# syntax:    <yes|no|try>
+#
+UCX_IB_GPU_DIRECT_RDMA=try
+
+#
+# Maximum effective data transfer rate of PCI bus connected to HCA
+# 
+#
+# syntax:    comma-separated list of: device_name:<number>[T|G|M|K]B|b[[p|/]s] or device_name:auto
+#
+UCX_IB_PCI_BW=
+
+#
+# DEVX support
+# 
+#
+# syntax:    <yes|no|try>
+#
+UCX_IB_MLX5_DEVX=try
+
+#
+# Objects to be created by DEVX
+# 
+#
+# syntax:    comma-separated list of: [rcqp|rcsrq|dct|dcsrq|dci]
+#
+UCX_IB_MLX5_DEVX_OBJECTS=rcqp,rcsrq,dct,dcsrq,dci
+
+#
+# Minimal MR size to be register using multiple parallel threads.
+# Number of threads used will be determined by number of CPUs which registering thread is bound to by hard affinity.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_IB_REG_MT_THRESH=4G
+
+#
+# Size of single chunk used in multithreaded registration.
+# Must be power of 2.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_IB_REG_MT_CHUNK=2G
+
+#
+# Enable setting CPU affinity of memory registration threads.
+#
+# syntax:    <y|n>
+#
+UCX_IB_REG_MT_BIND=n
+
+#
+# Enable relaxed ordering for PCIe transactions to improve performance on some systems.
+#
+# syntax:    <on|off|auto>
+#
+UCX_IB_PCI_RELAXED_ORDERING=auto
+
+#
+# Maximal number of invalidated memory keys that are kept idle before reuse.
+#
+# syntax:    unsigned integer
+#
+UCX_IB_MAX_IDLE_RKEY_COUNT=16
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# dc_mlx5 transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_DC_ALLOC, UCX_RC_ALLOC, UCX_IB_ALLOC, UCX_ALLOC
+#
+UCX_DC_MLX5_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_DC_FAILURE, UCX_RC_FAILURE, UCX_IB_FAILURE, UCX_FAILURE
+#
+UCX_DC_MLX5_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_DC_MAX_NUM_EPS, UCX_RC_MAX_NUM_EPS, UCX_IB_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_DC_MLX5_MAX_NUM_EPS=inf
+
+#
+# Size of bounce buffers used for post_send and post_recv.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_SEG_SIZE, UCX_RC_SEG_SIZE, UCX_IB_SEG_SIZE
+#
+UCX_DC_MLX5_SEG_SIZE=8256
+
+#
+# Length of send queue in the QP.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_TX_QUEUE_LEN, UCX_RC_TX_QUEUE_LEN, UCX_IB_TX_QUEUE_LEN
+#
+UCX_DC_MLX5_TX_QUEUE_LEN=128
+
+#
+# Number of send WQEs to batch in one post-send list. Larger values reduce
+# the CPU usage, but increase the latency and pipelining between sender and
+# receiver.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_TX_MAX_BATCH, UCX_RC_TX_MAX_BATCH, UCX_IB_TX_MAX_BATCH
+#
+UCX_DC_MLX5_TX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during TX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_TX_MAX_POLL, UCX_RC_TX_MAX_POLL, UCX_IB_TX_MAX_POLL
+#
+UCX_DC_MLX5_TX_MAX_POLL=16
+
+#
+# Bytes to reserve in send WQE for inline data. Messages which are small
+# enough will be sent inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_TX_MIN_INLINE, UCX_RC_TX_MIN_INLINE, UCX_IB_TX_MIN_INLINE
+#
+UCX_DC_MLX5_TX_MIN_INLINE=64
+
+#
+# Bytes to reserve in send WQE for inline response. Responses which are small
+# enough, such as of atomic operations and small reads, will be received inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_TX_INLINE_RESP, UCX_RC_TX_INLINE_RESP, UCX_IB_TX_INLINE_RESP
+#
+UCX_DC_MLX5_TX_INLINE_RESP=64
+
+#
+# Number of SG entries to reserve in the send WQE.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_TX_MIN_SGE, UCX_RC_TX_MIN_SGE, UCX_IB_TX_MIN_SGE
+#
+UCX_DC_MLX5_TX_MIN_SGE=5
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+# Attention: Setting this param with value != -1 is a dangerous thing
+# in RC/DC and could cause deadlock or performance degradation.
+#
+# syntax:    integer
+# inherits:  UCX_DC_TX_MAX_BUFS, UCX_RC_TX_MAX_BUFS, UCX_IB_TX_MAX_BUFS
+#
+UCX_DC_MLX5_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_TX_BUFS_GROW, UCX_RC_TX_BUFS_GROW, UCX_IB_TX_BUFS_GROW
+#
+UCX_DC_MLX5_TX_BUFS_GROW=1024
+
+#
+# Length of receive queue in the QPs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RX_QUEUE_LEN, UCX_RC_RX_QUEUE_LEN, UCX_IB_RX_QUEUE_LEN
+#
+UCX_DC_MLX5_RX_QUEUE_LEN=4095
+
+#
+# How many post-receives to perform in one batch.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RX_MAX_BATCH, UCX_RC_RX_MAX_BATCH, UCX_IB_RX_MAX_BATCH
+#
+UCX_DC_MLX5_RX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during RX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RX_MAX_POLL, UCX_RC_RX_MAX_POLL, UCX_IB_RX_MAX_POLL
+#
+UCX_DC_MLX5_RX_MAX_POLL=16
+
+#
+# Number of bytes to request for inline receive. If the maximal supported size
+# is smaller, it will be used instead. If it is possible to support a larger
+# size than requested with the same hardware resources, it will be used instead.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_RX_INLINE, UCX_RC_RX_INLINE, UCX_IB_RX_INLINE
+#
+UCX_DC_MLX5_RX_INLINE=64
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_DC_RX_MAX_BUFS, UCX_RC_RX_MAX_BUFS, UCX_IB_RX_MAX_BUFS
+#
+UCX_DC_MLX5_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RX_BUFS_GROW, UCX_RC_RX_BUFS_GROW, UCX_IB_RX_BUFS_GROW
+#
+UCX_DC_MLX5_RX_BUFS_GROW=0
+
+#
+# Set the interface address type. "auto" mode detects the type according to
+# link layer type and IB subnet prefix.
+# Deprecated. To force use of global routing use IS_GLOBAL.
+#
+# syntax:    [ib_local|ib_site_local|ib_global|eth|auto]
+# inherits:  UCX_DC_ADDR_TYPE, UCX_RC_ADDR_TYPE, UCX_IB_ADDR_TYPE
+#
+UCX_DC_MLX5_ADDR_TYPE=auto
+
+#
+# Force interface to use global routing.
+#
+# syntax:    <y|n>
+# inherits:  UCX_DC_IS_GLOBAL, UCX_RC_IS_GLOBAL, UCX_IB_IS_GLOBAL
+#
+UCX_DC_MLX5_IS_GLOBAL=n
+
+#
+# InfiniBand: Service level. 'auto' will select a value matching UCX_IB_AR configuration.
+# RoCEv2: Ethernet Priority. 'auto' will select 0 by default.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_DC_SL, UCX_RC_SL, UCX_IB_SL
+#
+UCX_DC_MLX5_SL=auto
+
+#
+# IB Traffic Class / RoCEv2 Differentiated Services Code Point (DSCP).
+# "auto" option selects 106 on RoCEv2 and 0 otherwise.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_DC_TRAFFIC_CLASS, UCX_RC_TRAFFIC_CLASS, UCX_IB_TRAFFIC_CLASS
+#
+UCX_DC_MLX5_TRAFFIC_CLASS=auto
+
+#
+# IB Hop limit / RoCEv2 Time to Live. Should be between 0 and 255.
+# 
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_HOP_LIMIT, UCX_RC_HOP_LIMIT, UCX_IB_HOP_LIMIT
+#
+UCX_DC_MLX5_HOP_LIMIT=255
+
+#
+# Number of connections that should be created between a pair of communicating
+# endpoints for optimal performance. The default value 'auto' behaves according
+# to the port link layer:
+#  RoCE       - 2 for LAG port, otherwise - 1.
+#  InfiniBand - As the number of path bits enabled by fabric's LMC value and selected
+#               by UCX_IB_LID_PATH_BITS configuration.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_DC_NUM_PATHS, UCX_RC_NUM_PATHS, UCX_IB_NUM_PATHS
+#
+UCX_DC_MLX5_NUM_PATHS=auto
+
+#
+# Use the local IP address and subnet mask of each network device to route RoCEv2 packets.
+# If set to 'y', only addresses within the interface's subnet will be assumed as reachable.
+# If set to 'n', every remote RoCEv2 IP address is assumed to be reachable from any port.
+#
+# syntax:    <y|n>
+# inherits:  UCX_DC_ROCE_LOCAL_SUBNET, UCX_RC_ROCE_LOCAL_SUBNET, UCX_IB_ROCE_LOCAL_SUBNET
+#
+UCX_DC_MLX5_ROCE_LOCAL_SUBNET=n
+
+#
+# Length, in bits, of the subnet prefix to be used for reachability check
+# when UCX_IB_ROCE_LOCAL_SUBNET is enabled.
+#  - auto  - Detect the subnet prefix length automatically from device address
+#  - inf   - Allow connections only within the same machine and same device
+#  - <num> - Specify a numeric bit-length value for the subnet prefix
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_DC_ROCE_SUBNET_PREFIX_LEN, UCX_RC_ROCE_SUBNET_PREFIX_LEN, UCX_IB_ROCE_SUBNET_PREFIX_LEN
+#
+UCX_DC_MLX5_ROCE_SUBNET_PREFIX_LEN=auto
+
+#
+# Multiplier for RoCE LAG UDP source port calculation. The UDP source port
+# is typically used by switches and network adapters to select a different
+# path for the same pair of endpoints.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_ROCE_PATH_FACTOR, UCX_RC_ROCE_PATH_FACTOR, UCX_IB_ROCE_PATH_FACTOR
+#
+UCX_DC_MLX5_ROCE_PATH_FACTOR=1
+
+#
+# List of IB Path bits separated by comma (a,b,c) which will be the low portion of the LID, according to the LMC in the fabric.
+#
+# syntax:    comma-separated list of: numbers range: <number>-<number>
+# inherits:  UCX_DC_LID_PATH_BITS, UCX_RC_LID_PATH_BITS, UCX_IB_LID_PATH_BITS
+#
+UCX_DC_MLX5_LID_PATH_BITS=0
+
+#
+# Which pkey value to use. Should be between 0 and 0x7fff.
+# "auto" option selects a first valid pkey value with full membership.
+#
+# syntax:    hex representation of a number or "auto"
+# inherits:  UCX_DC_PKEY, UCX_RC_PKEY, UCX_IB_PKEY
+#
+UCX_DC_MLX5_PKEY=auto
+
+#
+# Path MTU. "default" will select the best MTU for the device.
+#
+# syntax:    [default|512|1024|2048|4096]
+# inherits:  UCX_DC_PATH_MTU, UCX_RC_PATH_MTU, UCX_IB_PATH_MTU
+#
+UCX_DC_MLX5_PATH_MTU=default
+
+#
+# Maximal number of outstanding read or atomic replies. Auto means using the
+# maximum value supported by the hardware.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_DC_MAX_RD_ATOMIC, UCX_RC_MAX_RD_ATOMIC
+#
+UCX_DC_MLX5_MAX_RD_ATOMIC=auto
+
+#
+# Transport timeout
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_DC_TIMEOUT, UCX_RC_TIMEOUT
+#
+UCX_DC_MLX5_TIMEOUT=1000000.00us
+
+#
+# Transport retries
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RETRY_COUNT, UCX_RC_RETRY_COUNT
+#
+UCX_DC_MLX5_RETRY_COUNT=7
+
+#
+# RNR timeout
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_DC_RNR_TIMEOUT, UCX_RC_RNR_TIMEOUT
+#
+UCX_DC_MLX5_RNR_TIMEOUT=1000.00us
+
+#
+# RNR retries
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RNR_RETRY_COUNT, UCX_RC_RNR_RETRY_COUNT
+#
+UCX_DC_MLX5_RNR_RETRY_COUNT=7
+
+#
+# Enable flow control protocol to prevent sender from overwhelming the receiver,
+# thus avoiding RC RnR backoff timer.
+#
+# syntax:    <y|n>
+# inherits:  UCX_DC_FC_ENABLE, UCX_RC_FC_ENABLE
+#
+UCX_DC_MLX5_FC_ENABLE=y
+
+#
+# The size of flow control window per endpoint. limits the number of AM
+# which can be sent w/o acknowledgment.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_FC_WND_SIZE, UCX_RC_FC_WND_SIZE
+#
+UCX_DC_MLX5_FC_WND_SIZE=512
+
+#
+# Threshold for sending hard request for FC credits to the peer. This value
+# refers to the percentage of the FC_WND_SIZE value. (must be > 0 and < 1)
+#
+# syntax:    floating point number
+# inherits:  UCX_DC_FC_HARD_THRESH, UCX_RC_FC_HARD_THRESH
+#
+UCX_DC_MLX5_FC_HARD_THRESH=0.250
+
+#
+# IB fence type when API fence requested:
+#   none   - fence is a no-op
+#   weak   - fence makes sure remote reads are ordered with respect to remote writes
+#   auto   - select fence mode based on hardware capabilities
+#
+# syntax:    [none|weak|auto]
+# inherits:  UCX_DC_FENCE, UCX_RC_FENCE
+#
+UCX_DC_MLX5_FENCE=auto
+
+#
+# Maximal size of get operation with zcopy protocol.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_MAX_GET_ZCOPY, UCX_RC_MAX_GET_ZCOPY
+#
+UCX_DC_MLX5_MAX_GET_ZCOPY=auto
+
+#
+# Maximal number of bytes simultaneously transferred by get/RDMA_READ operations.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_TX_NUM_GET_BYTES, UCX_RC_TX_NUM_GET_BYTES
+#
+UCX_DC_MLX5_TX_NUM_GET_BYTES=inf
+
+#
+# When enabled, TX completions are polled every time the progress function is invoked.
+# Otherwise poll TX completions only if no RX completions found.
+#
+# syntax:    <y|n>
+# inherits:  UCX_DC_TX_POLL_ALWAYS, UCX_RC_TX_POLL_ALWAYS
+#
+UCX_DC_MLX5_TX_POLL_ALWAYS=n
+
+#
+# Device Memory segment size (0 - disabled)
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_DM_SIZE, UCX_RC_DM_SIZE, UCX_IB_DM_SIZE
+#
+UCX_DC_MLX5_DM_SIZE=2K
+
+#
+# Device Memory segments count (0 - disabled)
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_DM_COUNT, UCX_RC_DM_COUNT, UCX_IB_DM_COUNT
+#
+UCX_DC_MLX5_DM_COUNT=1
+
+#
+# How to write to MMIO register when posting sends on a QP. One of the following:
+#  bf_post    - BlueFlame post, write the WQE fully to MMIO register.
+#  bf_post_mt - Thread-safe BlueFlame, same as bf_post but same MMIO register can be used
+#               by multiple threads.
+#  db         - Doorbell mode, write only 8 bytes to MMIO register, followed by a memory
+#               store fence, which makes sure the doorbell goes out on the bus.
+#  auto       - Select best according to worker thread mode.
+#
+# syntax:    [bf_post|bf_post_mt|db|auto]
+# inherits:  UCX_DC_MMIO_MODE, UCX_RC_MMIO_MODE, UCX_IB_MMIO_MODE
+#
+UCX_DC_MLX5_MMIO_MODE=auto
+
+#
+# Enable Adaptive Routing (out of order) feature on SL that supports it.
+# SLs are selected as follows:
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +                                         + UCX_IB_AR_ENABLE=yes  + UCX_IB_AR_ENABLE=no   + UCX_IB_AR_ENABLE=try  + UCX_IB_AR_ENABLE=auto +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# + UCX_IB_SL=auto + AR enabled on some SLs + Use 1st SL with AR    + Use 1st SL without AR + Use 1st SL with AR    + Use SL=0              +
+# +                + AR enabled on all SLs  + Use SL=0              + Failure               + Use SL=0              + Use SL=0              +
+# +                + AR disabled on all SLs + Failure               + Use SL=0              + Use SL=0              + Use SL=0              +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# + UCX_IB_SL=<sl> + AR enabled on <sl>     + Use SL=<sl>           + Failure               + Use SL=<sl>           + Use SL=<sl>           +
+# +                + AR disabled on <sl>    + Failure               + Use SL=<sl>           + Use SL=<sl>           + Use SL=<sl>           +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# 
+#
+# syntax:    <yes|no|try|auto>
+# inherits:  UCX_DC_AR_ENABLE, UCX_RC_AR_ENABLE, UCX_IB_AR_ENABLE
+#
+UCX_DC_MLX5_AR_ENABLE=auto
+
+#
+# Enable CQE zipping feature. CQE zipping reduces PCI utilization by
+# merging several similar CQEs to a single CQE written by the device.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_DC_CQE_ZIPPING_ENABLE, UCX_RC_CQE_ZIPPING_ENABLE, UCX_IB_CQE_ZIPPING_ENABLE
+#
+UCX_DC_MLX5_CQE_ZIPPING_ENABLE=n
+
+#
+# Limits the number of outstanding WQE building blocks. The actual limit is
+# a minimum between this value and the number of building blocks in the TX QP.
+# -1 means no limit.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_TX_MAX_BB, UCX_RC_TX_MAX_BB
+#
+UCX_DC_MLX5_TX_MAX_BB=inf
+
+#
+# Enable HW tag matching
+#
+# syntax:    <y|n>
+# inherits:  UCX_DC_TM_ENABLE, UCX_RC_TM_ENABLE
+#
+UCX_DC_MLX5_TM_ENABLE=n
+
+#
+# Limits the number of tags posted to the HW for matching. The actual limit 
+# is a minimum between this value and the maximum value supported by the HW. 
+# -1 means no limit.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_TM_LIST_SIZE, UCX_RC_TM_LIST_SIZE
+#
+UCX_DC_MLX5_TM_LIST_SIZE=1024
+
+#
+# Maximal size of copy-out sends when tag-matching offload is enabled.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_DC_TM_SEG_SIZE, UCX_RC_TM_SEG_SIZE
+#
+UCX_DC_MLX5_TM_SEG_SIZE=48K
+
+#
+# Enable multi-packet SRQ support. Relevant for hardware tag-matching only.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_DC_TM_MP_SRQ_ENABLE, UCX_RC_TM_MP_SRQ_ENABLE
+#
+UCX_DC_MLX5_TM_MP_SRQ_ENABLE=try
+
+#
+# Number of strides used per single receive WQE for hardware tag-matching
+# unexpected messages. Can be 8 or 16 only. Relevant when MP SRQ is enabled.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_DC_TM_MP_NUM_STRIDES, UCX_RC_TM_MP_NUM_STRIDES
+#
+UCX_DC_MLX5_TM_MP_NUM_STRIDES=8
+
+#
+# Exponential Backoff Timeout Multiplier. ACK timeout will be multiplied 
+# by 2^EXP_BACKOFF every consecutive retry.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_EXP_BACKOFF, UCX_RC_EXP_BACKOFF
+#
+UCX_DC_MLX5_EXP_BACKOFF=0
+
+#
+# List of SRQ topology types in order of preference. Supported types are:
+# 
+# list              SRQ is organized as a buffer containing linked list of WQEs.
+# 
+# cyclic            SRQ is organized as a continuous array of WQEs. Requires DEVX.
+# 
+# cyclic_emulated   SRQ is organized as a continuous array of WQEs, but HW
+#                   treats it as a linked list. Doesn`t require DEVX.
+#
+# syntax:    comma-separated list of: string
+# inherits:  UCX_DC_SRQ_TOPO, UCX_RC_SRQ_TOPO
+#
+UCX_DC_MLX5_SRQ_TOPO=list
+
+#
+# Log of the ack frequency for requests, when using DEVX. Valid values are: 0-8.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_LOG_ACK_REQ_FREQ, UCX_RC_LOG_ACK_REQ_FREQ
+#
+UCX_DC_MLX5_LOG_ACK_REQ_FREQ=8
+
+#
+# Initial length of receive queue, before the interface is activated.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RX_QUEUE_LEN_INIT, UCX_UD_RX_QUEUE_LEN_INIT
+#
+UCX_DC_MLX5_RX_QUEUE_LEN_INIT=128
+
+#
+# Number of DC initiator QPs (DCI) used by the interface.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_NUM_DCI
+#
+UCX_DC_MLX5_NUM_DCI=8
+
+#
+# Specifies how DC initiator (DCI) is selected by the endpoint. The policies are:
+# 
+# dcs        The endpoint either uses already assigned DCI or one is allocated
+#            in a LIFO order, and released once it has no outstanding operations.
+# 
+# dcs_quota  Same as "dcs" but in addition the DCI is scheduled for release
+#            if it has sent more than quota, and there are endpoints waiting for a DCI.
+#            The dci is released once it completes all outstanding operations.
+#            This policy ensures that there will be no starvation among endpoints.
+# 
+# rand       Every endpoint is assigned with a randomly selected DCI.
+#            Multiple endpoints may share the same DCI.
+#
+# syntax:    [dcs|dcs_quota|rand]
+# inherits:  UCX_DC_TX_POLICY
+#
+UCX_DC_MLX5_TX_POLICY=dcs_quota
+
+#
+# Force full-handshake protocol for DC initiator. Enabling this mode
+# increases network latency, but is more resilient to packet drops.
+# Setting it to "auto" applies full-handshake on AR SLs.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_DC_DCI_FULL_HANDSHAKE
+#
+UCX_DC_MLX5_DCI_FULL_HANDSHAKE=n
+
+#
+# Force full-handshake protocol for DC keepalive initiator.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_DC_DCI_KA_FULL_HANDSHAKE
+#
+UCX_DC_MLX5_DCI_KA_FULL_HANDSHAKE=n
+
+#
+# Force full-handshake protocol for DC target.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_DC_DCT_FULL_HANDSHAKE
+#
+UCX_DC_MLX5_DCT_FULL_HANDSHAKE=n
+
+#
+# Seed for DCI allocation when "rand" dci policy is used (0 - use default).
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_RAND_DCI_SEED
+#
+UCX_DC_MLX5_RAND_DCI_SEED=0
+
+#
+# When "dcs_quota" policy is selected, how much to send from a DCI when
+# there are other endpoints waiting for it.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_DC_QUOTA
+#
+UCX_DC_MLX5_QUOTA=32
+
+#
+# Timeout for re-sending FC_HARD_REQ when FC window is empty.
+#
+# syntax:    time value: <number>[s|us|ms|ns], "inf", or "auto"
+# inherits:  UCX_DC_FC_HARD_REQ_TIMEOUT
+#
+UCX_DC_MLX5_FC_HARD_REQ_TIMEOUT=5000000.00us
+
+#
+# Enable compact address-vector optimization.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_COMPACT_AV
+#
+UCX_DC_MLX5_COMPACT_AV=y
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# rc_verbs transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_RC_ALLOC, UCX_IB_ALLOC, UCX_ALLOC
+#
+UCX_RC_VERBS_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_RC_FAILURE, UCX_IB_FAILURE, UCX_FAILURE
+#
+UCX_RC_VERBS_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_MAX_NUM_EPS, UCX_IB_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_RC_VERBS_MAX_NUM_EPS=256
+
+#
+# Size of bounce buffers used for post_send and post_recv.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_SEG_SIZE, UCX_IB_SEG_SIZE
+#
+UCX_RC_VERBS_SEG_SIZE=8256
+
+#
+# Length of send queue in the QP.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_QUEUE_LEN, UCX_IB_TX_QUEUE_LEN
+#
+UCX_RC_VERBS_TX_QUEUE_LEN=256
+
+#
+# Number of send WQEs to batch in one post-send list. Larger values reduce
+# the CPU usage, but increase the latency and pipelining between sender and
+# receiver.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_MAX_BATCH, UCX_IB_TX_MAX_BATCH
+#
+UCX_RC_VERBS_TX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during TX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_MAX_POLL, UCX_IB_TX_MAX_POLL
+#
+UCX_RC_VERBS_TX_MAX_POLL=16
+
+#
+# Bytes to reserve in send WQE for inline data. Messages which are small
+# enough will be sent inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_TX_MIN_INLINE, UCX_IB_TX_MIN_INLINE
+#
+UCX_RC_VERBS_TX_MIN_INLINE=64
+
+#
+# Bytes to reserve in send WQE for inline response. Responses which are small
+# enough, such as of atomic operations and small reads, will be received inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_TX_INLINE_RESP, UCX_IB_TX_INLINE_RESP
+#
+UCX_RC_VERBS_TX_INLINE_RESP=64
+
+#
+# Number of SG entries to reserve in the send WQE.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_MIN_SGE, UCX_IB_TX_MIN_SGE
+#
+UCX_RC_VERBS_TX_MIN_SGE=5
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+# Attention: Setting this param with value != -1 is a dangerous thing
+# in RC/DC and could cause deadlock or performance degradation.
+#
+# syntax:    integer
+# inherits:  UCX_RC_TX_MAX_BUFS, UCX_IB_TX_MAX_BUFS
+#
+UCX_RC_VERBS_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_BUFS_GROW, UCX_IB_TX_BUFS_GROW
+#
+UCX_RC_VERBS_TX_BUFS_GROW=1024
+
+#
+# Length of receive queue in the QPs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_QUEUE_LEN, UCX_IB_RX_QUEUE_LEN
+#
+UCX_RC_VERBS_RX_QUEUE_LEN=4095
+
+#
+# How many post-receives to perform in one batch.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_MAX_BATCH, UCX_IB_RX_MAX_BATCH
+#
+UCX_RC_VERBS_RX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during RX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_MAX_POLL, UCX_IB_RX_MAX_POLL
+#
+UCX_RC_VERBS_RX_MAX_POLL=16
+
+#
+# Number of bytes to request for inline receive. If the maximal supported size
+# is smaller, it will be used instead. If it is possible to support a larger
+# size than requested with the same hardware resources, it will be used instead.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_RX_INLINE, UCX_IB_RX_INLINE
+#
+UCX_RC_VERBS_RX_INLINE=64
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_RC_RX_MAX_BUFS, UCX_IB_RX_MAX_BUFS
+#
+UCX_RC_VERBS_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_BUFS_GROW, UCX_IB_RX_BUFS_GROW
+#
+UCX_RC_VERBS_RX_BUFS_GROW=0
+
+#
+# Set the interface address type. "auto" mode detects the type according to
+# link layer type and IB subnet prefix.
+# Deprecated. To force use of global routing use IS_GLOBAL.
+#
+# syntax:    [ib_local|ib_site_local|ib_global|eth|auto]
+# inherits:  UCX_RC_ADDR_TYPE, UCX_IB_ADDR_TYPE
+#
+UCX_RC_VERBS_ADDR_TYPE=auto
+
+#
+# Force interface to use global routing.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_IS_GLOBAL, UCX_IB_IS_GLOBAL
+#
+UCX_RC_VERBS_IS_GLOBAL=n
+
+#
+# InfiniBand: Service level. 'auto' will select a value matching UCX_IB_AR configuration.
+# RoCEv2: Ethernet Priority. 'auto' will select 0 by default.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_SL, UCX_IB_SL
+#
+UCX_RC_VERBS_SL=auto
+
+#
+# IB Traffic Class / RoCEv2 Differentiated Services Code Point (DSCP).
+# "auto" option selects 106 on RoCEv2 and 0 otherwise.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_TRAFFIC_CLASS, UCX_IB_TRAFFIC_CLASS
+#
+UCX_RC_VERBS_TRAFFIC_CLASS=auto
+
+#
+# IB Hop limit / RoCEv2 Time to Live. Should be between 0 and 255.
+# 
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_HOP_LIMIT, UCX_IB_HOP_LIMIT
+#
+UCX_RC_VERBS_HOP_LIMIT=255
+
+#
+# Number of connections that should be created between a pair of communicating
+# endpoints for optimal performance. The default value 'auto' behaves according
+# to the port link layer:
+#  RoCE       - 2 for LAG port, otherwise - 1.
+#  InfiniBand - As the number of path bits enabled by fabric's LMC value and selected
+#               by UCX_IB_LID_PATH_BITS configuration.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_NUM_PATHS, UCX_IB_NUM_PATHS
+#
+UCX_RC_VERBS_NUM_PATHS=auto
+
+#
+# Use the local IP address and subnet mask of each network device to route RoCEv2 packets.
+# If set to 'y', only addresses within the interface's subnet will be assumed as reachable.
+# If set to 'n', every remote RoCEv2 IP address is assumed to be reachable from any port.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_ROCE_LOCAL_SUBNET, UCX_IB_ROCE_LOCAL_SUBNET
+#
+UCX_RC_VERBS_ROCE_LOCAL_SUBNET=n
+
+#
+# Length, in bits, of the subnet prefix to be used for reachability check
+# when UCX_IB_ROCE_LOCAL_SUBNET is enabled.
+#  - auto  - Detect the subnet prefix length automatically from device address
+#  - inf   - Allow connections only within the same machine and same device
+#  - <num> - Specify a numeric bit-length value for the subnet prefix
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_ROCE_SUBNET_PREFIX_LEN, UCX_IB_ROCE_SUBNET_PREFIX_LEN
+#
+UCX_RC_VERBS_ROCE_SUBNET_PREFIX_LEN=auto
+
+#
+# Multiplier for RoCE LAG UDP source port calculation. The UDP source port
+# is typically used by switches and network adapters to select a different
+# path for the same pair of endpoints.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_ROCE_PATH_FACTOR, UCX_IB_ROCE_PATH_FACTOR
+#
+UCX_RC_VERBS_ROCE_PATH_FACTOR=1
+
+#
+# List of IB Path bits separated by comma (a,b,c) which will be the low portion of the LID, according to the LMC in the fabric.
+#
+# syntax:    comma-separated list of: numbers range: <number>-<number>
+# inherits:  UCX_RC_LID_PATH_BITS, UCX_IB_LID_PATH_BITS
+#
+UCX_RC_VERBS_LID_PATH_BITS=0
+
+#
+# Which pkey value to use. Should be between 0 and 0x7fff.
+# "auto" option selects a first valid pkey value with full membership.
+#
+# syntax:    hex representation of a number or "auto"
+# inherits:  UCX_RC_PKEY, UCX_IB_PKEY
+#
+UCX_RC_VERBS_PKEY=auto
+
+#
+# Path MTU. "default" will select the best MTU for the device.
+#
+# syntax:    [default|512|1024|2048|4096]
+# inherits:  UCX_RC_PATH_MTU, UCX_IB_PATH_MTU
+#
+UCX_RC_VERBS_PATH_MTU=default
+
+#
+# Maximal number of outstanding read or atomic replies. Auto means using the
+# maximum value supported by the hardware.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_MAX_RD_ATOMIC
+#
+UCX_RC_VERBS_MAX_RD_ATOMIC=auto
+
+#
+# Transport timeout
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_RC_TIMEOUT
+#
+UCX_RC_VERBS_TIMEOUT=1000000.00us
+
+#
+# Transport retries
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RETRY_COUNT
+#
+UCX_RC_VERBS_RETRY_COUNT=7
+
+#
+# RNR timeout
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_RC_RNR_TIMEOUT
+#
+UCX_RC_VERBS_RNR_TIMEOUT=1000.00us
+
+#
+# RNR retries
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RNR_RETRY_COUNT
+#
+UCX_RC_VERBS_RNR_RETRY_COUNT=7
+
+#
+# Enable flow control protocol to prevent sender from overwhelming the receiver,
+# thus avoiding RC RnR backoff timer.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_FC_ENABLE
+#
+UCX_RC_VERBS_FC_ENABLE=y
+
+#
+# The size of flow control window per endpoint. limits the number of AM
+# which can be sent w/o acknowledgment.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_FC_WND_SIZE
+#
+UCX_RC_VERBS_FC_WND_SIZE=512
+
+#
+# Threshold for sending hard request for FC credits to the peer. This value
+# refers to the percentage of the FC_WND_SIZE value. (must be > 0 and < 1)
+#
+# syntax:    floating point number
+# inherits:  UCX_RC_FC_HARD_THRESH
+#
+UCX_RC_VERBS_FC_HARD_THRESH=0.250
+
+#
+# IB fence type when API fence requested:
+#   none   - fence is a no-op
+#   weak   - fence makes sure remote reads are ordered with respect to remote writes
+#   auto   - select fence mode based on hardware capabilities
+#
+# syntax:    [none|weak|auto]
+# inherits:  UCX_RC_FENCE
+#
+UCX_RC_VERBS_FENCE=auto
+
+#
+# Maximal size of get operation with zcopy protocol.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_MAX_GET_ZCOPY
+#
+UCX_RC_VERBS_MAX_GET_ZCOPY=auto
+
+#
+# Maximal number of bytes simultaneously transferred by get/RDMA_READ operations.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_TX_NUM_GET_BYTES
+#
+UCX_RC_VERBS_TX_NUM_GET_BYTES=inf
+
+#
+# When enabled, TX completions are polled every time the progress function is invoked.
+# Otherwise poll TX completions only if no RX completions found.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_TX_POLL_ALWAYS
+#
+UCX_RC_VERBS_TX_POLL_ALWAYS=n
+
+#
+# Threshold for sending soft request for FC credits to the peer. This value
+# refers to the percentage of the FC_WND_SIZE value. (must be > HARD_THRESH and < 1)
+#
+# syntax:    floating point number
+# inherits:  UCX_RC_FC_SOFT_THRESH
+#
+UCX_RC_VERBS_FC_SOFT_THRESH=0.500
+
+#
+# Maximum number of send WQEs which can be posted without requesting a completion.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_CQ_MODERATION
+#
+UCX_RC_VERBS_TX_CQ_MODERATION=64
+
+#
+# Length of send completion queue. This limits the total number of outstanding signaled sends.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_CQ_LEN
+#
+UCX_RC_VERBS_TX_CQ_LEN=4096
+
+#
+# Buffer size to reserve for active message headers. If set to 0, the transport will
+# not support zero-copy active messages.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+#
+UCX_RC_VERBS_MAX_AM_HDR=128
+
+#
+# Limits the number of outstanding posted work requests. The actual limit is
+# a minimum between this value and the TX queue length. -1 means no limit.
+#
+# syntax:    unsigned integer
+#
+UCX_RC_VERBS_TX_MAX_WR=inf
+
+#
+# Method to use for posting flush operation:
+#  - write0 : Post empty RDMA_WRITE
+#  - fc     : Send flow control message
+#  - auto   : Select automatically based on device support
+#
+# syntax:    [write0|fc|auto]
+#
+UCX_RC_VERBS_FLUSH_MODE=auto
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# rc_mlx5 transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_RC_ALLOC, UCX_IB_ALLOC, UCX_ALLOC
+#
+UCX_RC_MLX5_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_RC_FAILURE, UCX_IB_FAILURE, UCX_FAILURE
+#
+UCX_RC_MLX5_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_MAX_NUM_EPS, UCX_IB_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_RC_MLX5_MAX_NUM_EPS=256
+
+#
+# Size of bounce buffers used for post_send and post_recv.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_SEG_SIZE, UCX_IB_SEG_SIZE
+#
+UCX_RC_MLX5_SEG_SIZE=8256
+
+#
+# Length of send queue in the QP.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_QUEUE_LEN, UCX_IB_TX_QUEUE_LEN
+#
+UCX_RC_MLX5_TX_QUEUE_LEN=256
+
+#
+# Number of send WQEs to batch in one post-send list. Larger values reduce
+# the CPU usage, but increase the latency and pipelining between sender and
+# receiver.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_MAX_BATCH, UCX_IB_TX_MAX_BATCH
+#
+UCX_RC_MLX5_TX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during TX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_MAX_POLL, UCX_IB_TX_MAX_POLL
+#
+UCX_RC_MLX5_TX_MAX_POLL=16
+
+#
+# Bytes to reserve in send WQE for inline data. Messages which are small
+# enough will be sent inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_TX_MIN_INLINE, UCX_IB_TX_MIN_INLINE
+#
+UCX_RC_MLX5_TX_MIN_INLINE=64
+
+#
+# Bytes to reserve in send WQE for inline response. Responses which are small
+# enough, such as of atomic operations and small reads, will be received inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_TX_INLINE_RESP, UCX_IB_TX_INLINE_RESP
+#
+UCX_RC_MLX5_TX_INLINE_RESP=64
+
+#
+# Number of SG entries to reserve in the send WQE.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_MIN_SGE, UCX_IB_TX_MIN_SGE
+#
+UCX_RC_MLX5_TX_MIN_SGE=5
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+# Attention: Setting this param with value != -1 is a dangerous thing
+# in RC/DC and could cause deadlock or performance degradation.
+#
+# syntax:    integer
+# inherits:  UCX_RC_TX_MAX_BUFS, UCX_IB_TX_MAX_BUFS
+#
+UCX_RC_MLX5_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_BUFS_GROW, UCX_IB_TX_BUFS_GROW
+#
+UCX_RC_MLX5_TX_BUFS_GROW=1024
+
+#
+# Length of receive queue in the QPs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_QUEUE_LEN, UCX_IB_RX_QUEUE_LEN
+#
+UCX_RC_MLX5_RX_QUEUE_LEN=4095
+
+#
+# How many post-receives to perform in one batch.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_MAX_BATCH, UCX_IB_RX_MAX_BATCH
+#
+UCX_RC_MLX5_RX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during RX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_MAX_POLL, UCX_IB_RX_MAX_POLL
+#
+UCX_RC_MLX5_RX_MAX_POLL=16
+
+#
+# Number of bytes to request for inline receive. If the maximal supported size
+# is smaller, it will be used instead. If it is possible to support a larger
+# size than requested with the same hardware resources, it will be used instead.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_RX_INLINE, UCX_IB_RX_INLINE
+#
+UCX_RC_MLX5_RX_INLINE=64
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_RC_RX_MAX_BUFS, UCX_IB_RX_MAX_BUFS
+#
+UCX_RC_MLX5_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RX_BUFS_GROW, UCX_IB_RX_BUFS_GROW
+#
+UCX_RC_MLX5_RX_BUFS_GROW=0
+
+#
+# Set the interface address type. "auto" mode detects the type according to
+# link layer type and IB subnet prefix.
+# Deprecated. To force use of global routing use IS_GLOBAL.
+#
+# syntax:    [ib_local|ib_site_local|ib_global|eth|auto]
+# inherits:  UCX_RC_ADDR_TYPE, UCX_IB_ADDR_TYPE
+#
+UCX_RC_MLX5_ADDR_TYPE=auto
+
+#
+# Force interface to use global routing.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_IS_GLOBAL, UCX_IB_IS_GLOBAL
+#
+UCX_RC_MLX5_IS_GLOBAL=n
+
+#
+# InfiniBand: Service level. 'auto' will select a value matching UCX_IB_AR configuration.
+# RoCEv2: Ethernet Priority. 'auto' will select 0 by default.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_SL, UCX_IB_SL
+#
+UCX_RC_MLX5_SL=auto
+
+#
+# IB Traffic Class / RoCEv2 Differentiated Services Code Point (DSCP).
+# "auto" option selects 106 on RoCEv2 and 0 otherwise.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_TRAFFIC_CLASS, UCX_IB_TRAFFIC_CLASS
+#
+UCX_RC_MLX5_TRAFFIC_CLASS=auto
+
+#
+# IB Hop limit / RoCEv2 Time to Live. Should be between 0 and 255.
+# 
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_HOP_LIMIT, UCX_IB_HOP_LIMIT
+#
+UCX_RC_MLX5_HOP_LIMIT=255
+
+#
+# Number of connections that should be created between a pair of communicating
+# endpoints for optimal performance. The default value 'auto' behaves according
+# to the port link layer:
+#  RoCE       - 2 for LAG port, otherwise - 1.
+#  InfiniBand - As the number of path bits enabled by fabric's LMC value and selected
+#               by UCX_IB_LID_PATH_BITS configuration.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_NUM_PATHS, UCX_IB_NUM_PATHS
+#
+UCX_RC_MLX5_NUM_PATHS=auto
+
+#
+# Use the local IP address and subnet mask of each network device to route RoCEv2 packets.
+# If set to 'y', only addresses within the interface's subnet will be assumed as reachable.
+# If set to 'n', every remote RoCEv2 IP address is assumed to be reachable from any port.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_ROCE_LOCAL_SUBNET, UCX_IB_ROCE_LOCAL_SUBNET
+#
+UCX_RC_MLX5_ROCE_LOCAL_SUBNET=n
+
+#
+# Length, in bits, of the subnet prefix to be used for reachability check
+# when UCX_IB_ROCE_LOCAL_SUBNET is enabled.
+#  - auto  - Detect the subnet prefix length automatically from device address
+#  - inf   - Allow connections only within the same machine and same device
+#  - <num> - Specify a numeric bit-length value for the subnet prefix
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_ROCE_SUBNET_PREFIX_LEN, UCX_IB_ROCE_SUBNET_PREFIX_LEN
+#
+UCX_RC_MLX5_ROCE_SUBNET_PREFIX_LEN=auto
+
+#
+# Multiplier for RoCE LAG UDP source port calculation. The UDP source port
+# is typically used by switches and network adapters to select a different
+# path for the same pair of endpoints.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_ROCE_PATH_FACTOR, UCX_IB_ROCE_PATH_FACTOR
+#
+UCX_RC_MLX5_ROCE_PATH_FACTOR=1
+
+#
+# List of IB Path bits separated by comma (a,b,c) which will be the low portion of the LID, according to the LMC in the fabric.
+#
+# syntax:    comma-separated list of: numbers range: <number>-<number>
+# inherits:  UCX_RC_LID_PATH_BITS, UCX_IB_LID_PATH_BITS
+#
+UCX_RC_MLX5_LID_PATH_BITS=0
+
+#
+# Which pkey value to use. Should be between 0 and 0x7fff.
+# "auto" option selects a first valid pkey value with full membership.
+#
+# syntax:    hex representation of a number or "auto"
+# inherits:  UCX_RC_PKEY, UCX_IB_PKEY
+#
+UCX_RC_MLX5_PKEY=auto
+
+#
+# Path MTU. "default" will select the best MTU for the device.
+#
+# syntax:    [default|512|1024|2048|4096]
+# inherits:  UCX_RC_PATH_MTU, UCX_IB_PATH_MTU
+#
+UCX_RC_MLX5_PATH_MTU=default
+
+#
+# Maximal number of outstanding read or atomic replies. Auto means using the
+# maximum value supported by the hardware.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_MAX_RD_ATOMIC
+#
+UCX_RC_MLX5_MAX_RD_ATOMIC=auto
+
+#
+# Transport timeout
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_RC_TIMEOUT
+#
+UCX_RC_MLX5_TIMEOUT=1000000.00us
+
+#
+# Transport retries
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RETRY_COUNT
+#
+UCX_RC_MLX5_RETRY_COUNT=7
+
+#
+# RNR timeout
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_RC_RNR_TIMEOUT
+#
+UCX_RC_MLX5_RNR_TIMEOUT=1000.00us
+
+#
+# RNR retries
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_RNR_RETRY_COUNT
+#
+UCX_RC_MLX5_RNR_RETRY_COUNT=7
+
+#
+# Enable flow control protocol to prevent sender from overwhelming the receiver,
+# thus avoiding RC RnR backoff timer.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_FC_ENABLE
+#
+UCX_RC_MLX5_FC_ENABLE=y
+
+#
+# The size of flow control window per endpoint. limits the number of AM
+# which can be sent w/o acknowledgment.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_FC_WND_SIZE
+#
+UCX_RC_MLX5_FC_WND_SIZE=512
+
+#
+# Threshold for sending hard request for FC credits to the peer. This value
+# refers to the percentage of the FC_WND_SIZE value. (must be > 0 and < 1)
+#
+# syntax:    floating point number
+# inherits:  UCX_RC_FC_HARD_THRESH
+#
+UCX_RC_MLX5_FC_HARD_THRESH=0.250
+
+#
+# IB fence type when API fence requested:
+#   none   - fence is a no-op
+#   weak   - fence makes sure remote reads are ordered with respect to remote writes
+#   auto   - select fence mode based on hardware capabilities
+#
+# syntax:    [none|weak|auto]
+# inherits:  UCX_RC_FENCE
+#
+UCX_RC_MLX5_FENCE=auto
+
+#
+# Maximal size of get operation with zcopy protocol.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_MAX_GET_ZCOPY
+#
+UCX_RC_MLX5_MAX_GET_ZCOPY=auto
+
+#
+# Maximal number of bytes simultaneously transferred by get/RDMA_READ operations.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_TX_NUM_GET_BYTES
+#
+UCX_RC_MLX5_TX_NUM_GET_BYTES=inf
+
+#
+# When enabled, TX completions are polled every time the progress function is invoked.
+# Otherwise poll TX completions only if no RX completions found.
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_TX_POLL_ALWAYS
+#
+UCX_RC_MLX5_TX_POLL_ALWAYS=n
+
+#
+# Threshold for sending soft request for FC credits to the peer. This value
+# refers to the percentage of the FC_WND_SIZE value. (must be > HARD_THRESH and < 1)
+#
+# syntax:    floating point number
+# inherits:  UCX_RC_FC_SOFT_THRESH
+#
+UCX_RC_MLX5_FC_SOFT_THRESH=0.500
+
+#
+# Maximum number of send WQEs which can be posted without requesting a completion.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_CQ_MODERATION
+#
+UCX_RC_MLX5_TX_CQ_MODERATION=64
+
+#
+# Length of send completion queue. This limits the total number of outstanding signaled sends.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_CQ_LEN
+#
+UCX_RC_MLX5_TX_CQ_LEN=4096
+
+#
+# Device Memory segment size (0 - disabled)
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_DM_SIZE, UCX_IB_DM_SIZE
+#
+UCX_RC_MLX5_DM_SIZE=2K
+
+#
+# Device Memory segments count (0 - disabled)
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_DM_COUNT, UCX_IB_DM_COUNT
+#
+UCX_RC_MLX5_DM_COUNT=1
+
+#
+# How to write to MMIO register when posting sends on a QP. One of the following:
+#  bf_post    - BlueFlame post, write the WQE fully to MMIO register.
+#  bf_post_mt - Thread-safe BlueFlame, same as bf_post but same MMIO register can be used
+#               by multiple threads.
+#  db         - Doorbell mode, write only 8 bytes to MMIO register, followed by a memory
+#               store fence, which makes sure the doorbell goes out on the bus.
+#  auto       - Select best according to worker thread mode.
+#
+# syntax:    [bf_post|bf_post_mt|db|auto]
+# inherits:  UCX_RC_MMIO_MODE, UCX_IB_MMIO_MODE
+#
+UCX_RC_MLX5_MMIO_MODE=auto
+
+#
+# Enable Adaptive Routing (out of order) feature on SL that supports it.
+# SLs are selected as follows:
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +                                         + UCX_IB_AR_ENABLE=yes  + UCX_IB_AR_ENABLE=no   + UCX_IB_AR_ENABLE=try  + UCX_IB_AR_ENABLE=auto +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# + UCX_IB_SL=auto + AR enabled on some SLs + Use 1st SL with AR    + Use 1st SL without AR + Use 1st SL with AR    + Use SL=0              +
+# +                + AR enabled on all SLs  + Use SL=0              + Failure               + Use SL=0              + Use SL=0              +
+# +                + AR disabled on all SLs + Failure               + Use SL=0              + Use SL=0              + Use SL=0              +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# + UCX_IB_SL=<sl> + AR enabled on <sl>     + Use SL=<sl>           + Failure               + Use SL=<sl>           + Use SL=<sl>           +
+# +                + AR disabled on <sl>    + Failure               + Use SL=<sl>           + Use SL=<sl>           + Use SL=<sl>           +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# 
+#
+# syntax:    <yes|no|try|auto>
+# inherits:  UCX_RC_AR_ENABLE, UCX_IB_AR_ENABLE
+#
+UCX_RC_MLX5_AR_ENABLE=auto
+
+#
+# Enable CQE zipping feature. CQE zipping reduces PCI utilization by
+# merging several similar CQEs to a single CQE written by the device.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_RC_CQE_ZIPPING_ENABLE, UCX_IB_CQE_ZIPPING_ENABLE
+#
+UCX_RC_MLX5_CQE_ZIPPING_ENABLE=n
+
+#
+# Limits the number of outstanding WQE building blocks. The actual limit is
+# a minimum between this value and the number of building blocks in the TX QP.
+# -1 means no limit.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TX_MAX_BB
+#
+UCX_RC_MLX5_TX_MAX_BB=inf
+
+#
+# Enable HW tag matching
+#
+# syntax:    <y|n>
+# inherits:  UCX_RC_TM_ENABLE
+#
+UCX_RC_MLX5_TM_ENABLE=n
+
+#
+# Limits the number of tags posted to the HW for matching. The actual limit 
+# is a minimum between this value and the maximum value supported by the HW. 
+# -1 means no limit.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_TM_LIST_SIZE
+#
+UCX_RC_MLX5_TM_LIST_SIZE=1024
+
+#
+# Maximal size of copy-out sends when tag-matching offload is enabled.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RC_TM_SEG_SIZE
+#
+UCX_RC_MLX5_TM_SEG_SIZE=48K
+
+#
+# Enable multi-packet SRQ support. Relevant for hardware tag-matching only.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_RC_TM_MP_SRQ_ENABLE
+#
+UCX_RC_MLX5_TM_MP_SRQ_ENABLE=try
+
+#
+# Number of strides used per single receive WQE for hardware tag-matching
+# unexpected messages. Can be 8 or 16 only. Relevant when MP SRQ is enabled.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RC_TM_MP_NUM_STRIDES
+#
+UCX_RC_MLX5_TM_MP_NUM_STRIDES=8
+
+#
+# Exponential Backoff Timeout Multiplier. ACK timeout will be multiplied 
+# by 2^EXP_BACKOFF every consecutive retry.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_EXP_BACKOFF
+#
+UCX_RC_MLX5_EXP_BACKOFF=0
+
+#
+# List of SRQ topology types in order of preference. Supported types are:
+# 
+# list              SRQ is organized as a buffer containing linked list of WQEs.
+# 
+# cyclic            SRQ is organized as a continuous array of WQEs. Requires DEVX.
+# 
+# cyclic_emulated   SRQ is organized as a continuous array of WQEs, but HW
+#                   treats it as a linked list. Doesn`t require DEVX.
+#
+# syntax:    comma-separated list of: string
+# inherits:  UCX_RC_SRQ_TOPO
+#
+UCX_RC_MLX5_SRQ_TOPO=cyclic,cyclic_emulated
+
+#
+# Log of the ack frequency for requests, when using DEVX. Valid values are: 0-8.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RC_LOG_ACK_REQ_FREQ
+#
+UCX_RC_MLX5_LOG_ACK_REQ_FREQ=8
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# ud_verbs transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_UD_ALLOC, UCX_IB_ALLOC, UCX_ALLOC
+#
+UCX_UD_VERBS_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_UD_FAILURE, UCX_IB_FAILURE, UCX_FAILURE
+#
+UCX_UD_VERBS_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_MAX_NUM_EPS, UCX_IB_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_UD_VERBS_MAX_NUM_EPS=inf
+
+#
+# Size of bounce buffers used for post_send and post_recv.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_SEG_SIZE, UCX_IB_SEG_SIZE
+#
+UCX_UD_VERBS_SEG_SIZE=8K
+
+#
+# Length of send queue in the QP.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_QUEUE_LEN, UCX_IB_TX_QUEUE_LEN
+#
+UCX_UD_VERBS_TX_QUEUE_LEN=256
+
+#
+# Number of send WQEs to batch in one post-send list. Larger values reduce
+# the CPU usage, but increase the latency and pipelining between sender and
+# receiver.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_MAX_BATCH, UCX_IB_TX_MAX_BATCH
+#
+UCX_UD_VERBS_TX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during TX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_MAX_POLL, UCX_IB_TX_MAX_POLL
+#
+UCX_UD_VERBS_TX_MAX_POLL=16
+
+#
+# Bytes to reserve in send WQE for inline data. Messages which are small
+# enough will be sent inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_TX_MIN_INLINE, UCX_IB_TX_MIN_INLINE
+#
+UCX_UD_VERBS_TX_MIN_INLINE=64
+
+#
+# Bytes to reserve in send WQE for inline response. Responses which are small
+# enough, such as of atomic operations and small reads, will be received inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_TX_INLINE_RESP, UCX_IB_TX_INLINE_RESP
+#
+UCX_UD_VERBS_TX_INLINE_RESP=0
+
+#
+# Number of SG entries to reserve in the send WQE.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_MIN_SGE, UCX_IB_TX_MIN_SGE
+#
+UCX_UD_VERBS_TX_MIN_SGE=5
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+# Attention: Setting this param with value != -1 is a dangerous thing
+# in RC/DC and could cause deadlock or performance degradation.
+#
+# syntax:    integer
+# inherits:  UCX_UD_TX_MAX_BUFS, UCX_IB_TX_MAX_BUFS
+#
+UCX_UD_VERBS_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_BUFS_GROW, UCX_IB_TX_BUFS_GROW
+#
+UCX_UD_VERBS_TX_BUFS_GROW=1024
+
+#
+# Length of receive queue in the QPs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_QUEUE_LEN, UCX_IB_RX_QUEUE_LEN
+#
+UCX_UD_VERBS_RX_QUEUE_LEN=4096
+
+#
+# How many post-receives to perform in one batch.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_MAX_BATCH, UCX_IB_RX_MAX_BATCH
+#
+UCX_UD_VERBS_RX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during RX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_MAX_POLL, UCX_IB_RX_MAX_POLL
+#
+UCX_UD_VERBS_RX_MAX_POLL=16
+
+#
+# Number of bytes to request for inline receive. If the maximal supported size
+# is smaller, it will be used instead. If it is possible to support a larger
+# size than requested with the same hardware resources, it will be used instead.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_RX_INLINE, UCX_IB_RX_INLINE
+#
+UCX_UD_VERBS_RX_INLINE=0
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_UD_RX_MAX_BUFS, UCX_IB_RX_MAX_BUFS
+#
+UCX_UD_VERBS_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_BUFS_GROW, UCX_IB_RX_BUFS_GROW
+#
+UCX_UD_VERBS_RX_BUFS_GROW=0
+
+#
+# Set the interface address type. "auto" mode detects the type according to
+# link layer type and IB subnet prefix.
+# Deprecated. To force use of global routing use IS_GLOBAL.
+#
+# syntax:    [ib_local|ib_site_local|ib_global|eth|auto]
+# inherits:  UCX_UD_ADDR_TYPE, UCX_IB_ADDR_TYPE
+#
+UCX_UD_VERBS_ADDR_TYPE=auto
+
+#
+# Force interface to use global routing.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_IS_GLOBAL, UCX_IB_IS_GLOBAL
+#
+UCX_UD_VERBS_IS_GLOBAL=n
+
+#
+# InfiniBand: Service level. 'auto' will select a value matching UCX_IB_AR configuration.
+# RoCEv2: Ethernet Priority. 'auto' will select 0 by default.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_SL, UCX_IB_SL
+#
+UCX_UD_VERBS_SL=auto
+
+#
+# IB Traffic Class / RoCEv2 Differentiated Services Code Point (DSCP).
+# "auto" option selects 106 on RoCEv2 and 0 otherwise.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_TRAFFIC_CLASS, UCX_IB_TRAFFIC_CLASS
+#
+UCX_UD_VERBS_TRAFFIC_CLASS=auto
+
+#
+# IB Hop limit / RoCEv2 Time to Live. Should be between 0 and 255.
+# 
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_HOP_LIMIT, UCX_IB_HOP_LIMIT
+#
+UCX_UD_VERBS_HOP_LIMIT=255
+
+#
+# Number of connections that should be created between a pair of communicating
+# endpoints for optimal performance. The default value 'auto' behaves according
+# to the port link layer:
+#  RoCE       - 2 for LAG port, otherwise - 1.
+#  InfiniBand - As the number of path bits enabled by fabric's LMC value and selected
+#               by UCX_IB_LID_PATH_BITS configuration.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_NUM_PATHS, UCX_IB_NUM_PATHS
+#
+UCX_UD_VERBS_NUM_PATHS=auto
+
+#
+# Use the local IP address and subnet mask of each network device to route RoCEv2 packets.
+# If set to 'y', only addresses within the interface's subnet will be assumed as reachable.
+# If set to 'n', every remote RoCEv2 IP address is assumed to be reachable from any port.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_ROCE_LOCAL_SUBNET, UCX_IB_ROCE_LOCAL_SUBNET
+#
+UCX_UD_VERBS_ROCE_LOCAL_SUBNET=n
+
+#
+# Length, in bits, of the subnet prefix to be used for reachability check
+# when UCX_IB_ROCE_LOCAL_SUBNET is enabled.
+#  - auto  - Detect the subnet prefix length automatically from device address
+#  - inf   - Allow connections only within the same machine and same device
+#  - <num> - Specify a numeric bit-length value for the subnet prefix
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_ROCE_SUBNET_PREFIX_LEN, UCX_IB_ROCE_SUBNET_PREFIX_LEN
+#
+UCX_UD_VERBS_ROCE_SUBNET_PREFIX_LEN=auto
+
+#
+# Multiplier for RoCE LAG UDP source port calculation. The UDP source port
+# is typically used by switches and network adapters to select a different
+# path for the same pair of endpoints.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_ROCE_PATH_FACTOR, UCX_IB_ROCE_PATH_FACTOR
+#
+UCX_UD_VERBS_ROCE_PATH_FACTOR=1
+
+#
+# List of IB Path bits separated by comma (a,b,c) which will be the low portion of the LID, according to the LMC in the fabric.
+#
+# syntax:    comma-separated list of: numbers range: <number>-<number>
+# inherits:  UCX_UD_LID_PATH_BITS, UCX_IB_LID_PATH_BITS
+#
+UCX_UD_VERBS_LID_PATH_BITS=0
+
+#
+# Which pkey value to use. Should be between 0 and 0x7fff.
+# "auto" option selects a first valid pkey value with full membership.
+#
+# syntax:    hex representation of a number or "auto"
+# inherits:  UCX_UD_PKEY, UCX_IB_PKEY
+#
+UCX_UD_VERBS_PKEY=auto
+
+#
+# Path MTU. "default" will select the best MTU for the device.
+#
+# syntax:    [default|512|1024|2048|4096]
+# inherits:  UCX_UD_PATH_MTU, UCX_IB_PATH_MTU
+#
+UCX_UD_VERBS_PATH_MTU=default
+
+#
+# Initial length of receive queue, before the interface is activated.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_QUEUE_LEN_INIT
+#
+UCX_UD_VERBS_RX_QUEUE_LEN_INIT=128
+
+#
+# Keep the connection open internally for this amount of time after closing it
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_LINGER_TIMEOUT
+#
+UCX_UD_VERBS_LINGER_TIMEOUT=300000000.00us
+
+#
+# Consider the remote peer as unreachable if an acknowledgment was not received
+# after this amount of time
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_TIMEOUT
+#
+UCX_UD_VERBS_TIMEOUT=30000000.00us
+
+#
+# Initial timeout for retransmissions
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_TIMER_TICK
+#
+UCX_UD_VERBS_TIMER_TICK=10000.00us
+
+#
+# Timeout multiplier for resending trigger (must be >= 1.0)
+#
+# syntax:    floating point number
+# inherits:  UCX_UD_TIMER_BACKOFF
+#
+UCX_UD_VERBS_TIMER_BACKOFF=2.000
+
+#
+# Resolution for async timer
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_ASYNC_TIMER_TICK
+#
+UCX_UD_VERBS_ASYNC_TIMER_TICK=100000.00us
+
+#
+# Minimal interval to send ACK request with solicited flag, to wake up
+# the remote peer in case it is not actively calling progress.
+# Smaller values may incur performance overhead, while extremely large
+# values can cause delays in presence of packet drops.
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_MIN_POKE_TIME
+#
+UCX_UD_VERBS_MIN_POKE_TIME=250000.00us
+
+#
+# Enable checking destination GID for incoming packets of Ethernet network.
+# Mismatched packets are silently dropped.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_ETH_DGID_CHECK
+#
+UCX_UD_VERBS_ETH_DGID_CHECK=y
+
+#
+# Max congestion avoidance window. Should be >= 2 and <= 1025
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_MAX_WINDOW
+#
+UCX_UD_VERBS_MAX_WINDOW=1025
+
+#
+# Max number of receive completions to pick during asynchronous TX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_ASYNC_MAX_POLL
+#
+UCX_UD_VERBS_RX_ASYNC_MAX_POLL=64
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# ud_mlx5 transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_UD_ALLOC, UCX_IB_ALLOC, UCX_ALLOC
+#
+UCX_UD_MLX5_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_UD_FAILURE, UCX_IB_FAILURE, UCX_FAILURE
+#
+UCX_UD_MLX5_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_MAX_NUM_EPS, UCX_IB_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_UD_MLX5_MAX_NUM_EPS=inf
+
+#
+# Size of bounce buffers used for post_send and post_recv.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_SEG_SIZE, UCX_IB_SEG_SIZE
+#
+UCX_UD_MLX5_SEG_SIZE=8K
+
+#
+# Length of send queue in the QP.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_QUEUE_LEN, UCX_IB_TX_QUEUE_LEN
+#
+UCX_UD_MLX5_TX_QUEUE_LEN=256
+
+#
+# Number of send WQEs to batch in one post-send list. Larger values reduce
+# the CPU usage, but increase the latency and pipelining between sender and
+# receiver.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_MAX_BATCH, UCX_IB_TX_MAX_BATCH
+#
+UCX_UD_MLX5_TX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during TX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_MAX_POLL, UCX_IB_TX_MAX_POLL
+#
+UCX_UD_MLX5_TX_MAX_POLL=16
+
+#
+# Bytes to reserve in send WQE for inline data. Messages which are small
+# enough will be sent inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_TX_MIN_INLINE, UCX_IB_TX_MIN_INLINE
+#
+UCX_UD_MLX5_TX_MIN_INLINE=64
+
+#
+# Bytes to reserve in send WQE for inline response. Responses which are small
+# enough, such as of atomic operations and small reads, will be received inline.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_TX_INLINE_RESP, UCX_IB_TX_INLINE_RESP
+#
+UCX_UD_MLX5_TX_INLINE_RESP=0
+
+#
+# Number of SG entries to reserve in the send WQE.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_MIN_SGE, UCX_IB_TX_MIN_SGE
+#
+UCX_UD_MLX5_TX_MIN_SGE=5
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+# Attention: Setting this param with value != -1 is a dangerous thing
+# in RC/DC and could cause deadlock or performance degradation.
+#
+# syntax:    integer
+# inherits:  UCX_UD_TX_MAX_BUFS, UCX_IB_TX_MAX_BUFS
+#
+UCX_UD_MLX5_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_TX_BUFS_GROW, UCX_IB_TX_BUFS_GROW
+#
+UCX_UD_MLX5_TX_BUFS_GROW=1024
+
+#
+# Length of receive queue in the QPs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_QUEUE_LEN, UCX_IB_RX_QUEUE_LEN
+#
+UCX_UD_MLX5_RX_QUEUE_LEN=4096
+
+#
+# How many post-receives to perform in one batch.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_MAX_BATCH, UCX_IB_RX_MAX_BATCH
+#
+UCX_UD_MLX5_RX_MAX_BATCH=16
+
+#
+# Max number of receive completions to pick during RX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_MAX_POLL, UCX_IB_RX_MAX_POLL
+#
+UCX_UD_MLX5_RX_MAX_POLL=16
+
+#
+# Number of bytes to request for inline receive. If the maximal supported size
+# is smaller, it will be used instead. If it is possible to support a larger
+# size than requested with the same hardware resources, it will be used instead.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_UD_RX_INLINE, UCX_IB_RX_INLINE
+#
+UCX_UD_MLX5_RX_INLINE=0
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_UD_RX_MAX_BUFS, UCX_IB_RX_MAX_BUFS
+#
+UCX_UD_MLX5_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_BUFS_GROW, UCX_IB_RX_BUFS_GROW
+#
+UCX_UD_MLX5_RX_BUFS_GROW=0
+
+#
+# Set the interface address type. "auto" mode detects the type according to
+# link layer type and IB subnet prefix.
+# Deprecated. To force use of global routing use IS_GLOBAL.
+#
+# syntax:    [ib_local|ib_site_local|ib_global|eth|auto]
+# inherits:  UCX_UD_ADDR_TYPE, UCX_IB_ADDR_TYPE
+#
+UCX_UD_MLX5_ADDR_TYPE=auto
+
+#
+# Force interface to use global routing.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_IS_GLOBAL, UCX_IB_IS_GLOBAL
+#
+UCX_UD_MLX5_IS_GLOBAL=n
+
+#
+# InfiniBand: Service level. 'auto' will select a value matching UCX_IB_AR configuration.
+# RoCEv2: Ethernet Priority. 'auto' will select 0 by default.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_SL, UCX_IB_SL
+#
+UCX_UD_MLX5_SL=auto
+
+#
+# IB Traffic Class / RoCEv2 Differentiated Services Code Point (DSCP).
+# "auto" option selects 106 on RoCEv2 and 0 otherwise.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_TRAFFIC_CLASS, UCX_IB_TRAFFIC_CLASS
+#
+UCX_UD_MLX5_TRAFFIC_CLASS=auto
+
+#
+# IB Hop limit / RoCEv2 Time to Live. Should be between 0 and 255.
+# 
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_HOP_LIMIT, UCX_IB_HOP_LIMIT
+#
+UCX_UD_MLX5_HOP_LIMIT=255
+
+#
+# Number of connections that should be created between a pair of communicating
+# endpoints for optimal performance. The default value 'auto' behaves according
+# to the port link layer:
+#  RoCE       - 2 for LAG port, otherwise - 1.
+#  InfiniBand - As the number of path bits enabled by fabric's LMC value and selected
+#               by UCX_IB_LID_PATH_BITS configuration.
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_NUM_PATHS, UCX_IB_NUM_PATHS
+#
+UCX_UD_MLX5_NUM_PATHS=auto
+
+#
+# Use the local IP address and subnet mask of each network device to route RoCEv2 packets.
+# If set to 'y', only addresses within the interface's subnet will be assumed as reachable.
+# If set to 'n', every remote RoCEv2 IP address is assumed to be reachable from any port.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_ROCE_LOCAL_SUBNET, UCX_IB_ROCE_LOCAL_SUBNET
+#
+UCX_UD_MLX5_ROCE_LOCAL_SUBNET=n
+
+#
+# Length, in bits, of the subnet prefix to be used for reachability check
+# when UCX_IB_ROCE_LOCAL_SUBNET is enabled.
+#  - auto  - Detect the subnet prefix length automatically from device address
+#  - inf   - Allow connections only within the same machine and same device
+#  - <num> - Specify a numeric bit-length value for the subnet prefix
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_UD_ROCE_SUBNET_PREFIX_LEN, UCX_IB_ROCE_SUBNET_PREFIX_LEN
+#
+UCX_UD_MLX5_ROCE_SUBNET_PREFIX_LEN=auto
+
+#
+# Multiplier for RoCE LAG UDP source port calculation. The UDP source port
+# is typically used by switches and network adapters to select a different
+# path for the same pair of endpoints.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_ROCE_PATH_FACTOR, UCX_IB_ROCE_PATH_FACTOR
+#
+UCX_UD_MLX5_ROCE_PATH_FACTOR=1
+
+#
+# List of IB Path bits separated by comma (a,b,c) which will be the low portion of the LID, according to the LMC in the fabric.
+#
+# syntax:    comma-separated list of: numbers range: <number>-<number>
+# inherits:  UCX_UD_LID_PATH_BITS, UCX_IB_LID_PATH_BITS
+#
+UCX_UD_MLX5_LID_PATH_BITS=0
+
+#
+# Which pkey value to use. Should be between 0 and 0x7fff.
+# "auto" option selects a first valid pkey value with full membership.
+#
+# syntax:    hex representation of a number or "auto"
+# inherits:  UCX_UD_PKEY, UCX_IB_PKEY
+#
+UCX_UD_MLX5_PKEY=auto
+
+#
+# Path MTU. "default" will select the best MTU for the device.
+#
+# syntax:    [default|512|1024|2048|4096]
+# inherits:  UCX_UD_PATH_MTU, UCX_IB_PATH_MTU
+#
+UCX_UD_MLX5_PATH_MTU=default
+
+#
+# Initial length of receive queue, before the interface is activated.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_QUEUE_LEN_INIT
+#
+UCX_UD_MLX5_RX_QUEUE_LEN_INIT=128
+
+#
+# Keep the connection open internally for this amount of time after closing it
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_LINGER_TIMEOUT
+#
+UCX_UD_MLX5_LINGER_TIMEOUT=300000000.00us
+
+#
+# Consider the remote peer as unreachable if an acknowledgment was not received
+# after this amount of time
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_TIMEOUT
+#
+UCX_UD_MLX5_TIMEOUT=30000000.00us
+
+#
+# Initial timeout for retransmissions
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_TIMER_TICK
+#
+UCX_UD_MLX5_TIMER_TICK=10000.00us
+
+#
+# Timeout multiplier for resending trigger (must be >= 1.0)
+#
+# syntax:    floating point number
+# inherits:  UCX_UD_TIMER_BACKOFF
+#
+UCX_UD_MLX5_TIMER_BACKOFF=2.000
+
+#
+# Resolution for async timer
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_ASYNC_TIMER_TICK
+#
+UCX_UD_MLX5_ASYNC_TIMER_TICK=100000.00us
+
+#
+# Minimal interval to send ACK request with solicited flag, to wake up
+# the remote peer in case it is not actively calling progress.
+# Smaller values may incur performance overhead, while extremely large
+# values can cause delays in presence of packet drops.
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+# inherits:  UCX_UD_MIN_POKE_TIME
+#
+UCX_UD_MLX5_MIN_POKE_TIME=250000.00us
+
+#
+# Enable checking destination GID for incoming packets of Ethernet network.
+# Mismatched packets are silently dropped.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_ETH_DGID_CHECK
+#
+UCX_UD_MLX5_ETH_DGID_CHECK=y
+
+#
+# Max congestion avoidance window. Should be >= 2 and <= 1025
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_MAX_WINDOW
+#
+UCX_UD_MLX5_MAX_WINDOW=1025
+
+#
+# Max number of receive completions to pick during asynchronous TX poll
+#
+# syntax:    unsigned integer
+# inherits:  UCX_UD_RX_ASYNC_MAX_POLL
+#
+UCX_UD_MLX5_RX_ASYNC_MAX_POLL=64
+
+#
+# Device Memory segment size (0 - disabled)
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_IB_DM_SIZE
+#
+UCX_UD_MLX5_DM_SIZE=2K
+
+#
+# Device Memory segments count (0 - disabled)
+#
+# syntax:    unsigned integer
+# inherits:  UCX_IB_DM_COUNT
+#
+UCX_UD_MLX5_DM_COUNT=1
+
+#
+# How to write to MMIO register when posting sends on a QP. One of the following:
+#  bf_post    - BlueFlame post, write the WQE fully to MMIO register.
+#  bf_post_mt - Thread-safe BlueFlame, same as bf_post but same MMIO register can be used
+#               by multiple threads.
+#  db         - Doorbell mode, write only 8 bytes to MMIO register, followed by a memory
+#               store fence, which makes sure the doorbell goes out on the bus.
+#  auto       - Select best according to worker thread mode.
+#
+# syntax:    [bf_post|bf_post_mt|db|auto]
+# inherits:  UCX_IB_MMIO_MODE
+#
+UCX_UD_MLX5_MMIO_MODE=auto
+
+#
+# Enable Adaptive Routing (out of order) feature on SL that supports it.
+# SLs are selected as follows:
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +                                         + UCX_IB_AR_ENABLE=yes  + UCX_IB_AR_ENABLE=no   + UCX_IB_AR_ENABLE=try  + UCX_IB_AR_ENABLE=auto +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# + UCX_IB_SL=auto + AR enabled on some SLs + Use 1st SL with AR    + Use 1st SL without AR + Use 1st SL with AR    + Use SL=0              +
+# +                + AR enabled on all SLs  + Use SL=0              + Failure               + Use SL=0              + Use SL=0              +
+# +                + AR disabled on all SLs + Failure               + Use SL=0              + Use SL=0              + Use SL=0              +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# + UCX_IB_SL=<sl> + AR enabled on <sl>     + Use SL=<sl>           + Failure               + Use SL=<sl>           + Use SL=<sl>           +
+# +                + AR disabled on <sl>    + Failure               + Use SL=<sl>           + Use SL=<sl>           + Use SL=<sl>           +
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# 
+#
+# syntax:    <yes|no|try|auto>
+# inherits:  UCX_IB_AR_ENABLE
+#
+UCX_UD_MLX5_AR_ENABLE=auto
+
+#
+# Enable CQE zipping feature. CQE zipping reduces PCI utilization by
+# merging several similar CQEs to a single CQE written by the device.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_IB_CQE_ZIPPING_ENABLE
+#
+UCX_UD_MLX5_CQE_ZIPPING_ENABLE=n
+
+#
+# Enable compact address-vector optimization.
+#
+# syntax:    <y|n>
+# inherits:  UCX_UD_COMPACT_AV
+#
+UCX_UD_MLX5_COMPACT_AV=y
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# RDMA-CM connection manager configuration
+#
+
+#
+# Log level of network errors for the connection manager
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_CM_FAILURE
+#
+UCX_RDMA_CM_FAILURE=DIAG
+
+#
+# Allow using an address that is already in use.
+#
+# syntax:    <y|n>
+# inherits:  UCX_CM_REUSEADDR
+#
+UCX_RDMA_CM_REUSEADDR=n
+
+#
+# If non-empty, specify the local source address (IPv4 or IPv6) to use 
+# when creating a client connection
+#
+# syntax:    string
+#
+UCX_RDMA_CM_SOURCE_ADDRESS=
+
+#
+# Timeout for RDMA address and route resolve operations
+#
+# syntax:    time value: <number>[s|us|ms|ns]
+#
+UCX_RDMA_CM_TIMEOUT=10000000.00us
+
+#
+# Reserved qpn enable mode:
+#   yes  - Always use reserved qpn, app fail if it's not supported
+#   try  - Use reserved qpn if it's supported, otherwise use dummy qp
+#   no   - Always use dummy qp
+#
+# syntax:    <yes|no|try>
+#
+UCX_RDMA_CM_RESERVED_QPN=try
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# CMA memory domain configuration
+#
+
+#
+# Expose memory invalidate support capability.
+# Note: this capability is not really supported yet. This variable will
+# be deprecated, when memory invalidation support is implemented.
+#
+# syntax:    <y|n>
+#
+UCX_CMA_MEMORY_INVALIDATE=n
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# cma transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_SCOPY_ALLOC, UCX_SM_ALLOC, UCX_ALLOC
+#
+UCX_CMA_ALLOC=huge,thp,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_SCOPY_FAILURE, UCX_SM_FAILURE, UCX_FAILURE
+#
+UCX_CMA_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_SCOPY_MAX_NUM_EPS, UCX_SM_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_CMA_MAX_NUM_EPS=inf
+
+#
+# Effective memory bandwidth
+#
+# syntax:    bandwidth value: <number>[T|G|M|K]B|b[[p|/]s] or "auto"
+# inherits:  UCX_SCOPY_BW, UCX_SM_BW
+#
+UCX_CMA_BW=11145.00MBps
+
+#
+# Maximum IOV count that can contain user-defined payload in a single
+# call to GET/PUT Zcopy operation
+#
+# syntax:    unsigned long
+# inherits:  UCX_SCOPY_MAX_IOV
+#
+UCX_CMA_MAX_IOV=16
+
+#
+# Segment size that is used to perform data transfer when doing progress
+# of GET/PUT Zcopy operations
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_SCOPY_SEG_SIZE
+#
+UCX_CMA_SEG_SIZE=512K
+
+#
+# How many TX segments can be dispatched during iface progress
+#
+# syntax:    unsigned integer
+# inherits:  UCX_SCOPY_TX_QUOTA
+#
+UCX_CMA_TX_QUOTA=1
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_SCOPY_TX_MAX_BUFS
+#
+UCX_CMA_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_SCOPY_TX_BUFS_GROW
+#
+UCX_CMA_TX_BUFS_GROW=8
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# KNEM memory domain configuration
+#
+
+#
+# Enable using memory registration cache
+#
+# syntax:    <yes|no|try>
+#
+UCX_KNEM_RCACHE=try
+
+#
+# Registration cache memory event priority
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RCACHE_MEM_PRIO
+#
+UCX_KNEM_RCACHE_MEM_PRIO=1000
+
+#
+# Registration cache lookup overhead
+#
+# syntax:    time value: <number>[s|us|ms|ns], "inf", or "auto"
+# inherits:  UCX_RCACHE_OVERHEAD
+#
+UCX_KNEM_RCACHE_OVERHEAD=auto
+
+#
+# Registration cache address alignment, must be power of 2
+# between (1ul << 4)and system page size
+#
+# syntax:    unsigned integer
+# inherits:  UCX_RCACHE_ADDR_ALIGN
+#
+UCX_KNEM_RCACHE_ADDR_ALIGN=64
+
+#
+# Maximal number of regions in the registration cache
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_RCACHE_MAX_REGIONS
+#
+UCX_KNEM_RCACHE_MAX_REGIONS=inf
+
+#
+# Maximal total size of registration cache regions
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RCACHE_MAX_SIZE
+#
+UCX_KNEM_RCACHE_MAX_SIZE=inf
+
+#
+# Maximal size of total memory regions in invalidate queue and garbage,
+# after which a cleanup is triggered.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_RCACHE_MAX_UNRELEASED
+#
+UCX_KNEM_RCACHE_MAX_UNRELEASED=512M
+
+#
+# Purge registration cache upon fork
+#
+# syntax:    <y|n>
+# inherits:  UCX_RCACHE_PURGE_ON_FORK
+#
+UCX_KNEM_RCACHE_PURGE_ON_FORK=y
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# knem transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_SCOPY_ALLOC, UCX_SM_ALLOC, UCX_ALLOC
+#
+UCX_KNEM_ALLOC=huge,thp,md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_SCOPY_FAILURE, UCX_SM_FAILURE, UCX_FAILURE
+#
+UCX_KNEM_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_SCOPY_MAX_NUM_EPS, UCX_SM_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_KNEM_MAX_NUM_EPS=inf
+
+#
+# Effective memory bandwidth
+#
+# syntax:    bandwidth value: <number>[T|G|M|K]B|b[[p|/]s] or "auto"
+# inherits:  UCX_SCOPY_BW, UCX_SM_BW
+#
+UCX_KNEM_BW=13862.00MBps
+
+#
+# Maximum IOV count that can contain user-defined payload in a single
+# call to GET/PUT Zcopy operation
+#
+# syntax:    unsigned long
+# inherits:  UCX_SCOPY_MAX_IOV
+#
+UCX_KNEM_MAX_IOV=16
+
+#
+# Segment size that is used to perform data transfer when doing progress
+# of GET/PUT Zcopy operations
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_SCOPY_SEG_SIZE
+#
+UCX_KNEM_SEG_SIZE=512K
+
+#
+# How many TX segments can be dispatched during iface progress
+#
+# syntax:    unsigned integer
+# inherits:  UCX_SCOPY_TX_QUOTA
+#
+UCX_KNEM_TX_QUOTA=1
+
+#
+# Maximal number of send buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_SCOPY_TX_MAX_BUFS
+#
+UCX_KNEM_TX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the send memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_SCOPY_TX_BUFS_GROW
+#
+UCX_KNEM_TX_BUFS_GROW=8
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# xpmem memory domain configuration
+#
+
+#
+# Enable using huge pages for internal buffers. Possible values are:
+#  y   - Allocate memory using huge pages only.
+#  n   - Allocate memory using regular pages only.
+#  try - Try to allocate memory using huge pages and if it fails, allocate regular pages.
+# 
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_MM_HUGETLB_MODE
+#
+UCX_XPMEM_HUGETLB_MODE=try
+
+
+# UCX library configuration file
+# Uncomment to modify values
+
+#
+# xpmem transport configuration
+#
+
+#
+# Priority of methods to allocate intermediate buffers for communication
+#
+# syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
+# inherits:  UCX_MM_ALLOC, UCX_SM_ALLOC, UCX_ALLOC
+#
+UCX_XPMEM_ALLOC=md,mmap,heap
+
+#
+# Level of network failure reporting
+#
+# syntax:    [FATAL|ERROR|WARN|DIAG|INFO|DEBUG|TRACE|REQ|DATA|ASYNC|FUNC|POLL]
+# inherits:  UCX_MM_FAILURE, UCX_SM_FAILURE, UCX_FAILURE
+#
+UCX_XPMEM_FAILURE=DIAG
+
+#
+# Maximum number of endpoints that the transport interface is able to create
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MM_MAX_NUM_EPS, UCX_SM_MAX_NUM_EPS, UCX_MAX_NUM_EPS
+#
+UCX_XPMEM_MAX_NUM_EPS=inf
+
+#
+# Effective memory bandwidth
+#
+# syntax:    bandwidth value: <number>[T|G|M|K]B|b[[p|/]s] or "auto"
+# inherits:  UCX_MM_BW, UCX_SM_BW
+#
+UCX_XPMEM_BW=12179.00MBps
+
+#
+# Size of the receive FIFO in the memory-map UCTs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_FIFO_SIZE
+#
+UCX_XPMEM_FIFO_SIZE=64
+
+#
+# Size of send/receive buffers for copy-out sends.
+#
+# syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
+# inherits:  UCX_MM_SEG_SIZE
+#
+UCX_XPMEM_SEG_SIZE=8256
+
+#
+# Frequency of resource releasing on the receiver's side in the MM UCT.
+# This value refers to the percentage of the FIFO size. (must be >= 0 and < 1).
+#
+# syntax:    floating point number
+# inherits:  UCX_MM_FIFO_RELEASE_FACTOR
+#
+UCX_XPMEM_FIFO_RELEASE_FACTOR=0.500
+
+#
+# Maximal number of receive buffers for the interface. -1 is infinite.
+#
+# syntax:    integer
+# inherits:  UCX_MM_RX_MAX_BUFS
+#
+UCX_XPMEM_RX_MAX_BUFS=-1
+
+#
+# How much buffers are added every time the receive memory pool grows.
+# 0 means the value is chosen by the transport.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_RX_BUFS_GROW
+#
+UCX_XPMEM_RX_BUFS_GROW=512
+
+#
+# Enable using huge pages for internal shared memory buffers.Possible values are:
+#  y   - Allocate memory using huge pages only.
+#  n   - Allocate memory using regular pages only.
+#  try - Try to allocate memory using huge pages and if it fails, allocate regular pages.
+#
+# syntax:    <yes|no|try>
+# inherits:  UCX_MM_FIFO_HUGETLB
+#
+UCX_XPMEM_FIFO_HUGETLB=n
+
+#
+# Size of the FIFO element size (data + header) in the MM UCTs.
+#
+# syntax:    unsigned integer
+# inherits:  UCX_MM_FIFO_ELEM_SIZE
+#
+UCX_XPMEM_FIFO_ELEM_SIZE=128
+
+#
+# Maximal number of receive completions to pick during RX poll
+#
+# syntax:    unsigned long: <number>, "inf", or "auto"
+# inherits:  UCX_MM_FIFO_MAX_POLL
+#
+UCX_XPMEM_FIFO_MAX_POLL=16
+
+#
+# Expose error handling support capability
+#
+# syntax:    <y|n>
+# inherits:  UCX_MM_ERROR_HANDLING
+#
+UCX_XPMEM_ERROR_HANDLING=n
+
+

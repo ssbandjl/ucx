@@ -1,0 +1,18 @@
+API头文件: src/uct/api/uct.h
+内存域资源描述符: typedef struct uct_md_resource_desc
+
+接口属性(能力和限制), 嵌套结构体: struct uct_iface_attr
+
+分散聚集IO, sgl, SGL, 聚散表: typedef struct uct_iov
+stride: 1个内存跨度,范围, 所有 iov 列表中的长度总和必须小于或等于相应通信操作的 max_zcopy。 如果长度或计数为零，则不会访问 buffer 指向的内存。 否则，缓冲区必须指向有效的内存。 如果 count 为 1，则每个 iov 条目指定单个连续数据块 如果 count > 1，则每个 iov 条目指定 count 元素的跨步块以及连续元素之间的跨步字节距离
+
+
+uct_example: uct_hello_world.c
+
+
+
+
+
+
+
+

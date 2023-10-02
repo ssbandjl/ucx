@@ -1,3 +1,4 @@
+ucx_info -d
 #
 # Memory domain: self
 #     Component: self
@@ -622,3 +623,4 @@
 #        iface address: 16 bytes
 #       error handling: none
 #
+
