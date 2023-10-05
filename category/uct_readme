@@ -8,6 +8,33 @@ stride: 1个内存跨度,范围, 所有 iov 列表中的长度总和必须小于
 
 
 uct_example: uct_hello_world.c
+启用编译: export HAVE_EXAMPLES=true
+bash examples/uct_hello_world
+server:  exec /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d ib17-0 -t tcp
+
+启动服务端: 主函数中解析命令行参数, 设置默认服务端口, 初始化上下文,
+异步事件上下文: 管理定时器和FD通知
+gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
+  if (parse_cmd(argc, argv, &cmd_args)) -> int parse_cmd(int argc, char * const argv[], cmd_args_t *args)
+    args->server_port   = 13337
+  status = ucs_async_context_create(UCS_ASYNC_MODE_THREAD_SPINLOCK, &async) -> 创建异步执行上下文 分配并初始化异步执行上下文。 这可用于确保安全的事件传递
+    async = ucs_malloc(sizeof(*async), "async context") -> 内部分配, 并记录内存分配信息
+      void *ptr = malloc(size)
+    status = ucs_async_context_init(async, mode)
+      ucs_trace_func("async=%p", async) -> 跟踪方法
+      status = ucs_mpmc_queue_init(&async->missed) -> 初始化多生产者/多消费者队列
+      status = ucs_async_method_call(mode, context_init, async) -> .context_init       = ucs_async_poll_init -> 异步轮训初始化, 不阻塞
+      async->last_wakeup = ucs_get_time() -> asm volatile("rdtsc" : "=a"(low), "=d"(high)) 汇编获取时间 -> UCS/ARCH/INFO：如果无法从CPU型号中读取x86 TSC值，请不要从/proc/cpuinfo中读取测量的CPU频率，因为它只能代表核心频率而不是TSC频率。 相反，通过一个短循环进行测量，当频率测量收敛或达到 1ms 时间限制时停止
+  status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化)
+  status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层
+    status = uct_query_components(&components, &num_components)
+      UCS_MODULE_FRAMEWORK_DECLARE(uct) -> 声明一个“框架”，它是可加载模块的特定集合的上下文。 通常特定框架中的模块提供相同内部接口的替代实现
+      UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
+      ucs_list_for_each uct_components_list 8个组件 -> ucs_vfs_obj_add_dir -> ucs_vfs_node_add 虚拟文件系统
+    status = uct_component_query(components[cmpt_index], &component_attr)
+
+
+      
 
 
 
@@ -15,4 +42,76 @@ uct_example: uct_hello_world.c
 
 
 
+typedef struct ucs_mpmc_queue, 多生产者多消费者线程安全队列。 在“良好”场景中，每次推/拉都是一个原子操作
 
+typedef struct uct_tl_resource_desc, 通信资源描述符。 资源描述符是表示网络资源的对象。 资源描述符可以表示独立的通信资源（例如HCA端口、网络接口）或多个资源（例如多个网络接口或通信端口）。 它还可以表示通过单个物理网络接口定义的虚拟通信资源
+
+md_resources, 内存域资源数组。 使用时，应在使用指向数组的指针调用 @ref uct_component_query 之前对其进行初始化，该数组足够大以容纳所有内存域资源条目。 调用后，该数组将填充现有内存域资源的信息。 为了分配该数组，您可以调用@ref uct_component_query两次：第一次将仅通过在field_mask中指定@ref UCT_COMPONENT_ATTR_FIELD_MD_RESOURCE_COUNT来获取所需的条目数量。 然后，可以为数组分配返回的条目数，并传递给对 @ref uct_component_query 的第二次调用，这次将 field_mask 设置为 @ref UCT_COMPONENT_ATTR_FIELD_MD_RESOURCES
+
+
+
+connect_common
+uct_iface_get_device_address
+sendrecv
+status = uct_ep_create(&ep_params, &ep)
+uct_rc_verbs_ep_connect_to_ep_v2
+
+
+
+
+client:
+[root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs 172.17.29.63
+
+main
+ucs_status_t do_am_short
+UCT_INLINE_API ucs_status_t uct_ep_am_short
+ucs_status_t uct_rc_verbs_ep_am_short
+uct_rc_verbs_ep_post_send
+ibv_post_send
+
+
+
+(gdb) b ibv_create_qp
+#0  0x00007ffff65347b0 in ibv_create_qp () from /lib64/libibverbs.so.1
+#1  0x00007ffff6778a58 in uct_rc_verbs_can_create_qp (ctx=<optimized out>, pd=0x60d3f0) at rc/verbs/rc_verbs_iface.c:556
+#2  0x00007ffff6778c23 in uct_rc_verbs_query_tl_devices (md=0x60efd0, tl_devices_p=0x7fffffffd630, num_tl_devices_p=0x7fffffffd620) at rc/verbs/rc_verbs_iface.c:581
+#3  0x00007ffff792864f in uct_md_query_tl_resources (md=0x60efd0, resources_p=resources_p@entry=0x7fffffffd7b0, num_resources_p=num_resources_p@entry=0x7fffffffd790) at base/uct_md.c:94
+#4  0x000000000040248c in dev_tl_lookup (cmd_args=cmd_args@entry=0x7fffffffda00, iface_p=iface_p@entry=0x7fffffffdac0) at uct_hello_world.c:363
+#5  0x000000000040193b in main (argc=<optimized out>, argv=<optimized out>) at uct_hello_world.c:611
+(gdb) c
+(gdb) bt
+#0  0x00007ffff65347b0 in ibv_create_qp () from /lib64/libibverbs.so.1
+#1  0x00007ffff675db21 in ibv_create_qp_ex (qp_init_attr_ex=0x7fffffffd558, context=<optimized out>) at /usr/include/infiniband/verbs.h:3016
+#2  uct_ib_iface_create_qp (iface=iface@entry=0x6160f0, attr=attr@entry=0x7fffffffd520, qp_p=qp_p@entry=0x7fffffffd4e0) at base/ib_iface.c:1024
+#3  0x00007ffff677238b in uct_rc_iface_qp_create (iface=iface@entry=0x6160f0, qp_p=qp_p@entry=0x7fffffffd4e0, attr=attr@entry=0x7fffffffd520, max_send_wr=<optimized out>, srq=<optimized out>)
+    at rc/base/rc_iface.c:838
+#4  0x00007ffff67794ed in uct_rc_verbs_iface_t_init (tl_config=0x60e130, params=<optimized out>, worker=<optimized out>, tl_md=<optimized out>, _init_count=0x7fffffffd4d0, 
+    _myclass=0x7ffff69fc760 <uct_rc_verbs_iface_t_class>, self=0x6160f0) at rc/verbs/rc_verbs_iface.c:357
+#5  uct_rc_verbs_iface_t_new (arg0=<optimized out>, arg1=<optimized out>, arg2=<optimized out>, arg3=0x60e130, obj_p=0x7fffffffdcd8) at rc/verbs/rc_verbs_iface.c:461
+#6  0x00007ffff7928b5b in uct_iface_open (md=0x60efd0, worker=0x607560, params=params@entry=0x7fffffffd820, config=0x60e130, iface_p=iface_p@entry=0x7fffffffdcd8) at base/uct_md.c:250
+#7  0x0000000000402738 in init_iface (iface_p=0x7fffffffdac0, func_am_type=FUNC_AM_SHORT, tl_name=0x616010 "rc_verbs", dev_name=0x61601a "mlx5_0:1") at uct_hello_world.c:271
+#8  dev_tl_lookup (cmd_args=cmd_args@entry=0x7fffffffda00, iface_p=iface_p@entry=0x7fffffffdac0) at uct_hello_world.c:383
+#9  0x000000000040193b in main (argc=<optimized out>, argv=<optimized out>) at uct_hello_world.c:611
+
+
+利用宏, 注册传输层:
+UCT_TL_DEFINE_ENTRY(&uct_ib_component, rc_verbs, uct_rc_verbs_query_tl_devices,
+                    uct_rc_verbs_iface_t, "RC_VERBS_",
+                    uct_rc_verbs_iface_config_table,
+                    uct_rc_verbs_iface_config_t);
+
+已注册的传输层类型, 搜索关键字(UCT_TL_DEFINE_ENTRY)
+uct_tl_t uct_rc_verbs_tl = { .name = "rc_verbs", .query_devices = uct_rc_verbs_query_tl_devices, .iface_open = uct_rc_verbs_iface_t_new, .config = { .name = "rc_verbs"" transport", .prefix = "RC_VERBS_", .table = uct_rc_verbs_iface_config_table, .size = sizeof(uct_rc_verbs_iface_config_t), } };
+
+
+rc_verbs
+ud_mlx5
+ud_verbs
+cma
+knem
+self
+tcp
+
+
+
+网卡,传输层操作, uct_rc_verbs_iface_tl_ops

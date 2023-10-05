@@ -1,0 +1,32 @@
+查看设备名和传输类型:
+[root@node63 ucx]# rdma link
+0/1: mlx5_0/1: state ACTIVE physical_state LINK_UP netdev ib17-0
+
+ucx_info -d
+
+
+/home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs
+gdb --args /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs
+
+
+server:
+[root@node63 examples]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs
+INFO: UCT_HELLO_WORLD AM function = uct_ep_am_short server = (null) port = 13337
+Using rc_verbs/mlx5_0:1
+Waiting for connection...
+----- UCT TEST SUCCESS ----
+[callback] uct_ep_am_short sent ABCDEFGHIJKLMNO (16 bytes)
+---------------------------
+----- UCT TEST SUCCESS ----
+[main] uct_ep_am_short sent ABCDEFGHIJKLMNO (16 bytes)
+---------------------------
+You have mail in /var/spool/mail/root
+[root@node63 examples]# 
+
+client:
+[root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -n localhost
+INFO: UCT_HELLO_WORLD AM function = uct_ep_am_short server = localhost port = 13337
+Using rc_verbs/mlx5_0:1
+
+
+

@@ -1,0 +1,61 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ucx_perftest",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/install-debug/bin/ucx_perftest",
+      // "args": ["-c", "0"],  // server
+      "args": ["172.17.29.63", "-t",  "ucp_put_bw",  "-c",  "1"], // client
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/install-debug/bin",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/bin/gdb",
+      "setupCommands": [
+          {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
+          },
+          {
+              "description": "Set Disassembly Flavor to Intel",
+              "text": "-gdb-set disassembly-flavor intel",
+              "ignoreFailures": true
+          }
+      ]
+    },
+
+    {
+      "name": "uct_hello_world_server",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/.libs/lt-uct_hello_world",
+      "args": ["-d", "ib17-0",  "-t",  "verbs"], // server
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/examples/.libs",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/bin/gdb",
+      "setupCommands": [
+          {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
+          },
+          {
+              "description": "Set Disassembly Flavor to Intel",
+              "text": "-gdb-set disassembly-flavor intel",
+              "ignoreFailures": true
+          }
+      ]
+    },
+
+  ]
+}
