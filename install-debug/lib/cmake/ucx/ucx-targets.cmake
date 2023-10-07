@@ -4,7 +4,7 @@
 # See file LICENSE for terms.
 #
 
-set(prefix "/home/xb/project/ucx/install-debug")
+get_filename_component(prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 set(exec_prefix "${prefix}")
 
 add_library(ucx::ucs SHARED IMPORTED)

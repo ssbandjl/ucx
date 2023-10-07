@@ -11,6 +11,8 @@ uct_example: uct_hello_world.c
 启用编译: export HAVE_EXAMPLES=true
 bash examples/uct_hello_world
 server:  exec /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d ib17-0 -t tcp
+gdb --args /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs
+
 
 启动服务端: 主函数中解析命令行参数, 设置默认服务端口, 初始化上下文,
 异步事件上下文: 管理定时器和FD通知
@@ -60,7 +62,7 @@ uct_rc_verbs_ep_connect_to_ep_v2
 
 
 client:
-[root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs 172.17.29.63
+[root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -n 172.17.29.63
 
 main
 ucs_status_t do_am_short
@@ -115,3 +117,59 @@ tcp
 
 
 网卡,传输层操作, uct_rc_verbs_iface_tl_ops
+
+
+创建完成队列:
+#0  0x00007ffff65345c0 in ibv_create_cq () from /lib64/libibverbs.so.1
+#1  0x00007ffff67694dc in uct_ib_mlx5_devx_open_device (ibv_device=ibv_device@entry=0x60de40) at mlx5/dv/ib_mlx5dv_md.c:947
+#2  0x00007ffff676cfd8 in uct_ib_mlx5_devx_md_open (ibv_device=0x60de40, md_config=0x607750, p_md=0x7fffffffd5e0) at mlx5/dv/ib_mlx5dv_md.c:1111
+#3  0x00007ffff6760d04 in uct_ib_md_open (component=<optimized out>, md_name=0x7fffffffd680 "mlx5_0", uct_md_config=0x607750, md_p=0x7fffffffd640) at base/ib_md.c:1051
+#4  0x00007ffff792852d in uct_md_open (component=0x7ffff69faf40 <uct_ib_component>, md_name=0x7fffffffd680 "mlx5_0", config=<optimized out>, md_p=md_p@entry=0x7fffffffddc0) at base/uct_md.c:61
+#5  0x0000000000402427 in dev_tl_lookup (cmd_args=cmd_args@entry=0x7fffffffda00, iface_p=iface_p@entry=0x7fffffffdac0) at uct_hello_world.c:352
+#6  0x000000000040193b in main (argc=<optimized out>, argv=<optimized out>) at uct_hello_world.c:611
+
+#0  0x00007ffff65345c0 in ibv_create_cq () from /lib64/libibverbs.so.1
+#1  0x00007ffff6778a39 in uct_rc_verbs_can_create_qp (ctx=<optimized out>, pd=0x60d3f0) at rc/verbs/rc_verbs_iface.c:546
+#2  0x00007ffff6778c23 in uct_rc_verbs_query_tl_devices (md=0x60efd0, tl_devices_p=0x7fffffffd630, num_tl_devices_p=0x7fffffffd620) at rc/verbs/rc_verbs_iface.c:581
+#3  0x00007ffff792864f in uct_md_query_tl_resources (md=0x60efd0, resources_p=resources_p@entry=0x7fffffffd7b0, num_resources_p=num_resources_p@entry=0x7fffffffd790) at base/uct_md.c:94
+#4  0x000000000040248c in dev_tl_lookup (cmd_args=cmd_args@entry=0x7fffffffda00, iface_p=iface_p@entry=0x7fffffffdac0) at uct_hello_world.c:363
+#5  0x000000000040193b in main (argc=<optimized out>, argv=<optimized out>) at uct_hello_world.c:611
+
+#0  0x00007ffff65347b0 in ibv_create_qp () from /lib64/libibverbs.so.1
+#1  0x00007ffff675db21 in ibv_create_qp_ex (qp_init_attr_ex=0x7fffffffd558, context=<optimized out>) at /usr/include/infiniband/verbs.h:3016
+#2  uct_ib_iface_create_qp (iface=iface@entry=0x6160f0, attr=attr@entry=0x7fffffffd520, qp_p=qp_p@entry=0x7fffffffd4e0) at base/ib_iface.c:1024
+#3  0x00007ffff677238b in uct_rc_iface_qp_create (iface=iface@entry=0x6160f0, qp_p=qp_p@entry=0x7fffffffd4e0, attr=attr@entry=0x7fffffffd520, max_send_wr=<optimized out>, srq=<optimized out>)
+    at rc/base/rc_iface.c:838
+#4  0x00007ffff67794ed in uct_rc_verbs_iface_t_init (tl_config=0x60e130, params=<optimized out>, worker=<optimized out>, tl_md=<optimized out>, _init_count=0x7fffffffd4d0, 
+    _myclass=0x7ffff69fc760 <uct_rc_verbs_iface_t_class>, self=0x6160f0) at rc/verbs/rc_verbs_iface.c:357
+#5  uct_rc_verbs_iface_t_new (arg0=<optimized out>, arg1=<optimized out>, arg2=<optimized out>, arg3=0x60e130, obj_p=0x7fffffffdcd8) at rc/verbs/rc_verbs_iface.c:461
+#6  0x00007ffff7928b5b in uct_iface_open (md=0x60efd0, worker=0x607560, params=params@entry=0x7fffffffd820, config=0x60e130, iface_p=iface_p@entry=0x7fffffffdcd8) at base/uct_md.c:250
+#7  0x0000000000402738 in init_iface (iface_p=0x7fffffffdac0, func_am_type=FUNC_AM_SHORT, tl_name=0x616010 "rc_verbs", dev_name=0x61601a "mlx5_0:1") at uct_hello_world.c:271
+#8  dev_tl_lookup (cmd_args=cmd_args@entry=0x7fffffffda00, iface_p=iface_p@entry=0x7fffffffdac0) at uct_hello_world.c:383
+#9  0x000000000040193b in main (argc=<optimized out>, argv=<optimized out>) at uct_hello_world.c:611
+
+
+help, 帮助:
+[root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -h
+Usage: uct_hello_world [parameters]
+UCT hello world client/server example utility
+
+Parameters are:
+  -i      Select "uct_ep_am_short" function to send the message (default) // 默认短消息
+  -b      Select "uct_ep_am_bcopy" function to send the message // 缓冲区
+  -z      Select "uct_ep_am_zcopy" function to send the message // 零拷贝
+  -d        Select device name
+  -t        Select transport layer
+  -n <name> Set node name or IP address of the server (required for client and should be ignored for server)
+  -p <port>     Set alternative server port (default:13337)
+  -6            Use IPv6 address in data exchange
+  -s <size>     Set test string length (default:16)
+  -m <mem type> Memory type of messages
+                host - system memory (default)
+                cuda - NVIDIA GPU memory
+                cuda-managed - NVIDIA GPU managed/unified memory
+
+Example:
+  Server: uct_hello_world -d eth0 -t tcp
+  Client: uct_hello_world -d eth0 -t tcp -n localhost
+

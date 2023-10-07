@@ -443,7 +443,7 @@ int print_err_usage()
 }
 
 int parse_cmd(int argc, char * const argv[], cmd_args_t *args)
-{
+ {
     int c = 0, idx = 0;
 
     assert(args);
