@@ -1,10 +1,13 @@
 https://github.com/ssbandjl/ucx.git
-文档: https://openucx.readthedocs.io/en/master/
+文档: https://openucx.readthedocs.io/en/master/, https://github.com/openucx/ucx/wiki
 API文档: https://openucx.readthedocs.io/en/master/api.html
 术语: https://openucx.readthedocs.io/en/master/glossaries.html
 cuda: 计算统一设备架构
 代码规范: https://github.com/openucx/ucx/blob/master/docs/CodeStyle.md
+打印ucx信息: https://github.com/openucx/ucx/wiki/Print-UCX-info
 
+
+设置日志级别: https://github.com/openucx/ucx/wiki/Logging
 
 
 git remote add upstream https://github.com/openucx/ucx.git

@@ -4,3 +4,5 @@ export HAVE_EXAMPLES=true
 ./contrib/configure-devel --prefix=$PWD/install-debug
 make
 make install
+
+# cd examples; make

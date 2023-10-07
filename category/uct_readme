@@ -7,6 +7,9 @@ API头文件: src/uct/api/uct.h
 stride: 1个内存跨度,范围, 所有 iov 列表中的长度总和必须小于或等于相应通信操作的 max_zcopy。 如果长度或计数为零，则不会访问 buffer 指向的内存。 否则，缓冲区必须指向有效的内存。 如果 count 为 1，则每个 iov 条目指定单个连续数据块 如果 count > 1，则每个 iov 条目指定 count 元素的跨步块以及连续元素之间的跨步字节距离
 
 
+先执行一次: cd example; ./uct_hello_world
+
+
 uct_example: uct_hello_world.c
 启用编译: export HAVE_EXAMPLES=true
 bash examples/uct_hello_world
@@ -34,6 +37,43 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
       ucs_list_for_each uct_components_list 8个组件 -> ucs_vfs_obj_add_dir -> ucs_vfs_node_add 虚拟文件系统
     status = uct_component_query(components[cmpt_index], &component_attr)
+  connect_common
+    ret = getaddrinfo(server, service, &hints, &res)
+    sockfd = socket(t->ai_family, t->ai_socktype, t->ai_protocol)
+    setsockopt
+    bind, listen, accept -> 等待客户端发起socket连接
+  status = uct_iface_get_device_address(if_info.iface, own_dev)
+  sendrecv(oob_sock, own_dev, if_info.iface_attr.device_addr_len, (void**)&peer_dev) -> 先通过socket发送和接收长度, 然后发送和接收地址, 交换地址
+  uct_iface_is_reachable 检查地址是否可达 -> uct_ib_iface_is_reachable_v2 -> static int uct_ib_iface_dev_addr_is_reachable -> ucs_test_all_flags
+    device_addr = (const uct_ib_address_t*) UCS_PARAM_VALUE -> 如果设置了字段掩码中的标志，则有条件地返回参数值。 否则，返回默认值
+  status = uct_ep_create(&ep_params, &ep) -> 创建新端点 -> UCS_CLASS_DEFINE_NEW_FUNC
+  ucs_vfs_obj_set_dirty(params->iface, uct_iface_vfs_refresh)
+    ucs_vfs_global_init() -> UCS_INIT_ONCE(&ucs_vfs_init_once) 单例
+    ucs_vfs_node_find_by_obj -> ucs_vfs_kh_find -> klib -> kh_get -> 独立且轻量级c库: https://github.com/attractivechaos/klib
+  ucs_status_t uct_rc_verbs_ep_get_address
+  status = uct_ep_connect_to_ep(ep, peer_dev, peer_ep) -> uct_rc_verbs_ep_connect_to_ep_v2
+    status = uct_rc_iface_qp_connect(iface, ep->qp, qp_num, &ah_attr, path_mtu) -> ucs_status_t uct_rc_iface_qp_connect
+      qp_attr.qp_state              = IBV_QPS_RTR -> 设备qp
+      ret = ibv_modify_qp(qp, &qp_attr, qp_attr_mask); -> 设置qp状态机
+      ...
+      qp_attr.qp_state              = IBV_QPS_RTS
+      ret = ibv_modify_qp(qp, &qp_attr, qp_attr_mask)
+      ucs_debug("connected rc qp 0x%x on " -> 打印debug日志 -> connected rc qp 0x1a91b on mlx5_0:1/RoCE to lid 49152(+0) sl 0 remote_qp 0x1a91a mtu 1024 timer 18x7 rnr 13x7 rd_atom 16
+      
+
+
+
+
+  
+
+
+
+client:
+...
+if (connect(sockfd, t->ai_addr, t->ai_addrlen) == 0)
+
+
+
 
 
       
@@ -172,4 +212,68 @@ Parameters are:
 Example:
   Server: uct_hello_world -d eth0 -t tcp
   Client: uct_hello_world -d eth0 -t tcp -n localhost
+
+
+typedef struct uct_iface_ops 传输接口操作，API 中公开的每个操作都必须出现在下表中，以允许使用自定义操作创建接口/端点
+ep_fence, 端点栅栏, 
+
+typedef struct uct_worker, 进程引擎和用于分配通信资源的域。 不同工人独立驱动
+
+
+ucs_status_t uct_ep_create, 创建新端点。 以可用模式之一创建 UCT 端点： -# 未连接端点：如果 uct_ep_params 中不存在任何地址，则会创建一个未连接端点。 要建立到远程端点的连接，需要调用 uct_ep_connect_to_ep  使用此模式需要 uct_ep_params_t::iface 具有 UCT_IFACE_FLAG_CONNECT_TO_EP 功能标志。 可以通过 uct_iface_query 获取。 -# 连接到远程接口：如果设置了 uct_ep_params_t::dev_addr 和 uct_ep_params_t::iface_addr，这将建立一个连接到远程接口的端点。 这要求 uct_ep_params_t::iface 具有 UCT_IFACE_FLAG_CONNECT_TO_IFACE 功能标志。 可以通过uct_iface_query获取。 -# 连接到远程套接字地址：如果设置了 uct_ep_params_t::sockaddr，这将创建一个连接到远程套接字的端点。 这要求设置 uct_ep_params::cm 或 uct_ep_params::iface。 在后一种情况下，接口必须支持 UCT_IFACE_FLAG_CONNECT_TO_SOCKADDR 标志，可以通过调用 uct_iface_query 来检查该标志。
+
+参数：
+[in] – params 用户为 ep_p 定义的 uct_ep_params_t 配置。
+[out] – ep_p 填充新端点的句柄。
+
+返回：
+UCS_OK 端点创建成功。 这并不能保证端点已连接到参数中定义的目的地； 如果失败，错误将报告给通过 uct_iface_params_t.err_handler 提供给 uct_iface_open 的接口错误处理回调。 ucs_status_t 定义的错误代码
+
+
+ucs_async_thread_add_event_fd
+status = ucs_async_thread_start(&thread)
+ucs_pthread_create(&thread->thread_id, ucs_async_thread_func
+
+
+
+
+flow:
+接口(uct_iface) -----> 操作(uct_iface_ops_t)
+端点(uct_ep_h) 中包含 iface_操作
+
+
+
+
+conjunction 连接
+typedef struct uct_ib_address IB网络地址
+
+UCS_CLASS_DEFINE_NEW_FUNC(uct_rc_verbs_ep_t, uct_ep_t, const uct_ep_params_t *); 宏展开
+ucs_status_t uct_rc_verbs_ep_t_new(const uct_ep_params_t * arg0,  uct_ep_t **obj_p) 
+{ 
+  ucs_status_t status; 
+  *obj_p = ((void *)0); 
+  status = ({ ucs_class_t *cls = &uct_rc_verbs_ep_t_class; ucs_status_t _status; void *obj; obj = ucs_class_malloc(cls); 
+  if (obj != ((void *)0)) 
+  { 
+    _status = ({ ucs_class_t *_cls = &uct_rc_verbs_ep_t_class; 
+    int _init_counter = 1; 
+    ucs_status_t __status; 
+    __status = uct_rc_verbs_ep_t_init((uct_rc_verbs_ep_t*)(obj), _cls, &_init_counter,arg0); 
+    if (__status != UCS_OK) { 
+      ucs_class_call_cleanup_chain(&uct_rc_verbs_ep_t_class, (obj), _init_counter); 
+    } (__status); }); 
+    if (_status == UCS_OK) { *(obj_p) = (__typeof__(*(obj_p)))obj; } else { ucs_class_free(obj); *(obj_p) = ((void *)0); } } else { _status = UCS_ERR_NO_MEMORY; *(obj_p) = ((void *)0); } (_status); }); ucs_class_check_new_func_result(status, *obj_p); return status; }
+
+
+数据结构: src/ucs/datastruct
+
+
+日志级别: 
+ucs_global_opts_table
+export UCX_LOG_LEVEL=debug
+
+ucs_init
+  ucs_global_opts_init
+
+io示例: buildlib/pr/io_demo/az-stage-io-demo.yaml
 
