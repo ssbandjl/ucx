@@ -26,7 +26,7 @@ gdb --args /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t
 gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
   if (parse_cmd(argc, argv, &cmd_args)) -> int parse_cmd(int argc, char * const argv[], cmd_args_t *args)
     args->server_port   = 13337
-  status = ucs_async_context_create(UCS_ASYNC_MODE_THREAD_SPINLOCK, &async) -> 创建异步执行上下文 分配并初始化异步执行上下文。 这可用于确保安全的事件传递
+  status = ucs_async_context_create(UCS_ASYNC_MODE_THREAD_SPINLOCK, &async) -> 创建异步执行上下文 分配并初始化异步执行上下文。 这可用于确保安全的事件传递, 模式为线程自旋锁
     async = ucs_malloc(sizeof(*async), "async context") -> 内部分配, 并记录内存分配信息
       void *ptr = malloc(size)
     status = ucs_async_context_init(async, mode)
@@ -34,7 +34,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       status = ucs_mpmc_queue_init(&async->missed) -> 初始化多生产者/多消费者队列
       status = ucs_async_method_call(mode, context_init, async) -> .context_init       = ucs_async_poll_init -> 异步轮训初始化, 不阻塞
       async->last_wakeup = ucs_get_time() -> asm volatile("rdtsc" : "=a"(low), "=d"(high)) 汇编获取时间 -> UCS/ARCH/INFO：如果无法从CPU型号中读取x86 TSC值，请不要从/proc/cpuinfo中读取测量的CPU频率，因为它只能代表核心频率而不是TSC频率。 相反，通过一个短循环进行测量，当频率测量收敛或达到 1ms 时间限制时停止
-  status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化)
+  status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化) -> 创建一个工作对象。 工人代表着进步的引擎。 可以在应用程序中创建多个进度引擎，例如供多个线程使用。 Transports 可以为每个 Worker 分配单独的通信资源，以便每个 Worker 都可以独立于其他 Worker 进行操作 -> 声明/定义一个创建类实例的函数
   status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层
     status = uct_query_components(&components, &num_components)
       UCS_MODULE_FRAMEWORK_DECLARE(uct) -> 声明一个“框架”，它是可加载模块的特定集合的上下文。 通常特定框架中的模块提供相同内部接口的替代实现
@@ -42,7 +42,13 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       ucs_list_for_each uct_components_list 8个组件 -> ucs_vfs_obj_add_dir -> ucs_vfs_node_add 虚拟文件系统
     status = uct_component_query(components[cmpt_index], &component_attr)
     status = init_iface(tl_resources[tl_index].dev_name,
-      uct_iface_progress_enable(iface_p->iface -> uct_base_iface_progress_enable_cb -> uct_rc_verbs_iface_progress
+      ...
+      status = uct_iface_open(iface_p->md, iface_p->worker, &params, config
+        status = tl->iface_open -> static UCS_CLASS_DEFINE_NEW_FUNC(uct_rc_verbs_iface_t -> static UCS_CLASS_INIT_FUNC(uct_rc_verbs_iface_t
+          status = uct_iface_mpool_init -> 创建地址控制器和原子内存池
+          uct_rc_verbs_iface_init_inl_wrs
+          status = uct_rc_init_fc_thresh(&config->super, &self->super)
+      uct_iface_progress_enable(iface_p->iface -> uct_base_iface_progress_enable_cb -> uct_rc_verbs_iface_progress(search) -> 驱动接口运转
         ucs_callbackq_add_safe
   connect_common
     ret = getaddrinfo(server, service, &hints, &res)
@@ -391,4 +397,60 @@ typedef struct ucs_arbiter        ucs_arbiter_t;
   - 组中的第一个元素指向下一个组 (next_group) 的第一个元素。
   - 除最后一个元素外的所有元素都指向同一组中的下一个元素，最后一个元素指向第一个（下一个）。
 注意：每个元素有4个指针。 可以使用 3 个指针来完成，以便当将其放入仲裁器队列时，将指向前一组的指针而不是组中最后一个元素中的“下一个”指针放入。 但是，这使得代码变得更加复杂
+
+
+
+
+
+数据结构, data_struct
+ucs_async_context
+
+
+创建工人的宏展开: 声明/定义一个创建类实例的函数
+ucs_status_t uct_worker_create(ucs_async_context_t* arg0, ucs_thread_mode_t arg1,  uct_worker_t **obj_p) { 
+  ucs_status_t status; 
+  *obj_p = ((void *)0); 
+  status = ({ ucs_class_t *cls = &uct_priv_worker_t_class; ucs_status_t _status; void *obj; obj = ucs_class_malloc(cls); 
+  if (obj != ((void *)0)) { 
+    _status = ({ ucs_class_t *_cls = &uct_priv_worker_t_class; int _init_counter = 1;
+    ucs_status_t __status; 
+    __status = uct_priv_worker_t_init((uct_priv_worker_t*)(obj), _cls, &_init_counter,arg0 , arg1); 
+    if (__status != UCS_OK) { 
+      ucs_class_call_cleanup_chain(&uct_priv_worker_t_class, (obj), _init_counter);
+    } 
+    (__status); }); 
+    if (_status == UCS_OK) { *(obj_p) = (__typeof__(*(obj_p)))obj; } else { ucs_class_free(obj); *(obj_p) = ((void *)0); } } else { _status = UCS_ERR_NO_MEMORY; *(obj_p) = ((void *)0); } (_status); }); ucs_class_check_new_func_result(status, *obj_p); return status; }
+
+
+
+
+常用宏(预处理器): src/ucs/sys/preprocessor.h
+/* Convert token to string */
+#define UCS_PP_QUOTE(x)                   # x
+
+/* Expand macro token to the macro value */
+#define UCS_PP_EXPAND(x)                  x
+
+/* Paste two expanded tokens */
+#define __UCS_TOKENPASTE_HELPER(x, y)     x ## y
+#define UCS_PP_TOKENPASTE(x, y)           __UCS_TOKENPASTE_HELPER(x, y)
+
+/* Paste three expanded tokens */
+#define __UCS_TOKENPASTE3_HELPER(x, y, z) x ## y ## z
+#define UCS_PP_TOKENPASTE3(x, y, z)       __UCS_TOKENPASTE3_HELPER(x, y, z)
+
+/* Unique value generator */
+#ifdef __COUNTER__
+#  define UCS_PP_UNIQUE_ID __COUNTER__
+#else
+#  define UCS_PP_UNIQUE_ID __LINE__
+#endif
+
+/* Creating unique identifiers, used for macros */
+#define UCS_PP_APPEND_UNIQUE_ID(x)        UCS_PP_TOKENPASTE(x, UCS_PP_UNIQUE_ID)
+
+/* Convert to string */
+#define _UCS_PP_MAKE_STRING(x)            #x
+#define UCS_PP_MAKE_STRING(x)             _UCS_PP_MAKE_STRING(x)
+
 
