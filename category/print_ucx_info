@@ -1,0 +1,118 @@
+https://github.com/openucx/ucx/wiki/Print-UCX-info
+
+打印 UCX 信息
+ 
+刘杰瑞编辑了此页面于 2022 年 6 月 18 日 · 2次修订
+ 页数93
+主页
+双周电话会议
+贡献者指南
+代码风格检查
+UCF Collectives WG
+
+在本地克隆此 wiki
+https://github.com/openucx/ucx.wiki.git
+该工具打印有关UCX库的各种信息：
+
+版本和构建配置
+每个变量的配置设置和帮助。
+各种数据结构的大小
+传输信息：设备和功能。该工具位于src/tools/info.
+完整选项列表：
+
+$ ucx_info -h
+Usage: ucx_info [options]
+Options are:
+  -v         Version
+  -d         Devices
+  -c         Configuration
+  -a         Show also hidden configuration
+  -b         Build configuration
+  -y         Type information
+  -f         Fully decorated output
+  -t <name>  Print information for a specific transport
+......
+示例输出：
+
+$ ucx_info -d
+# Memory domain: mlx5_bond_0
+#     Component: ib
+#             register: unlimited, cost: 180 nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#
+#      Transport: dc_mlx5
+#         Device: mlx5_bond_0:1
+#           Type: network
+#  System device: mlx5_bond_0 (0)
+#
+#      capabilities:
+#            bandwidth: 10957.84/ppn + 0.00 MB/sec
+#              latency: 860 nsec
+#             overhead: 40 nsec
+#            put_short: <= 2K
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 11 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 11 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 2046
+#             am_bcopy: <= 8254
+#             am_zcopy: <= 8254, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 138
+#               domain: device
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 40
+#     device num paths: 2
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 5 bytes
+#       error handling: buffer (zcopy), remote access, peer failure, ep_check
+$ UCX_TLS=rc_x UCX_NET_DEVICES=mlx5_bond_0:1 ucx_info -ep -u t
+#
+# UCP context
+#
+#     component 0  :  self
+#     component 1  :  tcp
+#     component 2  :  sysv
+#     component 3  :  posix
+#     component 4  :  ib
+#     component 5  :  rdmacm
+#     component 6  :  cma
+#
+#            md 0  :  component 4  mlx5_bond_0 
+#
+#      resource 0  :  md 0  dev 0  flags -- rc_mlx5/mlx5_bond_0:1
+#      resource 1  :  md 0  dev 0  flags a- ud_mlx5/mlx5_bond_0:1
+#
+# memory: 0.24MB, file descriptors: 7
+# create time: 19.528 ms
+#
+#
+# UCP endpoint 
+#
+#               peer: <no debug data>
+#                 lane[0]:  0:rc_mlx5/mlx5_bond_0:1.0 md[0]  -> md[0]/ib/sysdev[255] rma_bw#0 am am_bw#0
+#                 lane[1]:  0:rc_mlx5/mlx5_bond_0:1.1 md[0]  -> md[0]/ib/sysdev[255] rma_bw#1 wireup
+#
+#                tag_send: 0..<egr/short>..2039..<egr/bcopy>..2325..<egr/zcopy>..28242..<rndv>..(inf)
+#            tag_send_nbr: 0..<egr/short>..2039..<egr/bcopy>..262144..<rndv>..(inf)
+#           tag_send_sync: 0..<egr/short>..2039..<egr/bcopy>..2325..<egr/zcopy>..28242..<rndv>..(inf)
+#
+#                  rma_bw: mds [0] rndv_rkey_size 18
+

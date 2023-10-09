@@ -5,6 +5,8 @@ API文档: https://openucx.readthedocs.io/en/master/api.html
 cuda: 计算统一设备架构
 代码规范: https://github.com/openucx/ucx/blob/master/docs/CodeStyle.md
 打印ucx信息: https://github.com/openucx/ucx/wiki/Print-UCX-info
+uct设计(传输层): https://github.com/openucx/ucx/wiki/UCT-Design#rte
+
 
 
 设置日志级别: https://github.com/openucx/ucx/wiki/Logging

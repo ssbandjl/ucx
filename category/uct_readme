@@ -1,3 +1,7 @@
+总结:
+1. 通过socket交换地址
+2. 
+
 API头文件: src/uct/api/uct.h
 内存域资源描述符: typedef struct uct_md_resource_desc
 
@@ -37,6 +41,9 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
       ucs_list_for_each uct_components_list 8个组件 -> ucs_vfs_obj_add_dir -> ucs_vfs_node_add 虚拟文件系统
     status = uct_component_query(components[cmpt_index], &component_attr)
+    status = init_iface(tl_resources[tl_index].dev_name,
+      uct_iface_progress_enable(iface_p->iface -> uct_base_iface_progress_enable_cb -> uct_rc_verbs_iface_progress
+        ucs_callbackq_add_safe
   connect_common
     ret = getaddrinfo(server, service, &hints, &res)
     sockfd = socket(t->ai_family, t->ai_socktype, t->ai_protocol)
@@ -59,6 +66,25 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       qp_attr.qp_state              = IBV_QPS_RTS
       ret = ibv_modify_qp(qp, &qp_attr, qp_attr_mask)
       ucs_debug("connected rc qp 0x%x on " -> 打印debug日志 -> connected rc qp 0x1a91b on mlx5_0:1/RoCE to lid 49152(+0) sl 0 remote_qp 0x1a91a mtu 1024 timer 18x7 rnr 13x7 rd_atom 16
+  uct_worker_progress(if_info.worker) -> UCT 工作人员的显着进展。 该例程显式地处理任何未完成的通信操作和活动消息请求 -> uct_rc_verbs_iface_progress
+    count = uct_rc_verbs_iface_poll_rx_common(iface) -> ibv_poll_cq
+      uct_rc_verbs_iface_post_recv_common(iface, 0)
+    return count + uct_rc_verbs_iface_poll_tx(iface) -> always_inline
+      UCT_RC_VERBS_IFACE_FOREACH_TXWQE(&iface->super, i, wc, num_wcs) -> 遍历宏
+      uct_rc_txqp_completion_desc
+      ucs_arbiter_group_schedule -> 安排一个小组进行仲裁。 如果该组已经存在，则该操作将无效
+      uct_rc_verbs_update_tx_res(&iface->super, ep, count)
+        uct_rc_txqp_available_add
+        uct_rc_iface_update_reads -> 将 RDMA_READ 积分释放回 RC iface。 RDMA_READ 积分在完成回调中释放，但不会释放到 RC iface 以避免 OOO 发送。 否则，如果读取信用是唯一缺少的资源并在完成回调中释放，则即使挂起队列不为空，下一个完成回调也将能够发送
+        uct_rc_iface_add_cq_credits -> UCT/IB：修复错误处理后清除待处理请求的问题
+      ucs_arbiter_dispatch(&iface->super.tx.arbiter, 1, uct_rc_ep_process_pending, NULL) -> 在仲裁器中调度工作元素。 对于每个组，只要回调返回 REMOVE_ELEM 或 NEXT_GROUP，最多会调度 per_group 工作元素。 然后，对下一组执行相同的操作，直到仲裁器变空或回调返回 STOP。 如果一个组没有元素，或其回调返回 REMOVE_GROUP，则它将被删除，直到使用 ucs_arbiter_group_schedule() 将其放回到仲裁器上
+  if (barrier(oob_sock, progress_worker, if_info.worker)) -> TCP/TEST：修复 ucp_hello_world 同时 ep close 的问题
+  out_free_ep -> 释放资源
+  ...
+
+
+
+
       
 
 
@@ -276,4 +302,93 @@ ucs_init
   ucs_global_opts_init
 
 io示例: buildlib/pr/io_demo/az-stage-io-demo.yaml
+
+
+
+uct_rc_verbs_iface_common_progress_enable
+
+
+typedef struct uct_rc_verbs_txcnt {
+    uint16_t       pi;      /* producer (post_send) count */  生产者提交计数
+    uint16_t       ci;      /* consumer (ibv_poll_cq) completion count */ 消费者完成计数
+} uct_rc_verbs_txcnt_t;
+
+
+仲裁者:
+/*
+ *  A mechanism to arbitrate among groups of queued work elements, which attempts
+ * to be "fair" with respect to the groups.
+ *
+ * - "Arbiter" - the top-level entity.
+ * - "Element" - a single work element.
+ * - "Group"   - queue of work elements which would be dispatched in-order
+ *
+ * The arbiter contains a double-linked list of the group head elements. The
+ * next group head to be dispatched is the first entry in the list. Whenever a
+ * group is rescheduled, it's moved to the tail of the list. At any point, a
+ * group head can be removed from the "middle" of the list.
+ *
+ * The groups and elements are arranged like this:
+ *  - every arbitrated element points to the group (head).
+ *  - first element in the group points to previous and next group (list)
+ *  - first element in the group points to the first element of next group (next_group).
+ *  - all except last element point to the next element in same group, and the
+ *    last one points to the first (next).
+ *
+ * Note:
+ *  Every element holds 4 pointers. It could be done with 3 pointers, so that
+ *  the pointer to the previous group is put instead of "next" pointer in the last
+ *  element in the group, when it is put on the arbiter queue. However, it makes
+ *  the code much more complicated.
+ *
+ *
+ * Arbiter:
+ *   +=============+
+ *   | list        +
+ *   +======+======+
+ *   | next | prev |
+ *   +==|===+===|==+
+ *      |       +----------------------------------------------+
+ *      |                                                      |
+ *      +------+                                               |
+ *             |                                               |
+ *             |                                               |
+ * Elements:   V                                               V
+ *       +------------+          +------------+          +------------+
+ *       | list       |<-------->| list       |<-------->| list       |
+ *       +------------+          +------------+          +------------+
+ *    +->| next       +---+   +->| next       +---+      + next       +
+ *    |  +------------+   |   |  +------------+   |      +------------+
+ *    |  | group      |   |   |  | group      |   |      | group      |
+ *    |  +------------+   |   |  +------------+   |      +--------+---+
+ *    |                   |   |                   |          ^    |
+ *    |                   |   |                   |          |    |
+ *    |  +------------+   |   |  +------------+   |          |    |
+ *    |  | list       |<--+   |  | list       |<--+          |    |
+ *    |  +------------+       |  +------------+              |    |
+ *    +--+ next       +       +--+ next       |              |    |
+ *       +------------+          +------------+              |    |
+ *       | group      |          | group      |              |    |
+ *       +---------+--+          +--------+---+              |    |
+ *            ^    |                 ^    |                  |    |
+ * Groups:    |    |                 |    |                  |    |
+ *            |    |                 |    |                  |    |
+ *     +------+    |          +------+    |           +------+    |
+ *     | tail |<---+          | tail |<---+           | tail |<---+
+ *     +------+               +------+                +------+
+ *
+ */
+
+typedef struct ucs_arbiter        ucs_arbiter_t;
+
+一种在排队的工作元素组之间进行仲裁的机制，它试图对组进行“公平”
+- “仲裁者” - 顶级实体。
+- “元素”   - 单个工作元素。
+-“组”      -将按顺序分派的工作元素队列，仲裁器包含组头元素的双链表。 下一个要分派的组头是列表中的第一个条目。 每当重新安排一个组时，它就会移至列表的末尾。 在任何时候，都可以从列表的“中间”删除组头。
+组和元素的排列如下：
+  - 每个仲裁元素都指向该组（头）。
+  - 组中的第一个元素指向上一个和下一个组（列表）
+  - 组中的第一个元素指向下一个组 (next_group) 的第一个元素。
+  - 除最后一个元素外的所有元素都指向同一组中的下一个元素，最后一个元素指向第一个（下一个）。
+注意：每个元素有4个指针。 可以使用 3 个指针来完成，以便当将其放入仲裁器队列时，将指向前一组的指针而不是组中最后一个元素中的“下一个”指针放入。 但是，这使得代码变得更加复杂
 
