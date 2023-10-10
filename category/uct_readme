@@ -35,14 +35,19 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       status = ucs_async_method_call(mode, context_init, async) -> .context_init       = ucs_async_poll_init -> 异步轮训初始化, 不阻塞
       async->last_wakeup = ucs_get_time() -> asm volatile("rdtsc" : "=a"(low), "=d"(high)) 汇编获取时间 -> UCS/ARCH/INFO：如果无法从CPU型号中读取x86 TSC值，请不要从/proc/cpuinfo中读取测量的CPU频率，因为它只能代表核心频率而不是TSC频率。 相反，通过一个短循环进行测量，当频率测量收敛或达到 1ms 时间限制时停止
   status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化) -> 创建一个工作对象。 工人代表着进步的引擎。 可以在应用程序中创建多个进度引擎，例如供多个线程使用。 Transports 可以为每个 Worker 分配单独的通信资源，以便每个 Worker 都可以独立于其他 Worker 进行操作 -> 声明/定义一个创建类实例的函数
-  status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层
+  status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层, 动态加载
     status = uct_query_components(&components, &num_components)
       UCS_MODULE_FRAMEWORK_DECLARE(uct) -> 声明一个“框架”，它是可加载模块的特定集合的上下文。 通常特定框架中的模块提供相同内部接口的替代实现
-      UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
+      UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载所有模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
+        ucs_module_loader_init_paths -> 找到路径, 然后动态加载: ucs_module_load_one(framework, module_name, flags)
+          void UCS_F_CTOR uct_ib_init()
+            uct_component_register(&uct_ib_component)
+            uct_tl_register(&uct_ib_component, uct_ib_tls[i]) -> 注册所有IB传输层
       ucs_list_for_each uct_components_list 8个组件 -> ucs_vfs_obj_add_dir -> ucs_vfs_node_add 虚拟文件系统
     status = uct_component_query(components[cmpt_index], &component_attr)
+    ...
     status = init_iface(tl_resources[tl_index].dev_name,
-      ...
+      status = uct_md_iface_config_read(iface_p->md, tl_name, NULL, NULL, &config) -> 读取并填充配置
       status = uct_iface_open(iface_p->md, iface_p->worker, &params, config
         status = tl->iface_open -> static UCS_CLASS_DEFINE_NEW_FUNC(uct_rc_verbs_iface_t -> static UCS_CLASS_INIT_FUNC(uct_rc_verbs_iface_t
           status = uct_iface_mpool_init -> 创建地址控制器和原子内存池
@@ -452,5 +457,80 @@ ucs_status_t uct_worker_create(ucs_async_context_t* arg0, ucs_thread_mode_t arg1
 /* Convert to string */
 #define _UCS_PP_MAKE_STRING(x)            #x
 #define UCS_PP_MAKE_STRING(x)             _UCS_PP_MAKE_STRING(x)
+
+
+
+
+面向对象:
+struct uct_rc_iface {
+    uct_ib_iface_t              super;
+
+
+/**
+ * IB port active speed. IB端口速度
+ */
+enum {
+    UCT_IB_SPEED_SDR     = 1,
+    UCT_IB_SPEED_DDR     = 2,
+    UCT_IB_SPEED_QDR     = 4,
+    UCT_IB_SPEED_FDR10   = 8,
+    UCT_IB_SPEED_FDR     = 16,
+    UCT_IB_SPEED_EDR     = 32,
+    UCT_IB_SPEED_HDR     = 64,
+    UCT_IB_SPEED_NDR     = 128,
+    UCT_IB_SPEED_LAST
+};
+
+
+
+注册tl, 传输层
+_dl_init_internal
+void UCS_F_CTOR uct_init()
+uct_self_init() -> UCT_SINGLE_TL_INIT(&uct_self_component, self,,,)
+   void uct_self_init(void) { {; uct_component_register(&uct_self_component);}; uct_tl_register(&uct_self_component, &uct_self_tl); }  
+   void uct_self_cleanup(void) { uct_tl_unregister(&uct_self_tl); {uct_component_unregister(&uct_self_component); ;}; }
+uct_tl_register
+  ucs_list_add_tail(&component->tl_list, &tl->list)
+
+
+
+所有IB传输层:
+static uct_tl_t *uct_ib_tls[] = {
+#ifdef HAVE_TL_DC
+    &UCT_TL_NAME(dc_mlx5),
+#endif
+#ifdef HAVE_TL_RC
+    &UCT_TL_NAME(rc_verbs),
+#endif
+#if defined (HAVE_TL_RC) && defined (HAVE_MLX5_DV)
+    &UCT_TL_NAME(rc_mlx5),
+#endif
+#ifdef HAVE_TL_UD
+    &UCT_TL_NAME(ud_verbs),
+#endif
+#if defined (HAVE_TL_UD) && defined (HAVE_MLX5_HW_UD)
+    &UCT_TL_NAME(ud_mlx5)
+#endif
+};
+
+
+类: src/ucs/type/class.h
+
+
+wireup, 连线
+
+
+网络插件:
+● ofi: Libfabric (OpenFabrics Interfaces)**
+● portals4: Portals-based networks (uncommon)
+● self: Process-loopback communications
+● sm: Shared memory
+● smcuda: CUDA-aware shared memory
+● tcp: TCP
+● uct: UCX**
+● ugni: Cray uGNI (userspace Generic Network Interface)**
+● usnic: Cisco usNIC (userspace NIC)
+
+
 
 
