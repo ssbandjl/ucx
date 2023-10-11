@@ -54,13 +54,64 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
           ucs_config_parser_get_sub_prefix(env_prefix, &sub_prefix)
           ucs_config_parse_config_files()
           ucs_config_apply_config_vars -> 应用环境变量, 以及自定义前缀的环境变量
-    uct_md_open
-      status = component->md_open(component, md_name, config, &md)
+    uct_md_open -> 重要函数, 打开内存域
+      status = component->md_open(component, md_name, config, &md) -> ucs_status_t uct_ib_md_open
+        ib_device_list = ibv_get_device_list(&num_devices) -> 获取所有网卡列表, 获取设备列表
+        ibv_fork_init
+        status = uct_ib_ops[i]->ops->open(ib_device, md_config, &md) -> static ucs_status_t uct_ib_mlx5_devx_md_open
+          ctx = uct_ib_mlx5_devx_open_device(ibv_device)
+            ctx = mlx5dv_open_device(ibv_device, &dv_attr)
+            ibv_create_cq(ctx, 1, NULL, NULL, 0)
+            ibv_destroy_cq(cq)
+            event_channel = mlx5dv_devx_create_event_channel
+            mlx5dv_devx_destroy_event_channel(event_channel)
+          md = ucs_derived_of(uct_ib_md_alloc(sizeof(*md), "ib_mlx5_devx_md", ctx)
+          status = uct_ib_mlx5_check_uar(md)
+            uct_ib_mlx5_devx_uar_init
+              uct_ib_mlx5_devx_alloc_uar
+                mlx5dv_devx_alloc_uar
+            uct_ib_mlx5_devx_uar_cleanup
+          uct_ib_mlx5_devx_mr_lru_init(md)
+          status = uct_ib_device_query(dev, ibv_device)
+            uct_ib_query_device
+              ibv_get_device_name
+              ret = ibv_query_device_ex(ctx, NULL, attr)
+                ret = vctx->query_device_ex(context, input, attr, sizeof(*attr))
+            ibv_query_port
+            ucs_topo_resolve_sysfs_path ->  "/sys/devices/pci0000:15/0000:15:04.0/0000:17:00.0" -> PCI地址
+            ucs_topo_get_sysfs_dev
+            uct_ib_device_set_pci_id
+            ucs_topo_get_pci_bw
+              effective_bw = (p->bw_gbps * 1e9 / 8.0) * width * ((double)p->encoding / p->decoding) * link_utilization; -> 计算带宽
+          ret = mlx5dv_devx_general_cmd -> ucs_status_t uct_ib_mlx5_devx_general_cmd
+
+          status = uct_ib_mlx5_devx_query_lag(md, &lag_state)
+          md->port_select_mode = uct_ib_mlx5_devx_query_port_select(md)
+          uct_ib_mlx5_is_xgvmi_alias_supported
+          uct_ib_mlx5_devx_check_odp
+          uct_ib_mlx5_devx_general_cmd
+          uct_ib_md_open_common -> ucs_status_t uct_ib_md_open_common
+            uct_ib_device_init
+              uct_ib_device_get_locality
+              ucs_sys_fcntl_modfl
+                oldfl = fcntl(fd, F_GETFL)
+            uct_ib_md_check_dmabuf(md)                
+              ibv_reg_dmabuf_mr
+          uct_ib_mlx5_md_port_counter_set_id_init
+          ucs_mpool_init
+          uct_ib_mlx5_md_buf_alloc
+          uct_ib_md_parse_relaxed_order
+          uct_ib_mlx5_devx_init_flush_mr
+            uct_ib_reg_mr
+        ....
         static ucs_status_t uct_self_md_open
         uct_md_vfs_init(component, md, md_name)
     uct_config_release
     uct_md_query
+      status = uct_md_attr_v2_init(md, &md_attr_v2) -> static ucs_status_t uct_self_md_query
+      uct_md_attr_from_v2(md_attr, &md_attr_v2)
     uct_md_query_tl_resources
+      uct_self_query_tl_devices
     status = init_iface(tl_resources[tl_index].dev_name,
       status = uct_md_iface_config_read(iface_p->md, tl_name, NULL, NULL, &config) -> 读取并填充配置
       status = uct_iface_open(iface_p->md, iface_p->worker, &params, config
@@ -612,5 +663,60 @@ struct uct_md_attr
 Memory domain attributes
 } uct_md_attr_v2_t;
 内存域属性。 该结构定义了内存域的属性，其中包括可分配的最大内存、访问内存所需的凭据、指示 CPU 邻近度的 CPU 掩码以及指示可分配的内存类型 (CPU/CUDA/ROCM) 的位图。 检测到的、分配的、访问的以及可以返回 dmabuf 属性的内存类型
+
+
+
+static ucs_status_t uct_ib_verbs_md_open
+  uct_ib_device_query
+    status = uct_ib_query_device(dev->ibv_context, &dev->dev_attr)
+      ret = ibv_query_device(ctx, attr) -> 查询网卡信息
+
+
+
+
+ibv_get_device_list
+
+
+
+typedef struct {
+    double     bw_gbps;       /* Link speed */ 双精度,浮点数
+    uint16_t   payload;       /* Payload used to data transfer */
+    uint16_t   tlp_overhead;  /* PHY + data link layer + header + CRC */
+    uint16_t   ctrl_ratio;    /* Number of TLC before ACK */
+    uint16_t   ctrl_overhead; /* Length of control TLP */
+    uint16_t   encoding;      /* Number of encoded symbol bits */
+    uint16_t   decoding;      /* Number of decoded symbol bits */
+    const char *name;         /* Name of PCI generation */
+} ucs_topo_pci_info_t;
+
+
+传输层包封装
+MSC8156 技术数据表 (MSC8156)。 详细介绍了信号、AC/DC 特性、时钟信号特性、封装和引脚排列以及电气设计...
+https://www.nxp.com/products/processors-and-microcontrollers/additional-mpu-mcus-architectures/digital-signal-processors/high-performance-six-core-dsp:MSC8156
+/*
+ * - TLP (Transaction Layer Packet) overhead calculations (no ECRC):
+ *   Gen1/2:
+ *     Start   SeqNum   Hdr_64bit   LCRC   End
+ *       1   +   2    +   16      +   4  +  1  = 24
+ *
+ *   Gen3/4:
+ *     Start   SeqNum   Hdr_64bit   LCRC
+ *       4   +   2    +   16      +   4  = 26
+ *
+ * - DLLP (Data Link Layer Packet) overhead calculations:
+ *    - Control packet 8b ACK + 8b flow control
+ *    - ACK/FC ratio: 1 per 4 TLPs
+ *
+ * References:
+ * [1] https://www.xilinx.com/support/documentation/white_papers/wp350.pdf
+ * [2] https://xdevs.com/doc/Standards/PCI/PCI_Express_Base_4.0_Rev0.3_February19-2014.pdf
+ * [3] https://www.nxp.com/docs/en/application-note/AN3935.pdf
+ */
+
+MSC8156 基于采用 StarCore® 技术构建的业界最高性能 DSP 内核，专为当今无线宽带、医疗成像、航空航天、国防以及先进测试和测量市场的高性能应用的高级处理要求和功能而设计。 它提供更高的性能和节能，在高度集成的片上系统 (SoC) 中利用 45 nm 处理技术，提供相当于 6 GHz 单核设备的性能。 MSC8156 帮助设备制造商创建最终产品和服务，在更小的硬件占用空间中集成更多功能。
+
+MSC8156 DSP 提供高水平的性能和集成度，结合了六个完全可编程的增强型 SC3850 DSP 内核，每个内核的运行速度高达 1 GHz。 MAPLE-B 加速器由 NXP® 开发并集成在片上，支持 Turbo 和 Viterbi 通道解码以及 DFT/iDFT 和 FFT/iFFT 算法的硬件加速。 基于 RISC 的高性能内部 QUICC Engine® 子系统支持多种网络协议，以保证数据包网络上的可靠数据传输，同时显着减轻 DSP 内核的处理负担。
+
+MSC8156嵌入大容量内部存储器，支持多种先进的高速接口类型，包括两个RapidIO®接口、两个用于网络通信的千兆位以太网接口、一个PCI Express®控制器、两个用于高速、行业标准存储器接口的DDR控制器 和四个多通道TDM 接口。 MSC8156 通过与所有 MSC825x 和 MSC815x DSP 设备的引脚兼容性实现了高度的可扩展性。
 
 

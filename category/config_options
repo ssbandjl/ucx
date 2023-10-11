@@ -1,3 +1,4 @@
+设置日志级别, 缓冲区大小, 调试模式, 动态加载模块的路径, 正则过滤模块等配置
 static ucs_config_field_t ucs_global_opts_table[] = {
  {"LOG_LEVEL", "warn",
   "UCS logging level. Messages with a level higher or equal to the selected "
