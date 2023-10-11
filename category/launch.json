@@ -32,11 +32,37 @@
     },
 
     {
+      "name": "uct_hello_world_client",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/.libs/lt-uct_hello_world",
+      "args": ["-d", "mlx5_0:1",  "-t",  "rc_verbs", "-n", "172.17.29.63"], // client
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/examples/.libs",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/bin/gdb",
+      "setupCommands": [
+          {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
+          },
+          {
+              "description": "Set Disassembly Flavor to Intel",
+              "text": "-gdb-set disassembly-flavor intel",
+              "ignoreFailures": true
+          }
+      ]
+    },
+
+    {
       "name": "uct_hello_world_server",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/examples/.libs/lt-uct_hello_world",
-      "args": ["-d", "ib17-0",  "-t",  "verbs"], // server
+      "args": ["-d", "mlx5_0:1",  "-t",  "rc_verbs", "-z"], // server
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/examples/.libs",
       "environment": [],

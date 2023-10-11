@@ -6,3 +6,5 @@ mpirun -x UCX_PROTO_ENABLE=y -x UCX_PROTO_INFO=y -np 2 --map-by node osu_bw D D
 多通道(多设备负载均衡, 网卡,类似bond): multi_rail, 配置: UCX_MAX_RNDV_RAILS=<num-rails>
 独立通道: UCX_MAX_RNDV_RAILS=1, 每个进程使用1个本地最近的numa节点
 
+cp .vscode/launch.json category/launch.json
+

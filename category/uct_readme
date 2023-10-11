@@ -35,8 +35,8 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       status = ucs_async_method_call(mode, context_init, async) -> .context_init       = ucs_async_poll_init -> 异步轮训初始化, 不阻塞
       async->last_wakeup = ucs_get_time() -> asm volatile("rdtsc" : "=a"(low), "=d"(high)) 汇编获取时间 -> UCS/ARCH/INFO：如果无法从CPU型号中读取x86 TSC值，请不要从/proc/cpuinfo中读取测量的CPU频率，因为它只能代表核心频率而不是TSC频率。 相反，通过一个短循环进行测量，当频率测量收敛或达到 1ms 时间限制时停止
   status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化) -> 创建一个工作对象。 工人代表着进步的引擎。 可以在应用程序中创建多个进度引擎，例如供多个线程使用。 Transports 可以为每个 Worker 分配单独的通信资源，以便每个 Worker 都可以独立于其他 Worker 进行操作 -> 声明/定义一个创建类实例的函数
-  status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层, 动态加载
-    status = uct_query_components(&components, &num_components)
+  status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层, 动态加载, 由最小延迟决定要使用的设备和传输, 实参为地址指针, 形参为指针
+    status = uct_query_components(&components, &num_components) -> 得到8个组件
       UCS_MODULE_FRAMEWORK_DECLARE(uct) -> 声明一个“框架”，它是可加载模块的特定集合的上下文。 通常特定框架中的模块提供相同内部接口的替代实现
       UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载所有模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
         ucs_module_loader_init_paths -> 找到路径, 然后动态加载: ucs_module_load_one(framework, module_name, flags)
@@ -44,8 +44,23 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
             uct_component_register(&uct_ib_component)
             uct_tl_register(&uct_ib_component, uct_ib_tls[i]) -> 注册所有IB传输层
       ucs_list_for_each uct_components_list 8个组件 -> ucs_vfs_obj_add_dir -> ucs_vfs_node_add 虚拟文件系统
+    component_attr.md_resources = alloca -> alloca - 分配自动释放的内存
     status = uct_component_query(components[cmpt_index], &component_attr)
-    ...
+      status = component->query_md_resources(component, &resources, &num_resources); -> uct_md_query_single_md_resource
+    status = uct_md_config_read(components[cmpt_index], NULL, NULL, &md_config); -> 读取内存域资源
+      status = uct_config_read(&bundle, &component->md_config, env_prefix)
+        status = ucs_config_parser_fill_opts(config_bundle->data, entry, full_prefix, 0)
+          ucs_config_parser_set_default_values(opts, entry->table) -> ucs_config_sscanf_table
+          ucs_config_parser_get_sub_prefix(env_prefix, &sub_prefix)
+          ucs_config_parse_config_files()
+          ucs_config_apply_config_vars -> 应用环境变量, 以及自定义前缀的环境变量
+    uct_md_open
+      status = component->md_open(component, md_name, config, &md)
+        static ucs_status_t uct_self_md_open
+        uct_md_vfs_init(component, md, md_name)
+    uct_config_release
+    uct_md_query
+    uct_md_query_tl_resources
     status = init_iface(tl_resources[tl_index].dev_name,
       status = uct_md_iface_config_read(iface_p->md, tl_name, NULL, NULL, &config) -> 读取并填充配置
       status = uct_iface_open(iface_p->md, iface_p->worker, &params, config
@@ -311,6 +326,14 @@ export UCX_LOG_LEVEL=debug
 
 ucs_init
   ucs_global_opts_init
+    status = ucs_config_parser_fill_opts(&ucs_global_opts, UCS_CONFIG_GET_TABLE(ucs_global_opts_read_only_table), UCS_DEFAULT_ENV_PREFIX, 1); -> 配置文件 , 全局只读配置表 -> static ucs_config_field_t ucs_global_opts_read_only_table[] 
+    static ucs_config_field_t ucs_global_opts_table[] -> 全局选项表
+      ucs_config_parse_config_file
+        file = fopen(file_path, "r"); -> 读取配置文件
+        "/home/xb/project/ucx/install-debug/etc/ucx" -> 优先查找路径
+    ucs_vfs_obj_add_dir(NULL, &ucs_global_opts, "ucs/global_opts")
+    ucs_vfs_obj_add_rw_file(&ucs_global_opts, ucs_vfs_read_log_level, ucs_vfs_write_log_level, NULL, 0, "log_level")
+
 
 io示例: buildlib/pr/io_demo/az-stage-io-demo.yaml
 
@@ -532,5 +555,62 @@ wireup, 连线
 ● usnic: Cisco usNIC (userspace NIC)
 
 
+
+环境变量前缀与配置文件名:
+#define UCS_DEFAULT_ENV_PREFIX "UCX_"
+#define UCS_CONFIG_ARRAY_MAX   128
+#define UCX_CONFIG_FILE_NAME   "ucx.conf"
+
+全局选项配置:
+ucs_global_opts_t ucs_global_opts = {
+    .log_component         = {UCS_LOG_LEVEL_WARN, "UCX", "*"},
+    .log_print_enable      = 0,
+    .log_file              = "",
+    .log_file_size         = SIZE_MAX,
+    .log_file_rotate       = 0,
+    .log_buffer_size       = 1024,
+    .log_data_size         = 0,
+    .mpool_fifo            = 0,
+    .handle_errors         = UCS_BIT(UCS_HANDLE_ERROR_BACKTRACE),
+    .error_signals         = { NULL, 0 },
+    .error_mail_to         = "",
+    .error_mail_footer     = "",
+    .gdb_command           = "gdb",
+    .debug_signo           = SIGHUP,
+    .log_level_trigger     = UCS_LOG_LEVEL_FATAL,
+    .warn_unused_env_vars  = 1,
+    .enable_memtype_cache  = UCS_TRY,
+    .async_signo           = SIGALRM,
+    .stats_dest            = "",
+    .tuning_path           = "",
+    .memtrack_dest         = "",
+    .memtrack_limit        = UCS_MEMUNITS_INF,
+    .stats_trigger         = "exit",
+    .profile_mode          = 0,
+    .profile_file          = "",
+    .stats_filter          = { NULL, 0 },
+    .stats_format          = UCS_STATS_FULL,
+    .topo_prio             = { NULL, 0 },
+    .vfs_enable            = 1,
+    .vfs_thread_affinity   = 0,
+    .rcache_check_pfn      = 0,
+    .module_dir            = UCX_MODULE_DIR, /* defined in Makefile.am */ 模块搜索路径
+    .module_log_level      = UCS_LOG_LEVEL_TRACE,
+    .modules               = { {NULL, 0}, UCS_CONFIG_ALLOW_LIST_ALLOW_ALL },
+    .arch                  = UCS_ARCH_GLOBAL_OPTS_INITALIZER,
+    .rcache_stat_min       = 0,
+    .rcache_stat_max       = 0
+};
+
+
+
+类型定义头文件: src/uct/api/uct_def.h
+
+
+
+struct uct_md_attr
+Memory domain attributes
+} uct_md_attr_v2_t;
+内存域属性。 该结构定义了内存域的属性，其中包括可分配的最大内存、访问内存所需的凭据、指示 CPU 邻近度的 CPU 掩码以及指示可分配的内存类型 (CPU/CUDA/ROCM) 的位图。 检测到的、分配的、访问的以及可以返回 dmabuf 属性的内存类型
 
 
