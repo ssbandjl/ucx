@@ -313,7 +313,7 @@ tcp
 #9  0x000000000040193b in main (argc=<optimized out>, argv=<optimized out>) at uct_hello_world.c:611
 
 
-help, 帮助:
+help, 帮助, 选项, 参数:
 [root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -h
 Usage: uct_hello_world [parameters]
 UCT hello world client/server example utility
@@ -335,7 +335,10 @@ Parameters are:
 
 Example:
   Server: uct_hello_world -d eth0 -t tcp
+  /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs
+
   Client: uct_hello_world -d eth0 -t tcp -n localhost
+  /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -n 172.17.29.63
 
 
 typedef struct uct_iface_ops 传输接口操作，API 中公开的每个操作都必须出现在下表中，以允许使用自定义操作创建接口/端点
@@ -589,7 +592,7 @@ uct_tl_register
 
 
 
-所有IB传输层:
+所有IB传输层类型(tl):
 static uct_tl_t *uct_ib_tls[] = {
 #ifdef HAVE_TL_DC
     &UCT_TL_NAME(dc_mlx5),
@@ -754,5 +757,28 @@ iface_attr->cap.flags       = UCT_IFACE_FLAG_AM_BCOPY        |
 iface_attr->cap.event_flags = UCT_IFACE_FLAG_EVENT_SEND_COMP |
                               UCT_IFACE_FLAG_EVENT_RECV      |
                               UCT_IFACE_FLAG_EVENT_FD;
+
+
+
+
+三种数据发送模式(活动消息):
+/* Send active message to remote endpoint */
+if (cmd_args.func_am_type == FUNC_AM_SHORT) {
+    status = do_am_short(&if_info, ep, id, &cmd_args, str);
+} else if (cmd_args.func_am_type == FUNC_AM_BCOPY) {
+    status = do_am_bcopy(&if_info, ep, id, &cmd_args, str);
+} else if (cmd_args.func_am_type == FUNC_AM_ZCOPY) {
+    status = do_am_zcopy(&if_info, ep, id, &cmd_args, str);
+}
+
+短消息, 缓存区, 零拷贝
+case 'i':
+    args->func_am_type = FUNC_AM_SHORT;
+    break;
+case 'b':
+    args->func_am_type = FUNC_AM_BCOPY;
+    break;
+case 'z':
+    args->func_am_type = FUNC_AM_ZCOPY;
 
 
