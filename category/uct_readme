@@ -60,7 +60,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
         ibv_fork_init
         status = uct_ib_ops[i]->ops->open(ib_device, md_config, &md) -> static ucs_status_t uct_ib_mlx5_devx_md_open
           ctx = uct_ib_mlx5_devx_open_device(ibv_device)
-            ctx = mlx5dv_open_device(ibv_device, &dv_attr)
+            ctx = mlx5dv_open_device(ibv_device, &dv_attr) -> verbs_open_device -> rdma-core
             ibv_create_cq(ctx, 1, NULL, NULL, 0)
             ibv_destroy_cq(cq)
             event_channel = mlx5dv_devx_create_event_channel
@@ -125,7 +125,17 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
           status = uct_rc_init_fc_thresh(&config->super, &self->super)
           status = uct_rc_iface_qp_create
           uct_ib_destroy_qp(qp)
-      uct_iface_progress_enable(iface_p->iface -> uct_base_iface_progress_enable_cb -> uct_rc_verbs_iface_progress(search) -> 驱动接口运转
+      uct_iface_progress_enable(iface_p->iface -> uct_base_iface_progress_enable_cb -> uct_rc_verbs_iface_common_progress_enable
+        uct_rc_verbs_iface_common_prepost_recvs(iface)
+          uct_rc_verbs_iface_post_recv_common
+            uct_rc_verbs_iface_post_recv_always
+              uct_ib_iface_prepare_rx_wrs
+                UCT_TL_IFACE_GET_RX_DESC(&iface->super, mp, desc, break) -> ucs_mpool_get_inline
+                  ucs_mpool_get_grow
+                    ...
+                    ibv_reg_mr_iova2
+              ibv_post_srq_recv  
+      uct_rc_verbs_iface_progress(search) -> 驱动接口运转
         ucs_callbackq_add_safe
       status = uct_iface_query(iface_p->iface, &iface_p->iface_attr) -> uct_rc_verbs_iface_query
         status = uct_rc_iface_query
@@ -265,6 +275,9 @@ UCT_TL_DEFINE_ENTRY(&uct_ib_component, rc_verbs, uct_rc_verbs_query_tl_devices,
                     uct_rc_verbs_iface_t, "RC_VERBS_",
                     uct_rc_verbs_iface_config_table,
                     uct_rc_verbs_iface_config_t);
+
+UCT_TL_DEFINE_ENTRY(&uct_tcp_component, tcp, uct_tcp_query_devices,
+
 
 已注册的传输层类型, 搜索关键字(UCT_TL_DEFINE_ENTRY)
 uct_tl_t uct_rc_verbs_tl = { .name = "rc_verbs", .query_devices = uct_rc_verbs_query_tl_devices, .iface_open = uct_rc_verbs_iface_t_new, .config = { .name = "rc_verbs"" transport", .prefix = "RC_VERBS_", .table = uct_rc_verbs_iface_config_table, .size = sizeof(uct_rc_verbs_iface_config_t), } };
@@ -790,5 +803,6 @@ perf script -i perf.data &> perf.unfold
 ./stackcollapse-perf.pl ./perf.unfold &> ../perf.folded
 ./flamegraph.pl ../perf.folded > ../perf.svg
 sz -y ../perf.svg 
+
 
 
