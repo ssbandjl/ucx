@@ -592,6 +592,12 @@ int main(int argc, char **argv)
     uct_ep_params_t     ep_params;
     int                 res;
 
+
+    char word[128];
+    printf("%d, input:", getpid());
+    scanf("%s", word);
+    printf("output:%s\n", word);
+
     /* Parse the command line */
     if (parse_cmd(argc, argv, &cmd_args)) {
         status = UCS_ERR_INVALID_PARAM;
@@ -702,7 +708,7 @@ int main(int argc, char **argv)
                 func_am_max_size(cmd_args.func_am_type, &if_info.iface_attr));
         goto out_free_ep;
     }
-    // 客户端(指定了服务器IP)
+    /* 客户端(指定了服务器IP) */ 
     if (cmd_args.server_name) {
         char *str = (char *)mem_type_malloc(cmd_args.test_strlen);
         CHKERR_ACTION(str == NULL, "allocate memory",
@@ -722,7 +728,7 @@ int main(int argc, char **argv)
 
         mem_type_free(str);
         CHKERR_JUMP(UCS_OK != status, "send active msg", out_free_ep);
-    } else { // 服务端
+    } else {  /* 服务端 */ 
         recv_desc_t *rdesc;
 
         while (desc_holder == NULL) {

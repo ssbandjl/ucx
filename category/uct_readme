@@ -782,3 +782,13 @@ case 'z':
     args->func_am_type = FUNC_AM_ZCOPY;
 
 
+火焰图:
+cd /home/xb/fire/FlameGraph
+perf record -e cpu-clock  --call-graph dwarf -p 512634
+
+perf script -i perf.data &> perf.unfold
+./stackcollapse-perf.pl ./perf.unfold &> ../perf.folded
+./flamegraph.pl ../perf.folded > ../perf.svg
+sz -y ../perf.svg 
+
+
