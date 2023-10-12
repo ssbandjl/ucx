@@ -132,6 +132,8 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
               uct_ib_iface_prepare_rx_wrs
                 UCT_TL_IFACE_GET_RX_DESC(&iface->super, mp, desc, break) -> ucs_mpool_get_inline
                   ucs_mpool_get_grow
+                    ucs_mpool_grow -> chunk_alloc -> uct_iface_mp_chunk_alloc
+                      uct_iface_mem_alloc
                     ...
                     ibv_reg_mr_iova2
               ibv_post_srq_recv  
@@ -240,10 +242,11 @@ client:
 
 main
 ucs_status_t do_am_short
-UCT_INLINE_API ucs_status_t uct_ep_am_short
-ucs_status_t uct_rc_verbs_ep_am_short
-uct_rc_verbs_ep_post_send
-ibv_post_send
+  UCT_INLINE_API ucs_status_t uct_ep_am_short
+    ucs_status_t uct_rc_verbs_ep_am_short
+      uct_rc_verbs_iface_fill_inl_am_sge
+      uct_rc_verbs_ep_post_send
+        ibv_post_send
 
 
 
@@ -805,4 +808,60 @@ perf script -i perf.data &> perf.unfold
 sz -y ../perf.svg 
 
 
+do_am_bcopy
+  uct_ep_am_bcopy
+    uct_rc_verbs_ep_am_bcopy
+      UCT_RC_IFACE_GET_TX_AM_BCOPY_DESC
+      ucs_mpool_get_inline
+      uct_rc_verbs_ep_post_send_desc
+        uct_rc_verbs_ep_post_send
+          uct_rc_iface_tx_moderation
+          uct_rc_ep_fm
+          uct_ib_log_post_send
+          ibv_post_send
+          uct_rc_verbs_txqp_posted
+        uct_rc_txqp_add_send_op_sn
 
+
+ucs_status_t do_am_zcopy
+  uct_md_mem_reg
+  comp.uct_comp.func   = zcopy_completion_cb
+  do ... while (status == UCS_ERR_NO_RESOURCE) -> 没资源时退出循环 
+  status = uct_ep_am_zcopy -> ep->iface->ops.ep_am_zcopy
+    ucs_status_t uct_rc_mlx5_ep_am_zcopy | uct_rc_verbs_ep_am_zcopy
+      UCT_CHECK_IOV_SIZE
+      status = uct_rc_mlx5_ep_zcopy_post(ep, MLX5_OPCODE_SEND, iov, iovcnt, 0ul, id, header, header_length, 0, 0, 0ul, 0, 0, MLX5_WQE_CTRL_SOLICITED, uct_rc_ep_send_op_completion_handler, 0, comp);
+        uct_rc_mlx5_txqp_dptr_post_iov
+          uct_rc_mlx5_am_hdr_fill
+          uct_ib_mlx5_inline_copy
+          uct_rc_mlx5_common_post_send
+            uct_ib_mlx5_post_send
+              uct_ib_mlx5_bf_copy
+                uct_ib_mlx5_bf_copy_bb
+            uct_rc_txqp_posted
+        uct_rc_txqp_add_send_comp
+  uct_worker_progress
+
+
+
+
+io描述
+typedef struct uct_iov {
+    void     *buffer;   /**< Data buffer */
+    size_t    length;   /**< Length of the payload in bytes */
+    uct_mem_h memh;     /**< Local memory key descriptor for the data */
+    size_t    stride;   /**< Stride between beginnings of payload elements in
+                             the buffer in bytes */
+    unsigned  count;    /**< Number of payload elements in the buffer */
+} uct_iov_t;
+
+
+内联文件:
+noinst_HEADERS += \
+	mlx5/ib_mlx5_log.h \
+	mlx5/ib_mlx5.h \
+	mlx5/ib_mlx5.inl \
+	mlx5/dv/ib_mlx5_dv.h \
+	mlx5/dv/ib_mlx5_ifc.h
+
+  

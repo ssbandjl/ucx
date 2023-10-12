@@ -596,7 +596,7 @@ int main(int argc, char **argv)
     char word[128];
     printf("%d, input:", getpid());
     scanf("%s", word);
-    printf("output:%s\n", word);
+    printf("your input:%s\n", word);
 
     /* Parse the command line */
     if (parse_cmd(argc, argv, &cmd_args)) {
