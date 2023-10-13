@@ -66,3 +66,10 @@ https://github.com/google/googletest/. If you find a bug in Google Test
 [     INFO ] dc_mlx5 is not available
 ./gtest: invalid option -- 'h'
 
+
+
+UCP_INSTANTIATE_ALL_TEST_CASE
+enum_test_params
+bool ucp_test::check_tls(const std::string& tls)
+
+
