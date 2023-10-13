@@ -1,3 +1,5 @@
+[root@node63 gtest]# ./gtest >> gtest_log
+
 [     INFO ] dc_x is not available
 [     INFO ] ugni is not available
 [     INFO ] dc_x,cuda_copy,rocm_copy is not available

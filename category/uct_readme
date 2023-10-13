@@ -204,9 +204,6 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
 
 
 
-client:
-...
-if (connect(sockfd, t->ai_addr, t->ai_addrlen) == 0)
 
 
 
@@ -238,9 +235,27 @@ uct_rc_verbs_ep_connect_to_ep_v2
 
 
 client:
-[root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -n 172.17.29.63
+[root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -n 172.17.29.63 -z
+...
+if (connect(sockfd, t->ai_addr, t->ai_addrlen) == 0)
 
-main
+examples/uct_hello_world.c -> int main(int argc, char **argv)
+if (parse_cmd(argc, argv, &cmd_args)) -> 解析命令行参数
+ucs_async_context_create
+uct_worker_create
+dev_tl_lookup
+uct_iface_set_am_handler
+connect_common
+uct_iface_get_device_address
+uct_iface_get_address
+uct_ep_create
+sendrecv
+char *str = (char *)mem_type_malloc(cmd_args.test_strlen) -> 分配16字节的字符, malloc | cudaMalloc | cudaMallocManaged
+generate_test_string
+do_am_zcopy
+if (barrier(oob_sock, progress_worker, if_info.worker))
+
+...
 ucs_status_t do_am_short
   UCT_INLINE_API ucs_status_t uct_ep_am_short
     ucs_status_t uct_rc_verbs_ep_am_short

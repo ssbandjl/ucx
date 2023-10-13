@@ -36,7 +36,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/examples/.libs/lt-uct_hello_world",
-      "args": ["-d", "mlx5_0:1",  "-t",  "rc_verbs", "-n", "172.17.29.63"], // client
+      "args": ["-d", "mlx5_0:1",  "-t",  "rc_verbs", "-n", "172.17.29.63", "-z"], // client
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/examples/.libs",
       "environment": [],
@@ -62,7 +62,8 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/examples/.libs/lt-uct_hello_world",
-      "args": ["-d", "mlx5_0:1",  "-t",  "rc_verbs", "-z"], // server
+      // "args": ["-d", "mlx5_0:1",  "-t",  "rc_verbs", "-z"], // server
+      "args": ["-d", "mlx5_0:1",  "-t",  "rc_verbs", "-b"], // server
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/examples/.libs",
       "environment": [],
