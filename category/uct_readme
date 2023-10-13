@@ -824,7 +824,8 @@ do_am_bcopy
 
 
 ucs_status_t do_am_zcopy
-  uct_md_mem_reg
+  uct_md_mem_reg -> UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr -> 注册内存 -> 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
+    __ibv_reg_mr
   comp.uct_comp.func   = zcopy_completion_cb
   do ... while (status == UCS_ERR_NO_RESOURCE) -> 没资源时退出循环 
   status = uct_ep_am_zcopy -> ep->iface->ops.ep_am_zcopy
@@ -864,4 +865,57 @@ noinst_HEADERS += \
 	mlx5/dv/ib_mlx5_dv.h \
 	mlx5/dv/ib_mlx5_ifc.h
 
-  
+
+extern "C" static inline ucs_status_t uct_ep_am_zcopy(uct_ep_h ep, uint8_t id, const void *header, unsigned int header_length, const uct_iov_t *iov, size_t iovcnt, unsigned int flags, uct_completion_t *comp)
+发送活动消息，同时避免本地内存复制 ::uct_iov_t 结构的 iov 数组中的输入数据发送到远程端（“收集输出”）。 iov 中的缓冲区按数组顺序进行处理。 这意味着函数在继续执行 iov[1] 之前完成 iov[0]，依此类推
+
+参数：
+[in] – ep 目标端点句柄。
+[in] – id 活动消息 ID。 必须在 0..UCT_AM_ID_MAX-1 范围内。
+[in] – header 活动消息头。
+[in] – header_length 活动消息头长度（以字节为单位）。
+[in] – iov 指向 ::uct_iov_t 结构数组。 iov 指针必须是 ::uct_iov_t 结构数组的有效地址。 特定的结构指针必须是有效的地址。 不需要 NULL 终止的数组。
+[in] – iovcnt iov data ::uct_iov_t 结构数组的大小。 如果 iovcnt 为零，则数据被视为空。 iovcnt 受 uct_iface_attr_cap_am_max_iov "uct_iface_attr::cap::am::max_iov" 限制。
+[in] – flags 活动消息标志，请参阅 uct_msg_flags。
+[in] – 由 ::uct_completion_t 定义的 comp 完成句柄。
+
+返回：
+UCS_OK 操作成功完成。 UCS_INPROGRESS 某些通信操作仍在进行中。 如果提供了非 NULL comp，它将在完成这些操作后更新。 UCS_ERR_NO_RESOURCE 由于缺少发送资源而无法启动操作
+
+笔记：
+如果操作返回 UCS_INPROGRESS，则在 comp 完成操作之前，不得修改 iov 数组指向的内存缓冲区。 标头可以被释放或更改
+
+
+test, google, ut, 单元测试, uct, 
+gtest_SOURCES
+gtest_SOURCES = common/main.cc
+test/gtest/uct
+
+
+test/gtest/common/main.cc -> main
+  InitGoogleTest
+  watchdog_start
+  set_log_level
+  RUN_ALL_TESTS
+  watchdog_stop
+  analyze_test_results
+
+
+
+static inline ucs_status_t uct_iface_flush(uct_iface_h iface, unsigned int flags, uct_completion_t *comp)
+刷新接口上未完成的通信操作。 刷新此调用之前在接口上发出的所有未完成的通信。 操作在原点或目标处完成。 确切的完成语义取决于 flags 参数。
+
+参数：
+[in] – iface 用于刷新通信的接口。
+[in] – flags 控制完成语义的标志（当前仅支持 UCT_FLUSH_FLAG_LOCAL）。
+[inout] – comp 完成句柄，由 uct_completion_t 定义。 可以为 NULL，这意味着调用将返回接口的当前状态，并且在未完成通信的情况下不会生成完成。 如果它不为 NULL，则调用完成时完成计数器会减 1。 当计数器达到 0 时调用完成回调
+
+返回：
+UCS_OK - 没有剩余的未完成的通信。 UCS_INPROGRESS - 某些通信操作仍在进行中。 如果提供了非 NULL 'comp'，它将在完成这些操作后更新
+
+
+同: uct_ep_am_zcopy
+static inline ucs_status_t uct_ep_put_zcopy(uct_ep_h ep, const uct_iov_t *iov, size_t iovcnt, uint64_t remote_addr, uct_rkey_t rkey, uct_completion_t *comp)
+
+
+
