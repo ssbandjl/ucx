@@ -198,7 +198,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
 server:
 while (desc_holder == NULL) 
 uct_worker_progress(if_info.worker) -> static inline unsigned ucs_callbackq_dispatch -> count += cb(elem->arg)
-  static unsigned uct_rc_verbs_iface_progress(void *arg)
+  static unsigned uct_rc_verbs_iface_progress(void *arg) <- self->super.progress
     count = uct_rc_verbs_iface_poll_rx_common(iface)
       uct_rc_verbs_iface_handle_am
         uct_iface_invoke_am
@@ -207,6 +207,11 @@ uct_worker_progress(if_info.worker) -> static inline unsigned ucs_callbackq_disp
 
 
 
+
+uct_iface_progress_enable
+  uct_iface_progress -> return iface->ops.iface_progress(iface)
+    uct_rc_iface_do_progress <- .iface_progress
+      return iface->progress(iface)
       
 
 
@@ -877,13 +882,20 @@ ucs_status_t do_am_zcopy
         wr.sg_list = sge; wr.num_sge = (sge_cnt + 1); wr.opcode = (typeof(wr.opcode))IBV_WR_SEND;
       UCT_TL_EP_STAT_OP -> 统计发送状态
       uct_rc_verbs_ep_post_send_desc | status = uct_rc_mlx5_ep_zcopy_post(ep, MLX5_OPCODE_SEND, iov, iovcnt, 0ul, id, header, header_length, 0, 0, 0ul, 0, 0, MLX5_WQE_CTRL_SOLICITED, uct_rc_ep_send_op_completion_handler, 0, comp);
+        ----------- rc_mlx5_iface 迈络思可靠连接接口的提交实现
         uct_rc_mlx5_txqp_dptr_post_iov
           uct_rc_mlx5_am_hdr_fill
           uct_ib_mlx5_inline_copy
           uct_rc_mlx5_common_post_send
-            uct_ib_mlx5_post_send
-              uct_ib_mlx5_bf_copy
-                uct_ib_mlx5_bf_copy_bb
+            uct_ib_mlx5_post_send -> UCT/IB/MLX5：修复 TX WQ 溢出检查，当 WQE 恰好在 hw_ci+qp_length 结束时，当前检查失败，即使这是有效的情况，将溢出检查重构为特定断言并添加注释来解释它们，移动检查 函数到 C 文件，因为它不是快速路径
+              num_bb  = ucs_div_round_up(wqe_size, MLX5_SEND_WQE_BB) -> 向上取大的
+              uct_ib_mlx5_txwq_validate
+              ucs_memory_cpu_store_fence -> 内存屏障 -> asm volatile(""::: "memory") -> 防止编译器重新排序指令
+              *wq->dbrec = htonl(sw_pi += num_bb) -> 写门铃记录, volatile uint32_t           *dbrec;
+              ucs_memory_bus_store_fence()
+              ucs_likely uct_ib_mlx5_bf_copy
+                uct_ib_mlx5_bf_copy_bb -> UCP/UCT/IB：修复UCT中的线程模式,当以“序列化”模式创建 IB 接口时，请确保刷新写入组合缓冲区，以避免在另一个线程使用同一 MMIO 寄存器时数据损坏
+                  UCS_WORD_COPY(uint64_t, dst, uint64_t, src, MLX5_SEND_WQE_BB) -> UCT/IB：为 DM 字节复制循环解决无效的 GCC 矢量化问题 GCC 可以生成“movdqa”指令，该指令假定源缓冲区与 16 字节对齐，但是源缓冲区是由用户提供的，并且可能未对齐。 将源缓冲区类型声明为严格未对齐，以防止 GCC 进行无效矢量化
             uct_rc_txqp_posted
         uct_rc_txqp_add_send_comp
       UCT_RC_UPDATE_FC -> 更新流控
@@ -969,5 +981,49 @@ static inline ucs_status_t uct_ep_put_zcopy(uct_ep_h ep, const uct_iov_t *iov, s
 UCS_S_PACKED ucs_status_t;
 为了评估从某个错误中恢复所需的必要步骤，外部 API 可返回的所有错误代码均按永久受错误影响的最大实体进行分组。 每个组的范围介于其 UCS_ERR_FIRST_<name> 和 UCS_ERR_LAST_<name> 枚举值之间。 例如，与端点级错误相比，如果链接失败，则可能足以销毁（并可能替换）它
 
+
+/**
+ * A queue of callback to execute
+ */
+struct ucs_callbackq {
+    /**
+     * Array of fast-path element, the last is reserved as a sentinel to mark
+     * array end.
+     */
+    ucs_callbackq_elem_t           fast_elems[UCS_CALLBACKQ_FAST_COUNT + 1];  // 快速路径元素数组，最后一个元素被保留作为标记数组结束的标记
+    ...
+};
+
+
+
+
+结构体字段对齐
+struct mlx5_wqe_ctrl_seg {
+	__be32		opmod_idx_opcode;
+	__be32		qpn_ds;
+	uint8_t		signature;
+	__be16		dci_stream_channel_id;
+	uint8_t		fm_ce_se;
+	__be32		imm;
+} __attribute__((__packed__)) __attribute__((__aligned__(4)));
+
+
+
+数学库: src/ucs/sys/math.h
+
+
+
+底层免拷贝:
+static UCS_F_ALWAYS_INLINE void uct_ib_mlx5_bf_copy_bb(void * restrict dst,
+                                                       void * restrict src)
+{
+#if defined( __SSE4_2__)
+    UCS_WORD_COPY(__m128i, dst, __m128i, src, MLX5_SEND_WQE_BB);
+#elif defined(__ARM_NEON)
+    UCS_WORD_COPY(int16x8_t, dst, int16x8_t, src, MLX5_SEND_WQE_BB);
+#else /* NO SIMD support */
+    UCS_WORD_COPY(uint64_t, dst, uint64_t, src, MLX5_SEND_WQE_BB);
+#endif
+}
 
 
