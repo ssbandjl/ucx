@@ -12,6 +12,10 @@
 #include <assert.h>
 #include <inttypes.h>
 
+#define FFL_STR              "%s %s:%d"
+#define FFL                  __FUNCTION__,__FILE__,__LINE__
+/* use: printf(" "FFL_STR" \n", FFL); */
+
 
 typedef enum {
     FUNC_AM_SHORT,
@@ -387,8 +391,8 @@ static ucs_status_t dev_tl_lookup(const cmd_args_t *cmd_args,
                         break;
                     }
 
-                    fprintf(stdout, "Using "UCT_TL_RESOURCE_DESC_FMT"\n",
-                            UCT_TL_RESOURCE_DESC_ARG(&tl_resources[tl_index]));
+                    fprintf(stdout, "Using "UCT_TL_RESOURCE_DESC_FMT" "FFL_STR"\n",
+                            UCT_TL_RESOURCE_DESC_ARG(&tl_resources[tl_index]), FFL);
                     goto release_tl_resources;
                 }
             }
@@ -504,9 +508,9 @@ int parse_cmd(int argc, char * const argv[], cmd_args_t *args)
             return print_err_usage();
         }
     }
-    fprintf(stdout, "INFO: UCT_HELLO_WORLD AM function = %s server = %s port = %d\n",
+    fprintf(stdout, "INFO: UCT_HELLO_WORLD AM function = %s server = %s port = %d, "FFL_STR" \n",
             func_am_t_str(args->func_am_type), args->server_name,
-            args->server_port);
+            args->server_port, FFL);
 
     for (idx = optind; idx < argc; idx++) {
         fprintf(stderr, "WARNING: Non-option argument %s\n", argv[idx]);
@@ -592,12 +596,13 @@ int main(int argc, char **argv)
     uct_ep_params_t     ep_params;
     int                 res;
 
-
+    #if 0 /* 抓火焰图时开启此选项,暂停程序 */
     char word[128];
     printf("%d, input:", getpid());
     scanf("%s", word);
     printf("your input:%s\n", word);
-
+    #endif    
+    
     /* Parse the command line */
     if (parse_cmd(argc, argv, &cmd_args)) {
         status = UCS_ERR_INVALID_PARAM;
