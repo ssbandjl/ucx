@@ -154,6 +154,8 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
         iface_attr->latency.m += 1e-9 -> 1ns 纳秒
         iface_attr->overhead   = 75e-9
         iface_attr->ep_addr_len = uct_ib_md_is_flush_rkey_valid
+  status = uct_iface_set_am_handler(if_info.iface, id, hello_world, &cmd_args.func_am_type, 0) -> 设置服务端接收到客户端数据后的回调
+    iface->am[id].cb    = cb
   connect_common
     ret = getaddrinfo(server, service, &hints, &res)
     sockfd = socket(t->ai_family, t->ai_socktype, t->ai_protocol)
@@ -192,6 +194,16 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
   out_free_ep -> 释放资源
   ...
 
+
+server:
+while (desc_holder == NULL) 
+uct_worker_progress(if_info.worker) -> static inline unsigned ucs_callbackq_dispatch -> count += cb(elem->arg)
+  static unsigned uct_rc_verbs_iface_progress(void *arg)
+    count = uct_rc_verbs_iface_poll_rx_common(iface)
+      uct_rc_verbs_iface_handle_am
+        uct_iface_invoke_am
+          status = handler->cb(handler->arg, data, length, flags) -> hello_world -> 服务端收到数据后回调
+            print_strings
 
 
 
@@ -244,7 +256,7 @@ if (parse_cmd(argc, argv, &cmd_args)) -> 解析命令行参数
 ucs_async_context_create
 uct_worker_create
 dev_tl_lookup
-uct_iface_set_am_handler
+status = uct_iface_set_am_handler(if_info.iface, id, hello_world -> 设置接收到数据后的回调
 connect_common
 uct_iface_get_device_address
 uct_iface_get_address
@@ -252,7 +264,13 @@ uct_ep_create
 sendrecv
 char *str = (char *)mem_type_malloc(cmd_args.test_strlen) -> 分配16字节的字符, malloc | cudaMalloc | cudaMallocManaged
 generate_test_string
-do_am_zcopy
+  memcpy(dst, src, count) -> 拷贝16字节的字符串到str
+do_am_zcopy(&if_info, ep, id, &cmd_args, str) -> 
+  uct_md_mem_reg -> uct_ib_mlx5_devx_mem_reg
+    mr = UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr, md->pd, address, length, access_flags) -> 注册该段内存
+  iov.buffer = buf
+  iov.memh   = memh -> 空指针
+  ...
 if (barrier(oob_sock, progress_worker, if_info.worker))
 
 ...
@@ -828,25 +846,37 @@ do_am_bcopy
     uct_rc_verbs_ep_am_bcopy
       UCT_RC_IFACE_GET_TX_AM_BCOPY_DESC
       ucs_mpool_get_inline
-      uct_rc_verbs_ep_post_send_desc
-        uct_rc_verbs_ep_post_send
+        status = uct_rc_verbs_ep_post_send_desc(ep, &wr, desc, send_flags | IBV_SEND_SOLICITED, UCT_IB_MAX_ZCOPY_LOG_SGE(&iface->super.super));
+        UCT_RC_VERBS_FILL_DESC_WR(wr, desc) -> 将描述填充到工作请求, 新建sge与wr通过sgl关联
+        uct_rc_verbs_ep_post_send(iface, ep, wr, send_flags, max_log_sge)
+          ucs_assertv(ep->qp->state == IBV_QPS_RTS -> 队列对状态必须是准备发送
           uct_rc_iface_tx_moderation
           uct_rc_ep_fm
           uct_ib_log_post_send
-          ibv_post_send
-          uct_rc_verbs_txqp_posted
-        uct_rc_txqp_add_send_op_sn
+          ret = ibv_post_send(ep->qp, wr, &bad_wr); -> 提交wr到qp的发送队列, 触发服务端收到消息后打印, print_strings
+          uct_rc_verbs_txqp_posted -> 为DC(动态连接队列对 Dynamically Connected (DC) QPs)传输类型做准备, cq流控信用, 状态计数器等
+        uct_rc_txqp_add_send_op_sn -> 提交发送后, 将io描述, 按序号sn插入outstanding队列, 因为在轮询完成时，我们可获得完成的数量（而不是基于完成的零索引）
+          ucs_queue_push(&txqp->outstanding, &op->queue)
 
 
 ucs_status_t do_am_zcopy
-  uct_md_mem_reg -> UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr -> 注册内存 -> 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
+  uct_md_mem_reg -> UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr -> 注册内存 -> 分析函数调用, 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
     __ibv_reg_mr
   comp.uct_comp.func   = zcopy_completion_cb
   do ... while (status == UCS_ERR_NO_RESOURCE) -> 没资源时退出循环 
   status = uct_ep_am_zcopy -> ep->iface->ops.ep_am_zcopy
-    ucs_status_t uct_rc_mlx5_ep_am_zcopy | uct_rc_verbs_ep_am_zcopy
-      UCT_CHECK_IOV_SIZE
-      status = uct_rc_mlx5_ep_zcopy_post(ep, MLX5_OPCODE_SEND, iov, iovcnt, 0ul, id, header, header_length, 0, 0, 0ul, 0, 0, MLX5_WQE_CTRL_SOLICITED, uct_rc_ep_send_op_completion_handler, 0, comp);
+    ucs_status_t uct_rc_mlx5_ep_am_zcopy | uct_rc_verbs_ep_am_zcopy -> 可靠连接verbs端点的活动消息零拷贝
+      UCT_CHECK_IOV_SIZE -> 检查向量IO个数, 应该不超过网卡最大发送(SGE-1), 第一个sge给header使用
+      UCT_RC_CHECK_AM_ZCOPY -> 检查零拷贝参数
+      UCT_RC_CHECK_RES_AND_FC -> 检查资源和流控参数
+      UCT_RC_IFACE_GET_TX_AM_ZCOPY_DESC -> 从内存池获取发送端零拷贝内存描述 -> UCT/RC：使用恒定的标头大小，无论 TM 状态如何
+      sge_cnt = uct_ib_verbs_sge_fill_iov(sge + 1, iov, iovcnt) -> 填充IO(将iov设置到sge上), 通过 uct_iov_t 中提供的数据填充 ibv_sge 数据结构 该函数避免复制零长度的 IOV
+        sge[sge_it].addr   = (uintptr_t)(iov[iov_it].buffer) -> buffer地址转sge地址
+        sge[sge_it].lkey = uct_ib_memh_get_lkey(iov[iov_it].memh) -> 设置本地键
+      UCT_RC_VERBS_FILL_AM_ZCOPY_WR_IOV -> 准备工作请求wr, 将sge首地址和数量设置到wr, rdma操作码为发送(双边, IBV_WR_SEND)
+        wr.sg_list = sge; wr.num_sge = (sge_cnt + 1); wr.opcode = (typeof(wr.opcode))IBV_WR_SEND;
+      UCT_TL_EP_STAT_OP -> 统计发送状态
+      uct_rc_verbs_ep_post_send_desc | status = uct_rc_mlx5_ep_zcopy_post(ep, MLX5_OPCODE_SEND, iov, iovcnt, 0ul, id, header, header_length, 0, 0, 0ul, 0, 0, MLX5_WQE_CTRL_SOLICITED, uct_rc_ep_send_op_completion_handler, 0, comp);
         uct_rc_mlx5_txqp_dptr_post_iov
           uct_rc_mlx5_am_hdr_fill
           uct_ib_mlx5_inline_copy
@@ -856,6 +886,7 @@ ucs_status_t do_am_zcopy
                 uct_ib_mlx5_bf_copy_bb
             uct_rc_txqp_posted
         uct_rc_txqp_add_send_comp
+      UCT_RC_UPDATE_FC -> 更新流控
   uct_worker_progress
 
 
@@ -931,6 +962,12 @@ UCS_OK - 没有剩余的未完成的通信。 UCS_INPROGRESS - 某些通信操�
 
 同: uct_ep_am_zcopy
 static inline ucs_status_t uct_ep_put_zcopy(uct_ep_h ep, const uct_iov_t *iov, size_t iovcnt, uint64_t remote_addr, uct_rkey_t rkey, uct_completion_t *comp)
+
+
+
+状态码, 错误码:
+UCS_S_PACKED ucs_status_t;
+为了评估从某个错误中恢复所需的必要步骤，外部 API 可返回的所有错误代码均按永久受错误影响的最大实体进行分组。 每个组的范围介于其 UCS_ERR_FIRST_<name> 和 UCS_ERR_LAST_<name> 枚举值之间。 例如，与端点级错误相比，如果链接失败，则可能足以销毁（并可能替换）它
 
 
 
