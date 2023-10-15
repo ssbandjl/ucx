@@ -26,15 +26,25 @@ gdb --args /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t
 gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
   if (parse_cmd(argc, argv, &cmd_args)) -> int parse_cmd(int argc, char * const argv[], cmd_args_t *args)
     args->server_port   = 13337
-  status = ucs_async_context_create(UCS_ASYNC_MODE_THREAD_SPINLOCK, &async) -> 创建异步执行上下文 分配并初始化异步执行上下文。 这可用于确保安全的事件传递, 模式为线程自旋锁
+  status = ucs_async_context_create(UCS_ASYNC_MODE_THREAD_SPINLOCK, &async) -> 创建异步执行上下文, 分配并初始化异步执行上下文。 这可用于确保安全的事件传递, 模式为线程自旋锁(可重入), 在异步对象上, 初始化多生产者和多消费者队列
     async = ucs_malloc(sizeof(*async), "async context") -> 内部分配, 并记录内存分配信息
       void *ptr = malloc(size)
     status = ucs_async_context_init(async, mode)
       ucs_trace_func("async=%p", async) -> 跟踪方法
       status = ucs_mpmc_queue_init(&async->missed) -> 初始化多生产者/多消费者队列
+        ucs_queue_head_init(&mpmc->queue)
+        pthread_spin_init(&lock->lock, lock_flags) -> 初始化自旋锁, 标志: PTHREAD_PROCESS_SHARED 或 PTHREAD_PROCESS_PRIVATE
       status = ucs_async_method_call(mode, context_init, async) -> .context_init       = ucs_async_poll_init -> 异步轮训初始化, 不阻塞
       async->last_wakeup = ucs_get_time() -> asm volatile("rdtsc" : "=a"(low), "=d"(high)) 汇编获取时间 -> UCS/ARCH/INFO：如果无法从CPU型号中读取x86 TSC值，请不要从/proc/cpuinfo中读取测量的CPU频率，因为它只能代表核心频率而不是TSC频率。 相反，通过一个短循环进行测量，当频率测量收敛或达到 1ms 时间限制时停止
-  status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化) -> 创建一个工作对象。 工人代表着进步的引擎。 可以在应用程序中创建多个进度引擎，例如供多个线程使用。 Transports 可以为每个 Worker 分配单独的通信资源，以便每个 Worker 都可以独立于其他 Worker 进行操作 -> 声明/定义一个创建类实例的函数
+        ucs_async_thread_spinlock_ops.context_init(async) -> ucs_async_thread_spinlock_init -> 可重入自旋锁上下文初始化
+  status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化) -> 创建一个工作对象。 工人代表着progress的引擎。 可以在应用程序中创建多个进度引擎，例如供多个线程使用。 Transports 可以为每个 Worker 分配单独的通信资源，以便每个 Worker 都可以独立于其他 Worker 进行操作 -> 声明/定义一个创建类实例的函数, 初始化工人私有worker, 传输层链表
+    ucs_class_t *cls = &uct_priv_worker_t_class -> typedef struct uct_priv_worker
+    obj = ucs_class_malloc(cls)
+    ucs_class_t *_cls = &uct_priv_worker_t_class
+    uct_priv_worker_t_init -> static UCS_CLASS_INIT_FUNC(uct_priv_worker_t -> static UCS_CLASS_INIT_FUNC(uct_priv_worker_t -> 初始化父类以及当前类的传输链表
+      static UCS_CLASS_INIT_FUNC(uct_worker_t)
+        ucs_callbackq_init(&self->progress_q);
+        ucs_vfs_obj_add_dir(NULL, self, "uct/worker/%p", self)
   status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层, 动态加载, 由最小延迟决定要使用的设备和传输, 实参为地址指针, 形参为指针
     status = uct_query_components(&components, &num_components) -> 得到8个组件
       UCS_MODULE_FRAMEWORK_DECLARE(uct) -> 声明一个“框架”，它是可加载模块的特定集合的上下文。 通常特定框架中的模块提供相同内部接口的替代实现
@@ -213,24 +223,6 @@ uct_iface_progress_enable
     uct_rc_iface_do_progress <- .iface_progress
       return iface->progress(iface)
       
-
-
-
-
-  
-
-
-
-
-
-
-
-
-      
-
-
-
-
 
 
 
@@ -616,6 +608,23 @@ ucs_status_t uct_worker_create(ucs_async_context_t* arg0, ucs_thread_mode_t arg1
 面向对象:
 struct uct_rc_iface {
     uct_ib_iface_t              super;
+
+类: 
+typedef struct ucs_class     ucs_class_t;
+struct ucs_class {
+    const char               *name;
+    size_t                   size;
+    ucs_class_t              *superclass;
+    ucs_class_init_func_t    init;
+    ucs_class_cleanup_func_t cleanup;
+};
+
+typedef struct uct_priv_worker {
+    uct_worker_t           super;
+    ucs_async_context_t    *async;
+    ucs_thread_mode_t      thread_mode;
+    ucs_list_link_t        tl_data;
+} uct_priv_worker_t;
 
 
 /**
@@ -1026,4 +1035,16 @@ static UCS_F_ALWAYS_INLINE void uct_ib_mlx5_bf_copy_bb(void * restrict dst,
 #endif
 }
 
+
+
+可重入自旋锁
+typedef struct ucs_recursive_spinlock {
+    ucs_spinlock_t super;
+    int            count;
+    pthread_t      owner;
+} ucs_recursive_spinlock_t;
+
+
+类方法: 
+UCS_CLASS_INIT_FUNC -> 初始化
 
