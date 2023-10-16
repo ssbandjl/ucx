@@ -46,9 +46,12 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
         ucs_callbackq_init(&self->progress_q);
         ucs_vfs_obj_add_dir(NULL, self, "uct/worker/%p", self)
   status = dev_tl_lookup(&cmd_args, &if_info) -> 查找期望的传输层, 动态加载, 由最小延迟决定要使用的设备和传输, 实参为地址指针, 形参为指针
-    status = uct_query_components(&components, &num_components) -> 得到8个组件
+    status = uct_query_components(&components, &num_components) -> 查询组件列表。 获取当前系统上可用的传输组件列表, 得到8个组件
       UCS_MODULE_FRAMEWORK_DECLARE(uct) -> 声明一个“框架”，它是可加载模块的特定集合的上下文。 通常特定框架中的模块提供相同内部接口的替代实现
+        static ucs_init_once_t ucs_framework_init_once_uct = { { { 0, 0, 0, 0, 0, 0, 0, { 0, 0 } } }, 0 } -> 互斥锁+初始化标记
       UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载所有模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
+      [in] – _flags 模块加载标志，参见 ucs_module_load_flags_t 框架中的模块由 dlopen() 加载。 模块的共享库名称为：“lib<framework>_<module>.so.<version>”，其中： - <framework> 是框架名称 - <module> 是模块名称。 框架中所有模块的列表由自动生成的 config.h 文件中的预处理器宏 <framework>_MODULES 定义，例如：#define foo_MODULES ":bar1:bar2"。 - <version> 是模块的共享库版本，由 libtool 生成。 它是从当前库 (libucs) 的完整路径中提取的。 在以下位置搜索模块共享库（按优先级顺序）： 1. 当前共享库 (libucs) 目录内的“ucx”子目录 2. ${libdir}/ucx，其中 ${libdir} 是 库的安装目录 请注意，如果 libucs 是从其安装路径加载的，则 (1) 和 (2) 是同一位置。 仅当 libucs 被移动或从构建目录运行时，路径才会不同，在这种情况下，优先使用“本地库”而不是“已安装的”库。[in] – _name 框架名称（作为令牌）
+        ucs_load_modules("uct", uct_MODULES, &ucs_framework_init_once_uct, 0)
         ucs_module_loader_init_paths -> 找到路径, 然后动态加载: ucs_module_load_one(framework, module_name, flags)
           void UCS_F_CTOR uct_ib_init()
             uct_component_register(&uct_ib_component)
@@ -1048,3 +1051,46 @@ typedef struct ucs_recursive_spinlock {
 类方法: 
 UCS_CLASS_INIT_FUNC -> 初始化
 
+
+
+UCT组件及方法: 包含查询内存域资源, 打开内存域, 连接管理, rkey解包, rkey访问, rkey释放, rkey比较, 内存域配置条目, 连接管理配置条目, 传输列表, 链接到全局组件列表的链表, 标记位, 内存域对应的vfs初始化方法
+struct uct_component {
+    const char                              name[UCT_COMPONENT_NAME_MAX]; /**< Component name */
+    uct_component_query_md_resources_func_t query_md_resources; /**< Query memory domain resources method */
+    uct_component_md_open_func_t            md_open;            /**< Memory domain open method */
+    uct_component_cm_open_func_t            cm_open;            /**< Connection manager open method */
+    uct_component_rkey_unpack_func_t        rkey_unpack;        /**< Remote key unpack method */
+    uct_component_rkey_ptr_func_t           rkey_ptr;           /**< Remote key access pointer method */
+    uct_component_rkey_release_func_t       rkey_release;       /**< Remote key release method */
+    uct_component_rkey_compare_func_t       rkey_compare;       /**< Remote key comparison method */
+    ucs_config_global_list_entry_t          md_config;          /**< MD configuration entry */
+    ucs_config_global_list_entry_t          cm_config;          /**< CM configuration entry */
+    ucs_list_link_t                         tl_list;            /**< List of transports */
+    ucs_list_link_t                         list;               /**< Entry in global list of components */
+    uint64_t                                flags;              /**< Flags as defined by
+                                                                     UCT_COMPONENT_FLAG_xx */
+    /**< Memory domain initialize VFS method */
+    uct_component_md_vfs_init_func_t        md_vfs_init;
+};
+
+
+
+配置解析器实现的方法:
+配置变量格式
+name: <env_prefix><table_prefix><field_name>
+ * Examples of full variable names:
+ *   - UCS_CIB_RNDV_THRESH
+ *   - UCS_IB_TX_MODERATION
+ */
+typedef struct ucs_config_parser {
+    int                      (*read) (const char *buf, void *dest, const void *arg);
+    int                      (*write)(char *buf, size_t max,
+                                      const void *src, const void *arg);
+    ucs_status_t             (*clone)(const void *src, void *dest, const void *arg);
+    void                     (*release)(void *ptr, const void *arg);
+    void                     (*help)(char *buf, size_t max, const void *arg);
+    const void               *arg;
+} ucs_config_parser_t;
+
+
+定义模块: AC_DEFINE_UNQUOTED
