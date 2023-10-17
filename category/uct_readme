@@ -1133,9 +1133,37 @@ xtor构造器(main前执行):
 #define UCS_F_CTOR __attribute__((constructor))
 
 顺序:
-void UCS_F_CTOR ucs_init()
 void UCS_F_CTOR ucm_init()
+void UCS_F_CTOR ucs_init()
 void UCS_F_CTOR uct_init()
 void UCS_F_CTOR uct_ib_init()
 UCS_F_CTOR void uct_rdmacm_init(void)
+
+重命名后的构造器: UCS_STATIC_INIT
+UCT_COMPONENT_REGISTER 注册组件
+
+
+
+void UCS_F_CTOR ucm_init()
+  ucm_init_log() -> ucm_log_hostname 获取主机名
+  ucm_init_malloc_hook() -> ucs_recursive_spinlock_init -> 初始化可重入锁
+
+void UCS_F_CTOR ucs_init()
+  ucs_check_cpu_flags -> 检查cpu特性
+  ucs_log_early_init -> 初始化日志,进程ID等
+  ucs_global_opts_init -> 初始化全局配置选项, 获取配置文件路径, 填充配置文件等, 添加全局vfs节点(ucs/global_opts), vfs日志级别等
+  ucs_init_ucm_opts
+  ucs_memtype_cache_global_init
+  ucs_cpu_init
+  ucs_log_init
+  ucs_stats_init
+  ucs_memtrack_init
+  ucs_debug_init
+  ucs_profile_init
+  ucs_async_global_init
+  ucs_numa_init
+  ucs_topo_init
+  ucs_rand_seed_init
+  ucs_modules_load
+
 
