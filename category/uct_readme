@@ -52,14 +52,22 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载所有模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
       [in] – _flags 模块加载标志，参见 ucs_module_load_flags_t 框架中的模块由 dlopen() 加载。 模块的共享库名称为：“lib<framework>_<module>.so.<version>”，其中： - <framework> 是框架名称 - <module> 是模块名称。 框架中所有模块的列表由自动生成的 config.h 文件中的预处理器宏 <framework>_MODULES 定义，例如：#define foo_MODULES ":bar1:bar2"。 - <version> 是模块的共享库版本，由 libtool 生成。 它是从当前库 (libucs) 的完整路径中提取的。 在以下位置搜索模块共享库（按优先级顺序）： 1. 当前共享库 (libucs) 目录内的“ucx”子目录 2. ${libdir}/ucx，其中 ${libdir} 是 库的安装目录 请注意，如果 libucs 是从其安装路径加载的，则 (1) 和 (2) 是同一位置。 仅当 libucs 被移动或从构建目录运行时，路径才会不同，在这种情况下，优先使用“本地库”而不是“已安装的”库。[in] – _name 框架名称（作为令牌）
         ucs_load_modules("uct", uct_MODULES, &ucs_framework_init_once_uct, 0)
-        ucs_module_loader_init_paths -> 找到路径, 然后动态加载: ucs_module_load_one(framework, module_name, flags)
-          void UCS_F_CTOR uct_ib_init()
-            uct_component_register(&uct_ib_component)
-            uct_tl_register(&uct_ib_component, uct_ib_tls[i]) -> 注册所有IB传输层
+          ucs_module_loader_init_paths -> 找到路径, 然后动态加载: ucs_module_load_one(framework, module_name, flags) -> ucs_module_init(module_path, dl) -> 找到初始化方法名, 如: module_init_name 
+          ucs_module_loader_add_dl_dir
+            动态库路径: 0x6070b0 "/home/xb/project/ucx/src/ucs/.libs/libucs.so.0"
+            dladdr((void*)&ucs_module_loader_state, &dl_info) -> 利用dladdr来获得so自身的路径(ucs_module_loader_state)
+            ucs_module_loader_state.srch_path[ucs_module_loader_state.srchpath_cnt++] = path -> 记录动态库位置
+          ucs_module_loader_add_install_dir
+
+          ucs_module_global_init -> 查找动态库入库函数地址: addr = dlsym(dl, symbol) -> status = init_func()
+            void UCS_F_CTOR uct_ib_init()
+              uct_component_register(&uct_ib_component)
+              uct_tl_register(&uct_ib_component, uct_ib_tls[i]) -> 注册所有IB传输层
       ucs_list_for_each uct_components_list 8个组件 -> ucs_vfs_obj_add_dir -> ucs_vfs_node_add 虚拟文件系统
     component_attr.md_resources = alloca -> alloca - 分配自动释放的内存
     status = uct_component_query(components[cmpt_index], &component_attr)
       status = component->query_md_resources(component, &resources, &num_resources); -> uct_md_query_single_md_resource
+      UCS_MODULE_FRAMEWORK_LOAD(uct_ib, 0) -> 调用查询内存域资源接口中会加载对应的动态库
     status = uct_md_config_read(components[cmpt_index], NULL, NULL, &md_config); -> 读取内存域资源
       status = uct_config_read(&bundle, &component->md_config, env_prefix)
         status = ucs_config_parser_fill_opts(config_bundle->data, entry, full_prefix, 0)
@@ -1093,4 +1101,41 @@ typedef struct ucs_config_parser {
 } ucs_config_parser_t;
 
 
-定义模块: AC_DEFINE_UNQUOTED
+定义模块: AC_DEFINE_UNQUOTED([uct_MODULES], ["${uct_modules}"], [UCT loadable modules])
+
+如果定义了共享库: #ifdef UCX_SHARED_LIB
+注册模块: status = init_func()
+
+
+动态模块名:
+0x7fffffffb7b0 "/home/xb/project/ucx/src/ucs/.libs/ucx/libuct_ib.so.0"
+
+
+定义结构和初始化:
+static struct {
+    ucs_init_once_t  init;
+    char             module_ext[NAME_MAX];
+    unsigned         srchpath_cnt;
+    char             *srch_path[UCS_MODULE_SRCH_PATH_MAX];
+} ucs_module_loader_state = {
+    .init         = UCS_INIT_ONCE_INITIALIZER,
+    .module_ext   = ".so", /* default extension */
+    .srchpath_cnt = 0,
+    .srch_path    = { NULL, NULL}
+};
+
+
+void UCS_F_CTOR ucs_init()
+  ucs_modules_load
+    UCS_MODULE_FRAMEWORK_LOAD(ucs, UCS_MODULE_LOAD_FLAG_GLOBAL)
+
+xtor构造器(main前执行):
+#define UCS_F_CTOR __attribute__((constructor))
+
+顺序:
+void UCS_F_CTOR ucs_init()
+void UCS_F_CTOR ucm_init()
+void UCS_F_CTOR uct_init()
+void UCS_F_CTOR uct_ib_init()
+UCS_F_CTOR void uct_rdmacm_init(void)
+
