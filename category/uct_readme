@@ -1152,9 +1152,9 @@ void UCS_F_CTOR ucs_init()
   ucs_check_cpu_flags -> 检查cpu特性
   ucs_log_early_init -> 初始化日志,进程ID等
   ucs_global_opts_init -> 初始化全局配置选项, 获取配置文件路径, 填充配置文件等, 添加全局vfs节点(ucs/global_opts), vfs日志级别等
-  ucs_init_ucm_opts
-  ucs_memtype_cache_global_init
-  ucs_cpu_init
+  ucs_init_ucm_opts -> 添加ucm全局配置表(内存对齐16, 日志级别为WARN等), 填充配置文件(包含环境变量,前缀为UCX_), 初始化ucs库(kh的hash表初始化, map初始化), 打开动态库: /home/xb/project/ucx/src/ucm/.libs/libucm.so.0, 为 aarch64 实现了 CUDA bistro 挂钩（以在此平台上启用内存缓存）
+  ucs_memtype_cache_global_init -> 互斥锁初始化
+  ucs_cpu_init -> 优化版本的memcpy, ucs_cpu_builtin_memcpy, 获取CPU提供者(ucs_cpu_vendor)
   ucs_log_init
   ucs_stats_init
   ucs_memtrack_init
@@ -1166,4 +1166,88 @@ void UCS_F_CTOR ucs_init()
   ucs_rand_seed_init
   ucs_modules_load
 
+
+ucs全局配置选项:
+ucm_global_config_t ucm_global_opts = {
+    .log_level                  = UCS_LOG_LEVEL_WARN,
+    .enable_events              = 1,
+    .mmap_hook_mode             = UCM_DEFAULT_HOOK_MODE,
+    .enable_malloc_hooks        = 1,
+    .enable_malloc_reloc        = 0,
+    .cuda_hook_modes            =
+#if UCM_BISTRO_HOOKS
+                                  UCS_BIT(UCM_MMAP_HOOK_BISTRO) |
+#endif
+                                  UCS_BIT(UCM_MMAP_HOOK_RELOC),
+    .enable_dynamic_mmap_thresh = 1,
+    .alloc_alignment            = 16,
+    .dlopen_process_rpath       = 1,
+    .bistro_force_far_jump      = 0,
+};
+
+
+
+UCM：修复由 ucp_set_event_handler() 引起的堆损坏
+修复安装时测试 mmap 事件的 sbrk() 与程序中任何其他线程的 brk/sbrk() 之间的竞争，作为正常堆操作的一部分。 这种竞争会导致堆损坏和程序中止/段错误。 一般来说，我们不应该直接调用brk/sbrk()。修复方法：
+1. 在库初始化期间初始化 bistro 挂钩。 这可以确保没有其他线程会读取错误的机器指令。
+2. 仅当事件测试来自独占上下文 (1) 时，才从事件测试中调用 brk/sbrk()。 对于非独占情况，仅使用无效参数进行虚拟调用，这不应对其他线程产生副作用。
+3. 为 brk() 创建单独的事件，以避免在实际调用 brk() 时模拟 sbrk() 事件。
+4. 修复 brk() 系统调用以返回完整的 64 位值
+void ucm_mmap_init() -> 
+  ucm_prevent_dl_unload
+  ucm_mmap_install
+    ucm_mmap_events_to_native_events
+    ucm_mmap_test_events_nolock
+    ucs_mmap_install_reloc
+    ucm_mmap_test_events_nolock
+    ucm_bistro_patch -> bistro hooks for cuda
+      ucm_bistro_create_restore_point
+      return ucm_bistro_apply_patch_atomic(func_ptr, patch, patch_len);
+
+
+
+cpu提供商:
+typedef enum ucs_cpu_vendor {
+    UCS_CPU_VENDOR_UNKNOWN,
+    UCS_CPU_VENDOR_INTEL,
+    UCS_CPU_VENDOR_AMD,
+    UCS_CPU_VENDOR_GENERIC_ARM,
+    UCS_CPU_VENDOR_GENERIC_PPC,
+    UCS_CPU_VENDOR_FUJITSU_ARM,
+    UCS_CPU_VENDOR_ZHAOXIN,
+    UCS_CPU_VENDOR_GENERIC_RV64G,
+    UCS_CPU_VENDOR_LAST
+} ucs_cpu_vendor_t;
+
+
+CPU缓存类型
+/* CPU cache types */
+typedef enum ucs_cpu_cache_type {
+    UCS_CPU_CACHE_L1d, /**< L1 data cache */          数据缓存
+    UCS_CPU_CACHE_L1i, /**< L1 instruction cache */   指令缓存
+    UCS_CPU_CACHE_L2,  /**< L2 cache */
+    UCS_CPU_CACHE_L3,  /**< L3 cache */
+    UCS_CPU_CACHE_LAST
+} ucs_cpu_cache_type_t;
+struct { /* sysfs entries for system cache sizes */
+    int         level;
+    const char *type;
+} const ucs_cpu_cache_sysfs_name[] = {
+    [UCS_CPU_CACHE_L1d] = {.level = 1, .type = "Data"},
+    [UCS_CPU_CACHE_L1i] = {.level = 1, .type = "Instruction"},
+    [UCS_CPU_CACHE_L2]  = {.level = 2, .type = "Unified"},
+    [UCS_CPU_CACHE_L3]  = {.level = 3, .type = "Unified"}
+};
+
+
+src/ucs/arch/cpu.c
+static void ucs_sysfs_get_cache_size() -> 获取缓存大小
+double ucs_cpu_get_memcpy_bw() -> 获取内存带宽
+
+带宽, k, m, g, t, p
+#define UCS_KBYTE    (1ull << 10)
+#define UCS_MBYTE    (1ull << 20)
+#define UCS_GBYTE    (1ull << 30)
+#define UCS_TBYTE    (1ull << 40)
+#define UCS_PBYTE    (1ull << 50)
 
