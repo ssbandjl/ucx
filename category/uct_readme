@@ -51,8 +51,10 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
         static ucs_init_once_t ucs_framework_init_once_uct = { { { 0, 0, 0, 0, 0, 0, 0, { 0, 0 } } }, 0 } -> 互斥锁+初始化标记
       UCS_MODULE_FRAMEWORK_LOAD(uct, 0) -> void ucs_load_modules 加载所有模块, self, tcp, sysv, posix, ib, rdmacm, cma, knem, ...
       [in] – _flags 模块加载标志，参见 ucs_module_load_flags_t 框架中的模块由 dlopen() 加载。 模块的共享库名称为：“lib<framework>_<module>.so.<version>”，其中： - <framework> 是框架名称 - <module> 是模块名称。 框架中所有模块的列表由自动生成的 config.h 文件中的预处理器宏 <framework>_MODULES 定义，例如：#define foo_MODULES ":bar1:bar2"。 - <version> 是模块的共享库版本，由 libtool 生成。 它是从当前库 (libucs) 的完整路径中提取的。 在以下位置搜索模块共享库（按优先级顺序）： 1. 当前共享库 (libucs) 目录内的“ucx”子目录 2. ${libdir}/ucx，其中 ${libdir} 是 库的安装目录 请注意，如果 libucs 是从其安装路径加载的，则 (1) 和 (2) 是同一位置。 仅当 libucs 被移动或从构建目录运行时，路径才会不同，在这种情况下，优先使用“本地库”而不是“已安装的”库。[in] – _name 框架名称（作为令牌）
-        ucs_load_modules("uct", uct_MODULES, &ucs_framework_init_once_uct, 0)
-          ucs_module_loader_init_paths -> 找到路径, 然后动态加载: ucs_module_load_one(framework, module_name, flags) -> ucs_module_init(module_path, dl) -> 找到初始化方法名, 如: module_init_name 
+        ucs_load_modules("uct", uct_MODULES, &ucs_framework_init_once_uct, 0) -> 加载框架, 模块
+          ucs_module_loader_init_paths -> 找到路径, 然后动态加载: ucs_module_load_one(framework, module_name, flags) -> ucs_module_init(module_path, dl) -> 找到初始化方法名, 如: module_init_name
+          modules_str = ucs_strdup(modules, "modules_list") -> 从内存跟踪表中查找字符串
+          module_name = strtok_r(modules_str, ":", &saveptr) -> 每次取冒号分割的第一个字符串分段(字符串分割函数 strtok_r )
           ucs_module_loader_add_dl_dir
             动态库路径: 0x6070b0 "/home/xb/project/ucx/src/ucs/.libs/libucs.so.0"
             dladdr((void*)&ucs_module_loader_state, &dl_info) -> 利用dladdr来获得so自身的路径(ucs_module_loader_state)
@@ -655,10 +657,10 @@ enum {
 
 
 
-注册tl, 传输层
+注册tl, 传输层, 通过宏展开实现
 _dl_init_internal
 void UCS_F_CTOR uct_init()
-uct_self_init() -> UCT_SINGLE_TL_INIT(&uct_self_component, self,,,)
+uct_self_init() -> UCT_SINGLE_TL_INIT(&uct_self_component, self,,,) -> 链表的初始化
    void uct_self_init(void) { {; uct_component_register(&uct_self_component);}; uct_tl_register(&uct_self_component, &uct_self_tl); }  
    void uct_self_cleanup(void) { uct_tl_unregister(&uct_self_tl); {uct_component_unregister(&uct_self_component); ;}; }
 uct_tl_register
@@ -1102,6 +1104,7 @@ typedef struct ucs_config_parser {
 
 
 定义模块: AC_DEFINE_UNQUOTED([uct_MODULES], ["${uct_modules}"], [UCT loadable modules])
+通过编译配置, 拼接多个字符串, 最终得到uct模块字符串(:ib:rdmacm:cma:knem), uct_modules="${uct_modules}:ib" 
 
 如果定义了共享库: #ifdef UCX_SHARED_LIB
 注册模块: status = init_func()
@@ -1159,12 +1162,15 @@ void UCS_F_CTOR ucs_init()
   ucs_stats_init -> 状态统计初始化, 链表初始化, 数据库等初始化
   ucs_memtrack_init -> 内存跟踪初始化
   ucs_debug_init -> 调试和信号堆栈(sigaltstack)初始化
-  ucs_profile_init
-  ucs_async_global_init
-  ucs_numa_init
-  ucs_topo_init
-  ucs_rand_seed_init
-  ucs_modules_load
+  ucs_profile_init -> 初始化线程私有上下文,私有数据
+  ucs_async_global_init -> 异步事件和定时器初始化
+  ucs_numa_init -> numa距离hash表初始化
+  ucs_topo_init -> 用总线id查找设备
+  ucs_rand_seed_init -> tcp允许使用端口范围, 生成高低位的启动ID(3817213743958597775), 随机值, 进程id, 时间, 线程id, 版本等
+  ucs_sys_get_lib_path -> 查找当前库 libucs.so.0 (多个路径下查找库)
+  ucs_get_process_cmdline -> 打印当前cmdline
+  ucs_modules_load -> 监控进程的虚拟文件系统初始化, 加载所有ucs模块
+  
 
 
 ucs全局配置选项:
@@ -1285,5 +1291,35 @@ debugging, datatypes, logging, statistics, configuration parsing, math, atomics,
     ucs_vfs_obj_add_dir -> ucs/memtrack
     ucs_vfs_obj_add_ro_file -> 在VFS中添加描述对象特征的只读文件。 如果 obj 为 NULL，则挂载目录将用作 rel_path 的基础
     
+ucs_async_global_init
+  ucs_async_method_call_all(init) -> UCS/ASYNC：修复信号模式下的死锁。在获取事件处理程序哈希锁之前，需要禁用信号。 否则，可以调用信号处理程序并尝试在同一线程持有锁时获取锁 - 这将导致死锁。 （更通用的方法是引入一组类似于内核的 spin_lock_irqsave/spin_lock_irqrestore 的锁定原语，但当前的修复更简单）
+    ucs_async_signal_ops.init(); -> ucs_async_signal_global_init
+    ucs_async_thread_spinlock_ops.init(); 
+    ucs_async_thread_mutex_ops.init(); -> ucs_empty_function
+    ucs_async_poll_ops.init(); -> ucs_empty_function
 
+
+const char* ucs_get_process_cmdline() -> 打印当前的命令行
+  ucs_read_file(cmdline, sizeof(cmdline), 1, "/proc/self/cmdline")
+
+
+
+ucs_modules_load -> UCS/TOOLS/BUILD：基于 FUSE 的监控文件系统的基础设施 为虚拟监控文件系统添加构建脚本和初始文件，可用于检查 UCX 对象（协议、传输、数据结构）及其关系（表示为 fs 层次结构和符号链接）并尽可能在运行时修改设置。
+- ucx_vfs 是一个守护进程，它跟踪每个用户的挂载点和进程状态，并在进程终止时负责清理。
+- ucs/vfs/base/vfs_obj.{c,h} 是保持对象层次结构的数据结构（“模型”）
+- ucs/vfs/fuse 正在为文件系统操作提供服务（“视图”）
+- ucs/vfs/sock 添加了守护进程和 UCS 之间通信的便捷功能
+  ucs_load_modules("ucs", ucs_MODULES, &ucs_framework_init_once_ucs, UCS_MODULE_LOAD_FLAG_GLOBAL)
+
+
+格式化, 大页, 启动id, 进程状态等宏
+/* Default huge page size is 2 MBytes */
+#define UCS_DEFAULT_MEM_FREE       640000
+#define UCS_PROCESS_SMAPS_FILE     "/proc/self/smaps"
+#define UCS_PROCESS_NS_DIR         "/proc/self/ns"
+#define UCS_PROCESS_BOOTID_FILE    "/proc/sys/kernel/random/boot_id"
+#define UCS_PROCESS_BOOTID_FMT     "%x-%4hx-%4hx-%4hx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx"
+#define UCS_PROCCESS_STAT_FMT      "/proc/%d/stat"
+#define UCS_PROCESS_NS_FIRST       0xF0000000U
+#define UCS_PROCESS_NS_NET_DFLT    0xF0000080U
 
