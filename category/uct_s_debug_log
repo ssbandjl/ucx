@@ -1,5 +1,6 @@
 export UCX_LOG_LEVEL=debug
-/home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs
+export UCX_LOG_LEVEL=trace
+/home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -z
 
 [root@node63 ucx]# ./s_uct.sh 
 [1696660940.924550] [node63:3375441:0]           debug.c:1155 UCX  DEBUG using signal stack 0x7faadc17a000 size 141824
@@ -84,4 +85,117 @@ Waiting for connection...
 [1696660984.954971] [node63:3375441:0]           async.c:172  UCX  DEBUG release async handler 0x172b320 [id=4 ref 0] ???()
 You have mail in /var/spool/mail/root
 [root@node63 ucx]# 
+
+
+
+[root@node63 examples]# export UCX_LOG_LEVEL=trace
+[root@node63 examples]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -z
+[1697715109.410145] [node63:3063309:0]           stats.c:854  UCX  TRACE statistics disabled
+[1697715109.410160] [node63:3063309:0]        memtrack.c:419  UCX  TRACE memtrack disabled
+[1697715109.410178] [node63:3063309:0]           debug.c:1155 UCX  DEBUG using signal stack 0x7f3255cae000 size 141824
+[1697715109.422750] [node63:3063309:0]            init.c:121  UCX  DEBUG /home/xb/project/ucx/src/ucs/.libs/libucs.so.0 loaded at 0x7f3255849000
+[1697715109.422770] [node63:3063309:0]            init.c:122  UCX  DEBUG cmd line: /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -z 
+[1697715109.422782] [node63:3063309:0]          module.c:72   UCX  DEBUG ucs library path: /home/xb/project/ucx/src/ucs/.libs/libucs.so.0
+[1697715109.422788] [node63:3063309:0]          module.c:280  UCX  DEBUG loading modules for ucs
+INFO: UCT_HELLO_WORLD AM function = uct_ep_am_zcopy server = (null) port = 13337, parse_cmd uct_hello_world.c:513 
+[1697715109.422819] [node63:3063309:0]          module.c:280  UCX  DEBUG loading modules for uct
+[1697715109.422824] [node63:3063309:0]          module.c:242  UCX  TRACE loading module 'ib' with mode 0x1
+[1697715109.498021] [node63:3063309:0]          module.c:183  UCX  TRACE loaded /home/xb/project/ucx/src/uct/ib/.libs/libuct_ib.so.0.0.0 [0x18b0b10]
+[1697715109.498033] [node63:3063309:0]          module.c:242  UCX  TRACE loading module 'rdmacm' with mode 0x1
+[1697715109.527893] [node63:3063309:0]          module.c:183  UCX  TRACE loaded /home/xb/project/ucx/src/uct/ib/rdmacm/.libs/libuct_rdmacm.so.0.0.0 [0x18b37f0]
+[1697715109.527901] [node63:3063309:0]          module.c:242  UCX  TRACE loading module 'cma' with mode 0x1
+[1697715109.540265] [node63:3063309:0]          module.c:183  UCX  TRACE loaded /home/xb/project/ucx/src/uct/sm/scopy/cma/.libs/libuct_cma.so.0.0.0 [0x18b4770]
+[1697715109.540272] [node63:3063309:0]          module.c:242  UCX  TRACE loading module 'knem' with mode 0x1
+[1697715109.551321] [node63:3063309:0]          module.c:183  UCX  TRACE loaded /home/xb/project/ucx/src/uct/sm/scopy/knem/.libs/libuct_knem.so.0.0.0 [0x18b4de0]
+[1697715109.551783] [node63:3063309:0]            topo.c:787  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1697715109.551790] [node63:3063309:0]            topo.c:479  UCX  DEBUG lo: system device unknown
+[1697715109.551980] [node63:3063309:0]            topo.c:792  UCX  DEBUG /sys/class/net/ib98-0: PF sysfs path is '/sys/devices/pci0000:97/0000:97:04.0/0000:98:00.0'
+[1697715109.551989] [node63:3063309:0]            topo.c:240  UCX  DEBUG added sys_dev 0 for bus id 98:00.0
+[1697715109.551993] [node63:3063309:0]            topo.c:475  UCX  DEBUG ib98-0: bdf_name 0000:98:00.0 sys_dev 0
+[1697715109.552438] [node63:3063309:0]            topo.c:792  UCX  DEBUG /sys/class/net/ib17-0: PF sysfs path is '/sys/devices/pci0000:15/0000:15:04.0/0000:17:00.0'
+[1697715109.552443] [node63:3063309:0]            topo.c:240  UCX  DEBUG added sys_dev 1 for bus id 17:00.0
+[1697715109.552447] [node63:3063309:0]            topo.c:475  UCX  DEBUG ib17-0: bdf_name 0000:17:00.0 sys_dev 1
+[1697715109.553667] [node63:3063309:0]            topo.c:792  UCX  DEBUG /sys/class/net/ethA69-0: PF sysfs path is '/sys/devices/pci0000:68/0000:68:02.0/0000:69:00.0'
+[1697715109.553673] [node63:3063309:0]            topo.c:240  UCX  DEBUG added sys_dev 2 for bus id 69:00.0
+[1697715109.553677] [node63:3063309:0]            topo.c:475  UCX  DEBUG ethA69-0: bdf_name 0000:69:00.0 sys_dev 2
+[1697715109.553779] [node63:3063309:0]          module.c:280  UCX  DEBUG loading modules for uct_ib
+[1697715109.554070] [node63:3063309:0]           ib_md.c:1001 UCX  TRACE opening IB device mlx5_0
+[1697715109.558541] [node63:3063309:0]            topo.c:792  UCX  DEBUG /sys/class/infiniband/mlx5_0: PF sysfs path is '/sys/devices/pci0000:15/0000:15:04.0/0000:17:00.0'
+[1697715109.558551] [node63:3063309:0]            topo.c:475  UCX  DEBUG mlx5_0: bdf_name 0000:17:00.0 sys_dev 1
+[1697715109.558569] [node63:3063309:0]       ib_device.c:487  UCX  DEBUG mlx5_0: vendor_id 0x15b3 device_id 4117
+[1697715109.558619] [node63:3063309:0]            topo.c:739  UCX  TRACE mlx5_0: PCIe gen3 8x, effective throughput 6724.045 MB/s 56.405 Gb/s
+[1697715109.559165] [node63:3063309:0]    ib_mlx5dv_md.c:1264 UCX  DEBUG mlx5_0: crossing_vhca_mkey is not supported
+[1697715109.559345] [node63:3063309:0]    ib_mlx5dv_md.c:880  UCX  DEBUG mlx5_0: ODP is disabled because version 1 is not supported for DevX QP
+[1697715109.559551] [node63:3063309:0]           async.c:232  UCX  DEBUG added async handler 0x18b63b0 [id=4 ref 1] ???() to hash
+[1697715109.559617] [node63:3063309:0]           async.c:494  UCX  DEBUG listening to async event fd 4 events 0x1 mode thread_spinlock
+[1697715109.559623] [node63:3063309:0]       ib_device.c:586  UCX  DEBUG initialized device 'mlx5_0' (InfiniBand channel adapter) with 1 ports
+[1697715109.559632] [node63:3063309:0]           ib_md.c:1115 UCX  DEBUG mlx5_0: cuda GPUDirect RDMA is disabled
+[1697715109.559638] [node63:3063309:0]           ib_md.c:1115 UCX  DEBUG mlx5_0: rocm GPUDirect RDMA is disabled
+[1697715109.559650] [node63:3063309:0]           ib_md.c:1140 UCX  DEBUG mlx5_0: dmabuf is supported
+[1697715109.559657] [node63:3063309:0]           mpool.c:138  UCX  DEBUG mpool devx dbrec: align 64, maxelems 4294967295, elemsize 40
+[1697715109.559897] [node63:3063309:0]    ib_mlx5dv_md.c:1341 UCX  DEBUG mlx5_0: opened DEVX md log_max_qp=17
+[1697715109.559902] [node63:3063309:0]           ib_md.c:1103 UCX  DEBUG mlx5_0: relaxed order memory access is disabled
+[1697715109.559939] [node63:3063309:0]            time.c:22   UCX  DEBUG arch clock frequency: 2400000000.00 Hz
+[1697715109.559944] [node63:3063309:0]           ib_md.c:486  UCX  TRACE ibv_reg_mr(pd=0x18b5900 addr=0x18bc000 len=8 fd=-1 offset=0 access=0xf): mr=0x18bb650 lkey=0x2cbaa retry=0 took 0.031 ms
+[1697715109.560389] [node63:3063309:0]    ib_mlx5dv_md.c:104  UCX  TRACE mlx5_0: registered KSM for flush mr 0..8 with 1 entries of 2147483648 bytes, mkey=0x8300 mr=0x18bb7f0
+[1697715109.560393] [node63:3063309:0]    ib_mlx5dv_md.c:1011 UCX  DEBUG created indirect rkey 0x8300 for remote flush
+[1697715109.560396] [node63:3063309:0]           ib_md.c:1054 UCX  DEBUG mlx5_0: md open by 'uct_ib_mlx5_devx_md_ops' is successful
+[1697715109.560429] [node63:3063309:0]       ib_device.c:694  UCX  TRACE mlx5_0:1 does not support DC
+[1697715109.560434] [node63:3063309:0]       ib_device.c:1038 UCX  TRACE mlx5_0:1 does not support flags 0xc4: Unsupported operation
+[1697715109.560437] [node63:3063309:0]       ib_device.c:1052 UCX  DEBUG no compatible IB ports found for flags 0xc4
+[1697715109.560443] [node63:3063309:0]          uct_md.c:97   UCX  DEBUG failed to query dc_mlx5 resources: No such device
+[1697715109.562146] [node63:3063309:0]        ib_iface.c:927  UCX  DEBUG using pkey[0] 0xffff on mlx5_0:1/RoCE
+[1697715109.562204] [node63:3063309:0]       ib_device.c:916  UCX  DEBUG mlx5_0:1 using gid_index 3
+[1697715109.563244] [node63:3063309:0]        ib_iface.c:1453 UCX  DEBUG created uct_ib_iface_t headroom_ofs 12 payload_ofs 16 hdr_ofs 15 data_sz 8256
+[1697715109.563272] [node63:3063309:0]           mpool.c:138  UCX  DEBUG mpool rc_recv_desc: align 64, maxelems 4294967295, elemsize 8279
+[1697715109.563277] [node63:3063309:0]           mpool.c:138  UCX  DEBUG mpool rc_send_desc: align 64, maxelems 4294967295, elemsize 8328
+[1697715109.563359] [node63:3063309:0]           mpool.c:138  UCX  DEBUG mpool send-ops-mpool: align 64, maxelems 4294967295, elemsize 56
+[1697715109.563803] [node63:3063309:0]           mpool.c:138  UCX  DEBUG mpool pending-ops: align 1, maxelems 4294967295, elemsize 64
+[1697715109.563814] [node63:3063309:0]           mpool.c:138  UCX  DEBUG mpool rc_verbs_short_desc: align 64, maxelems 4294967295, elemsize 200
+[1697715109.564410] [node63:3063309:0]        ib_iface.c:1052 UCX  DEBUG iface=0x18bd010: created RC QP 0x1cd2 on mlx5_0:1 TX wr:409 sge:5 inl:124 resp:64 RX wr:0 sge:0 resp:64
+[1697715109.565225] [node63:3063309:0]         uct_mem.c:106  UCX  TRACE allocating rc_recv_desc: host memory length 37481712 flags 0x304
+[1697715109.565230] [node63:3063309:0]         uct_mem.c:110  UCX  TRACE   trying allocation method huge
+[1697715109.565272] [node63:3063309:0]             sys.c:674  UCX  TRACE   detected huge page size: 2097152
+[1697715109.565294] [node63:3063309:0]         uct_mem.c:303  UCX  TRACE   allocated 37748736 bytes at 0x7f3250600000 using huge
+[1697715109.569754] [node63:3063309:0]           ib_md.c:486  UCX  TRACE ibv_reg_mr(pd=0x18b5900 addr=0x7f3250600000 len=37748736 fd=-1 offset=0 access=0xf): mr=0x18b7fe0 lkey=0xf5b39 retry=0 took 4.437 ms
+[1697715109.569766] [node63:3063309:0]           mpool.c:282  UCX  DEBUG mpool rc_recv_desc: allocated chunk 0x7f3250600018 of 37748712 bytes with 4537 elements
+Using rc_verbs/mlx5_0:1 dev_tl_lookup uct_hello_world.c:395
+Waiting for connection... connect_common hello_world_util.h:238 
+[1697715194.579504] [node63:3063309:0]        ib_iface.c:1052 UCX  DEBUG iface=0x18bd010: created RC QP 0x1cd5 on mlx5_0:1 TX wr:409 sge:5 inl:124 resp:64 RX wr:0 sge:0 resp:64
+[1697715194.579525] [node63:3063309:0]           rc_ep.c:165  UCX  DEBUG created rc ep 0x18b7e80
+[1697715194.579816] [node63:3063309:0]        ib_iface.c:809  UCX  DEBUG iface 0x18bd010: ah_attr dlid=49152 sl=0 port=1 src_path_bits=0 dgid=::ffff:172.17.29.63 flow_label=0xffffffff sgid_index=3 traffic_class=106
+[1697715194.580154] [node63:3063309:0]        rc_iface.c:934  UCX  DEBUG connected rc qp 0x1cd5 on mlx5_0:1/RoCE to lid 49152(+0) sl 0 remote_qp 0x1cd6 mtu 1024 timer 18x7 rnr 13x7 rd_atom 16
+
+
+----- UCT TEST SUCCESS ----
+
+[callback] uct_ep_am_zcopy sent ABCDEFGHIJKLMNO (16 bytes)
+
+---------------------------
+
+
+----- UCT TEST SUCCESS ----
+
+[main] uct_ep_am_zcopy sent ABCDEFGHIJKLMNO (16 bytes)
+
+---------------------------
+[1697715194.580992] [node63:3063309:a]       ib_device.c:468  UCX  DEBUG IB Async event on mlx5_0: SRQ-attached QP 0x1cd5 was flushed
+[1697715194.581013] [node63:3063309:0]           rc_ep.c:185  UCX  DEBUG destroy rc ep 0x18b7e80
+[1697715194.583053] [node63:3063309:0]           mpool.c:194  UCX  DEBUG mpool rc_verbs_short_desc destroyed
+[1697715194.583372] [node63:3063309:0]           mpool.c:194  UCX  DEBUG mpool send-ops-mpool destroyed
+[1697715194.583376] [node63:3063309:0]           mpool.c:194  UCX  DEBUG mpool rc_send_desc destroyed
+[1697715194.583404] [node63:3063309:0]           ib_md.c:498  UCX  TRACE ibv_dereg_mr(mr=0x18b7fe0 addr=0x7f3250600000 length=37748736)
+[1697715194.583655] [node63:3063309:0]           mpool.c:194  UCX  DEBUG mpool rc_recv_desc destroyed
+[1697715194.583659] [node63:3063309:0]           mpool.c:194  UCX  DEBUG mpool pending-ops destroyed
+[1697715194.584365] [node63:3063309:0]    ib_mlx5dv_md.c:1399 UCX  DEBUG mlx5_0: md=0x18b8460 md->flags=0x3f01a3 flush_rkey=0x8300
+[1697715194.584759] [node63:3063309:0]           ib_md.c:498  UCX  TRACE ibv_dereg_mr(mr=0x18bb650 addr=0x18bc000 length=8)
+[1697715194.584917] [node63:3063309:0]           mpool.c:194  UCX  DEBUG mpool devx dbrec destroyed
+[1697715194.584924] [node63:3063309:0]       ib_device.c:605  UCX  DEBUG destroying ib device mlx5_0
+[1697715194.584930] [node63:3063309:0]           async.c:157  UCX  DEBUG removed async handler 0x18b63b0 [id=4 ref 1] ???() from hash
+[1697715194.584934] [node63:3063309:0]           async.c:547  UCX  DEBUG removing async handler 0x18b63b0 [id=4 ref 1] ???()
+[1697715194.584974] [node63:3063309:0]           async.c:563  UCX  TRACE waiting for 0x18b63b0 [id=4 ref 1] ???() completion (called=0)
+[1697715194.584978] [node63:3063309:0]           async.c:172  UCX  DEBUG release async handler 0x18b63b0 [id=4 ref 0] ???()
+You have mail in /var/spool/mail/root
+[root@node63 examples]# 
+
 

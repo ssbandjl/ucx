@@ -1,0 +1,1115 @@
+[root@node63 ucx]# ucx_info -v
+# Version 1.13.0
+# Git branch '', revision 90c38a0
+# Configured with: --build=x86_64-redhat-linux-gnu --host=x86_64-redhat-linux-gnu --program-prefix= --disable-dependency-tracking --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/libexec --localstatedir=/var --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info --disable-optimizations --disable-logging --disable-debug --disable-assertions --enable-mt --disable-params-check --without-go --without-java --enable-cma --with-cuda --with-gdrcopy --with-verbs --with-knem --with-rdmacm --without-rocm --with-xpmem --without-fuse3 --without-ugni --with-cuda=/usr/local/cuda-11.6
+[root@node63 ucx]# ucx_info -v
+
+
+
+ucx_info -d >> category/ucx_info
+#
+# Memory domain: self
+#     Component: self
+#             register: unlimited, cost: 0 nsec
+#           remote key: 0 bytes
+#
+#      Transport: self
+#         Device: memory0
+#           Type: loopback
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 6911.00 MB/sec
+#              latency: 0 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 0 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+#
+#
+# Memory domain: tcp
+#     Component: tcp
+#             register: unlimited, cost: 0 nsec
+#           remote key: 0 bytes
+#
+#      Transport: tcp
+#         Device: lo
+#           Type: network
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 11.91/ppn + 0.00 MB/sec
+#              latency: 10960 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 1
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+#
+#      Transport: tcp
+#         Device: ib98-0
+#           Type: network
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 2829.09/ppn + 0.00 MB/sec
+#              latency: 5223 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 1
+#     device num paths: 1
+#              max eps: 256
+#       device address: 6 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+#
+#      Transport: tcp
+#         Device: ib17-0
+#           Type: network
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 2829.09/ppn + 0.00 MB/sec
+#              latency: 5223 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 1
+#     device num paths: 1
+#              max eps: 256
+#       device address: 6 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+#
+#      Transport: tcp
+#         Device: ethA69-0
+#           Type: network
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 113.16/ppn + 0.00 MB/sec
+#              latency: 5776 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: 256
+#       device address: 6 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+#
+#
+# Connection manager: tcp
+#      max_conn_priv: 2064 bytes
+#
+# Memory domain: sysv
+#     Component: sysv
+#             allocate: unlimited
+#           remote key: 12 bytes
+#           rkey_ptr is supported
+#
+#      Transport: sysv
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 12179.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 100
+#             am_bcopy: <= 8256
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+#
+#
+# Memory domain: posix
+#     Component: posix
+#             allocate: <= 126730008K
+#           remote key: 24 bytes
+#           rkey_ptr is supported
+#
+#      Transport: posix
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 12179.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 100
+#             am_bcopy: <= 8256
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+#
+#
+# Memory domain: mlx5_0
+#     Component: ib
+#             register: unlimited, cost: 180 nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#
+#      Transport: rc_verbs
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (0)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 75 nsec
+#            put_short: <= 124
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 5 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 5 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 123
+#             am_bcopy: <= 8255
+#             am_zcopy: <= 8255, up to 4 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 127
+#               domain: device
+#           atomic_add: 64 bit
+#          atomic_fadd: 64 bit
+#         atomic_cswap: 64 bit
+#           connection: to ep
+#      device priority: 28
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 5 bytes
+#       error handling: peer failure, ep_check
+#
+#
+#      Transport: rc_mlx5
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (0)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 40 nsec
+#            put_short: <= 220
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 14 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 14 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 234
+#             am_bcopy: <= 8254
+#             am_zcopy: <= 8254, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 186
+#               domain: device
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to ep
+#      device priority: 28
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 7 bytes
+#       error handling: buffer (zcopy), remote access, peer failure, ep_check
+#
+#
+#      Transport: ud_verbs
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (0)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 830 nsec
+#             overhead: 105 nsec
+#             am_short: <= 116
+#             am_bcopy: <= 1016
+#             am_zcopy: <= 1016, up to 5 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 880
+#           connection: to ep, to iface
+#      device priority: 28
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 3 bytes
+#           ep address: 6 bytes
+#       error handling: peer failure, ep_check
+#
+#
+#      Transport: ud_mlx5
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (0)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 830 nsec
+#             overhead: 80 nsec
+#             am_short: <= 180
+#             am_bcopy: <= 1016
+#             am_zcopy: <= 1016, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 132
+#           connection: to ep, to iface
+#      device priority: 28
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 3 bytes
+#           ep address: 6 bytes
+#       error handling: peer failure, ep_check
+#
+#
+# Memory domain: mlx5_1
+#     Component: ib
+#             register: unlimited, cost: 180 nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#   < no supported devices found >
+#
+# Memory domain: mlx5_2
+#     Component: ib
+#             register: unlimited, cost: 180 nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#
+#      Transport: rc_verbs
+#         Device: mlx5_2:1
+#           Type: network
+#  System device: mlx5_2 (2)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 75 nsec
+#            put_short: <= 124
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 5 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 5 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 123
+#             am_bcopy: <= 8255
+#             am_zcopy: <= 8255, up to 4 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 127
+#               domain: device
+#           atomic_add: 64 bit
+#          atomic_fadd: 64 bit
+#         atomic_cswap: 64 bit
+#           connection: to ep
+#      device priority: 28
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 5 bytes
+#       error handling: peer failure, ep_check
+#
+#
+#      Transport: rc_mlx5
+#         Device: mlx5_2:1
+#           Type: network
+#  System device: mlx5_2 (2)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 40 nsec
+#            put_short: <= 220
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 14 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 14 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 234
+#             am_bcopy: <= 8254
+#             am_zcopy: <= 8254, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 186
+#               domain: device
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to ep
+#      device priority: 28
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 7 bytes
+#       error handling: buffer (zcopy), remote access, peer failure, ep_check
+#
+#
+#      Transport: ud_verbs
+#         Device: mlx5_2:1
+#           Type: network
+#  System device: mlx5_2 (2)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 830 nsec
+#             overhead: 105 nsec
+#             am_short: <= 116
+#             am_bcopy: <= 1016
+#             am_zcopy: <= 1016, up to 5 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 880
+#           connection: to ep, to iface
+#      device priority: 28
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 3 bytes
+#           ep address: 6 bytes
+#       error handling: peer failure, ep_check
+#
+#
+#      Transport: ud_mlx5
+#         Device: mlx5_2:1
+#           Type: network
+#  System device: mlx5_2 (2)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 830 nsec
+#             overhead: 80 nsec
+#             am_short: <= 180
+#             am_bcopy: <= 1016
+#             am_zcopy: <= 1016, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 132
+#           connection: to ep, to iface
+#      device priority: 28
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 3 bytes
+#           ep address: 6 bytes
+#       error handling: peer failure, ep_check
+#
+#
+# Memory domain: mlx5_3
+#     Component: ib
+#             register: unlimited, cost: 180 nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#   < no supported devices found >
+#
+# Connection manager: rdmacm
+#      max_conn_priv: 54 bytes
+#
+# Memory domain: cma
+#     Component: cma
+#             register: unlimited, cost: 9 nsec
+#
+#      Transport: cma
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 11145.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 2000 nsec
+#            put_zcopy: unlimited, up to 16 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 1
+#            get_zcopy: unlimited, up to 16 iov
+#  get_opt_zcopy_align: <= 1
+#        get_align_mtu: <= 1
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 4 bytes
+#       error handling: peer failure, ep_check
+#
+#
+# Memory domain: knem
+#     Component: knem
+#             register: unlimited, cost: 180 nsec
+#           remote key: 16 bytes
+#
+#      Transport: knem
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 13862.00/ppn + 0.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 2000 nsec
+#            put_zcopy: unlimited, up to 16 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 1
+#            get_zcopy: unlimited, up to 16 iov
+#  get_opt_zcopy_align: <= 1
+#        get_align_mtu: <= 1
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 0 bytes
+#       error handling: none
+#
+#
+# Memory domain: xpmem
+#     Component: xpmem
+#             register: unlimited, cost: 60 nsec
+#           remote key: 24 bytes
+#           rkey_ptr is supported
+#
+#      Transport: xpmem
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 12179.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 100
+#             am_bcopy: <= 8256
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 16 bytes
+#       error handling: none
+#
+
+
+ucx_info -b  >> category/ucx_info
+
+#define UCX_CONFIG_H              
+#define ENABLE_BUILTIN_MEMCPY     1
+#define ENABLE_DEBUG_DATA         0
+#define ENABLE_MT                 1
+#define ENABLE_PARAMS_CHECK       0
+#define HAVE_1_ARG_BFD_SECTION_SIZE 0
+#define HAVE_ALLOCA               1
+#define HAVE_ALLOCA_H             1
+#define HAVE_ATTRIBUTE_NOOPTIMIZE 1
+#define HAVE_CLEARENV             1
+#define HAVE_CPLUS_DEMANGLE       1
+#define HAVE_CPU_SET_T            1
+#define HAVE_CUDA                 1
+#define HAVE_CUDA_H               1
+#define HAVE_CUDA_RUNTIME_H       1
+#define HAVE_DC_DV                1
+#define HAVE_DECL_ASPRINTF        1
+#define HAVE_DECL_BASENAME        1
+#define HAVE_DECL_BFD_GET_SECTION_FLAGS 1
+#define HAVE_DECL_BFD_GET_SECTION_VMA 1
+#define HAVE_DECL_BFD_SECTION_FLAGS 0
+#define HAVE_DECL_BFD_SECTION_VMA 1
+#define HAVE_DECL_CPU_ISSET       1
+#define HAVE_DECL_CPU_ZERO        1
+#define HAVE_DECL_ETHTOOL_CMD_SPEED 1
+#define HAVE_DECL_FMEMOPEN        1
+#define HAVE_DECL_F_SETOWN_EX     1
+#define HAVE_DECL_GDR_COPY_TO_MAPPING 1
+#define HAVE_DECL_GETAUXVAL       1
+#define HAVE_DECL_IBV_ACCESS_ON_DEMAND 1
+#define HAVE_DECL_IBV_ACCESS_RELAXED_ORDERING 1
+#define HAVE_DECL_IBV_ADVISE_MR   1
+#define HAVE_DECL_IBV_ALLOC_DM    1
+#define HAVE_DECL_IBV_ALLOC_TD    1
+#define HAVE_DECL_IBV_CMD_MODIFY_QP 0
+#define HAVE_DECL_IBV_CREATE_CQ_ATTR_IGNORE_OVERRUN 1
+#define HAVE_DECL_IBV_CREATE_CQ_EX 1
+#define HAVE_DECL_IBV_CREATE_QP_EX 1
+#define HAVE_DECL_IBV_CREATE_SRQ  1
+#define HAVE_DECL_IBV_CREATE_SRQ_EX 1
+#define HAVE_DECL_IBV_EVENT_GID_CHANGE 1
+#define HAVE_DECL_IBV_EVENT_TYPE_STR 1
+#define HAVE_DECL_IBV_EXP_ACCESS_ALLOCATE_MR 0
+#define HAVE_DECL_IBV_EXP_ACCESS_ON_DEMAND 0
+#define HAVE_DECL_IBV_EXP_ALLOC_DM 0
+#define HAVE_DECL_IBV_EXP_ATOMIC_HCA_REPLY_BE 0
+#define HAVE_DECL_IBV_EXP_CQ_IGNORE_OVERRUN 0
+#define HAVE_DECL_IBV_EXP_CQ_MODERATION 0
+#define HAVE_DECL_IBV_EXP_CREATE_QP 0
+#define HAVE_DECL_IBV_EXP_CREATE_SRQ 0
+#define HAVE_DECL_IBV_EXP_DCT_OOO_RW_DATA_PLACEMENT 0
+#define HAVE_DECL_IBV_EXP_DEVICE_ATTR_PCI_ATOMIC_CAPS 0
+#define HAVE_DECL_IBV_EXP_DEVICE_ATTR_RESERVED_2 0
+#define HAVE_DECL_IBV_EXP_DEVICE_DC_TRANSPORT 0
+#define HAVE_DECL_IBV_EXP_DEVICE_MR_ALLOCATE 0
+#define HAVE_DECL_IBV_EXP_MR_FIXED_BUFFER_SIZE 0
+#define HAVE_DECL_IBV_EXP_MR_INDIRECT_KLMS 0
+#define HAVE_DECL_IBV_EXP_ODP_SUPPORT_IMPLICIT 0
+#define HAVE_DECL_IBV_EXP_POST_SEND 0
+#define HAVE_DECL_IBV_EXP_PREFETCH_MR 0
+#define HAVE_DECL_IBV_EXP_PREFETCH_WRITE_ACCESS 0
+#define HAVE_DECL_IBV_EXP_QPT_DC_INI 0
+#define HAVE_DECL_IBV_EXP_QP_CREATE_UMR 0
+#define HAVE_DECL_IBV_EXP_QP_INIT_ATTR_ATOMICS_ARG 0
+#define HAVE_DECL_IBV_EXP_QP_OOO_RW_DATA_PLACEMENT 0
+#define HAVE_DECL_IBV_EXP_QUERY_DEVICE 0
+#define HAVE_DECL_IBV_EXP_QUERY_GID_ATTR 0
+#define HAVE_DECL_IBV_EXP_REG_MR  0
+#define HAVE_DECL_IBV_EXP_SEND_EXT_ATOMIC_INLINE 0
+#define HAVE_DECL_IBV_EXP_SETENV  0
+#define HAVE_DECL_IBV_EXP_WR_EXT_MASKED_ATOMIC_CMP_AND_SWP 0
+#define HAVE_DECL_IBV_EXP_WR_EXT_MASKED_ATOMIC_FETCH_AND_ADD 0
+#define HAVE_DECL_IBV_EXP_WR_NOP  0
+#define HAVE_DECL_IBV_GET_ASYNC_EVENT 1
+#define HAVE_DECL_IBV_GET_DEVICE_NAME 1
+#define HAVE_DECL_IBV_LINK_LAYER_ETHERNET 1
+#define HAVE_DECL_IBV_LINK_LAYER_INFINIBAND 1
+#define HAVE_DECL_IBV_ODP_SUPPORT_IMPLICIT 1
+#define HAVE_DECL_IBV_QPF_GRH_REQUIRED 1
+#define HAVE_DECL_IBV_QUERY_DEVICE_EX 1
+#define HAVE_DECL_IBV_QUERY_GID   1
+#define HAVE_DECL_IBV_WC_STATUS_STR 1
+#define HAVE_DECL_INOTIFY_ADD_WATCH 1
+#define HAVE_DECL_INOTIFY_INIT    1
+#define HAVE_DECL_IN_ATTRIB       1
+#define HAVE_DECL_IPPROTO_TCP     1
+#define HAVE_DECL_MADV_FREE       0
+#define HAVE_DECL_MADV_REMOVE     1
+#define HAVE_DECL_MLX5DV_CQ_INIT_ATTR_MASK_COMPRESSED_CQE 1
+#define HAVE_DECL_MLX5DV_CQ_INIT_ATTR_MASK_CQE_SIZE 1
+#define HAVE_DECL_MLX5DV_CREATE_QP 1
+#define HAVE_DECL_MLX5DV_DCTYPE_DCT 1
+#define HAVE_DECL_MLX5DV_DEVX_SUBSCRIBE_DEVX_EVENT 1
+#define HAVE_DECL_MLX5DV_INIT_OBJ 1
+#define HAVE_DECL_MLX5DV_IS_SUPPORTED 1
+#define HAVE_DECL_MLX5DV_OBJ_AH   1
+#define HAVE_DECL_MLX5DV_QP_CREATE_ALLOW_SCATTER_TO_CQE 1
+#define HAVE_DECL_MLX5DV_UAR_ALLOC_TYPE_BF 1
+#define HAVE_DECL_MLX5DV_UAR_ALLOC_TYPE_NC 1
+#define HAVE_DECL_POSIX_MADV_DONTNEED 1
+#define HAVE_DECL_PR_SET_PTRACER  1
+#define HAVE_DECL_SOL_SOCKET      1
+#define HAVE_DECL_SO_KEEPALIVE    1
+#define HAVE_DECL_SPEED_UNKNOWN   1
+#define HAVE_DECL_STRERROR_R      1
+#define HAVE_DECL_SYS_BRK         1
+#define HAVE_DECL_SYS_IPC         0
+#define HAVE_DECL_SYS_MADVISE     1
+#define HAVE_DECL_SYS_MMAP        1
+#define HAVE_DECL_SYS_MREMAP      1
+#define HAVE_DECL_SYS_MUNMAP      1
+#define HAVE_DECL_SYS_SHMAT       1
+#define HAVE_DECL_SYS_SHMDT       1
+#define HAVE_DECL_TCP_KEEPCNT     1
+#define HAVE_DECL_TCP_KEEPIDLE    1
+#define HAVE_DECL_TCP_KEEPINTVL   1
+#define HAVE_DECL___PPC_GET_TIMEBASE 0
+#define HAVE_DECL___PPC_GET_TIMEBASE_FREQ 0
+#define HAVE_DETAILED_BACKTRACE   1
+#define HAVE_DEVX                 1
+#define HAVE_DLFCN_H              1
+#define HAVE_GDRAPI_H             1
+#define HAVE_HW_TIMER             1
+#define HAVE_IB                   1
+#define HAVE_IBV_DM               1
+#define HAVE_IN6_ADDR_S6_ADDR32   1
+#define HAVE_INFINIBAND_MLX5DV_H  1
+#define HAVE_INFINIBAND_TM_TYPES_H 1
+#define HAVE_INOTIFY              1
+#define HAVE_INTTYPES_H           1
+#define HAVE_IP_IP_DST            1
+#define HAVE_LIBBFD               1
+#define HAVE_LIBGEN_H             1
+#define HAVE_LIBRT                1
+#define HAVE_LINUX_FUTEX_H        1
+#define HAVE_LINUX_IP_H           1
+#define HAVE_LINUX_MMAN_H         1
+#define HAVE_MALLOC_GET_STATE     1
+#define HAVE_MALLOC_H             1
+#define HAVE_MALLOC_HOOK          1
+#define HAVE_MALLOC_SET_STATE     1
+#define HAVE_MALLOC_TRIM          1
+#define HAVE_MEMALIGN             1
+#define HAVE_MEMORY_H             1
+#define HAVE_MLX5_DV              1
+#define HAVE_MLX5_HW              1
+#define HAVE_MLX5_HW_UD           1
+#define HAVE_MREMAP               1
+#define HAVE_NETINET_IP_H         1
+#define HAVE_NET_ETHERNET_H       1
+#define HAVE_NUMA                 1
+#define HAVE_NUMAIF_H             1
+#define HAVE_NUMA_H               1
+#define HAVE_NVML_H               1
+#define HAVE_ODP                  1
+#define HAVE_ODP_IMPLICIT         1
+#define HAVE_POSIX_MEMALIGN       1
+#define HAVE_PREFETCH             1
+#define HAVE_SCHED_GETAFFINITY    1
+#define HAVE_SCHED_SETAFFINITY    1
+#define HAVE_SIGACTION_SA_RESTORER 1
+#define HAVE_SIGEVENT_SIGEV_UN_TID 1
+#define HAVE_SIGHANDLER_T         1
+#define HAVE_STDINT_H             1
+#define HAVE_STDLIB_H             1
+#define HAVE_STRERROR_R           1
+#define HAVE_STRINGS_H            1
+#define HAVE_STRING_H             1
+#define HAVE_STRUCT_BITMASK       1
+#define HAVE_STRUCT_DL_PHDR_INFO  1
+#define HAVE_STRUCT_IBV_DEVICE_ATTR_EX_PCI_ATOMIC_CAPS 1
+#define HAVE_STRUCT_IBV_TM_CAPS_FLAGS 1
+#define HAVE_STRUCT_MLX5DV_CQ_CQ_UAR 1
+#define HAVE_SYS_EPOLL_H          1
+#define HAVE_SYS_EVENTFD_H        1
+#define HAVE_SYS_STAT_H           1
+#define HAVE_SYS_TYPES_H          1
+#define HAVE_SYS_UIO_H            1
+#define HAVE_TL_DC                1
+#define HAVE_TL_RC                1
+#define HAVE_TL_UD                1
+#define HAVE_UCM_PTMALLOC286      1
+#define HAVE_UNISTD_H             1
+#define HAVE___CLEAR_CACHE        1
+#define HAVE___CURBRK             1
+#define HAVE___SIGHANDLER_T       1
+#define IBV_HW_TM                 1
+#define LT_OBJDIR                 ".libs/"
+#define NVALGRIND                 1
+#define PACKAGE                   "ucx"
+#define PACKAGE_BUGREPORT         ""
+#define PACKAGE_NAME              "ucx"
+#define PACKAGE_STRING            "ucx 1.13"
+#define PACKAGE_TARNAME           "ucx"
+#define PACKAGE_URL               ""
+#define PACKAGE_VERSION           "1.13"
+#define STDC_HEADERS              1
+#define STRERROR_R_CHAR_P         1
+#define UCM_BISTRO_HOOKS          1
+#define UCS_MAX_LOG_LEVEL         UCS_LOG_LEVEL_DEBUG
+#define UCT_TCP_EP_KEEPALIVE      1
+#define UCT_UD_EP_DEBUG_HOOKS     0
+#define UCX_CONFIGURE_FLAGS       "--build=x86_64-redhat-linux-gnu --host=x86_64-redhat-linux-gnu --program-prefix= --disable-dependency-tracking --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/libexec --localstatedir=/var --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info --disable-optimizations --disable-logging --disable-debug --disable-assertions --enable-mt --disable-params-check --without-go --without-java --enable-cma --with-cuda --with-gdrcopy --with-verbs --with-knem --with-rdmacm --without-rocm --with-xpmem --without-fuse3 --without-ugni --with-cuda=/usr/local/cuda-11.6"
+#define UCX_MODULE_SUBDIR         "ucx"
+#define VERSION                   "1.13"
+#define restrict                  __restrict
+#define test_MODULES              ":module"
+#define ucm_MODULES               ":cuda"
+#define ucs_MODULES               ""
+#define uct_MODULES               ":cuda:ib:rdmacm:cma:knem:xpmem"
+#define uct_cuda_MODULES          ":gdrcopy"
+#define uct_ib_MODULES            ""
+#define uct_rocm_MODULES          ""
+#define ucx_perftest_MODULES      ":cuda"
+
+
+
+ucx_info -y   // 类型
+UCS:
+    sizeof(ucs_mpool_t) = ................. 16    
+    sizeof(ucs_mpool_chunk_t) = ........... 24    
+    sizeof(ucs_mpool_elem_t) = ............ 8     
+    sizeof(ucs_async_context_t) = ......... 80    
+    sizeof(ucs_async_handler_t) = ......... 56    
+    sizeof(ucs_async_ops_t) = ............. 112   
+    sizeof(ucs_async_pipe_t) = ............ 8     
+    sizeof(ucs_async_signal_context_t) = .. 24    
+    sizeof(ucs_async_thread_context_t) = .. 40    
+    sizeof(ucs_class_t) = ................. 40    
+    sizeof(ucs_config_field_t) = .......... 80    
+    sizeof(ucs_config_parser_t) = ......... 48    
+    sizeof(ucs_frag_list_t) = ............. 48    
+    sizeof(ucs_frag_list_elem_t) = ........ 32    
+    sizeof(ucs_frag_list_head_t) = ........ 24    
+    sizeof(ucs_ib_port_spec_t) = .......... 16    
+    sizeof(ucs_list_link_t) = ............. 16    
+    sizeof(ucs_memtrack_entry_t) = ........ 24    
+    sizeof(ucs_mpmc_queue_t) = ............ 24    
+    sizeof(ucs_callbackq_t) = ............. 264   
+    sizeof(ucs_callbackq_elem_t) = ........ 24    
+    sizeof(ucs_ptr_array_t) = ............. 32    
+    sizeof(ucs_queue_elem_t) = ............ 8     
+    sizeof(ucs_queue_head_t) = ............ 16    
+    sizeof(ucs_recursive_spinlock_t) = .... 16    
+    sizeof(ucs_timer_t) = ................. 24    
+    sizeof(ucs_timer_queue_t) = ........... 40    
+    sizeof(ucs_twheel_t) = ................ 48    
+    sizeof(ucs_wtimer_t) = ................ 32    
+    sizeof(ucs_arbiter_t) = ............... 16    
+    sizeof(ucs_arbiter_group_t) = ......... 8     
+    sizeof(ucs_arbiter_elem_t) = .......... 32    
+    sizeof(ucs_pgtable_t) = ............... 48    
+    sizeof(ucs_pgt_entry_t) = ............. 8     
+    sizeof(ucs_pgt_dir_t) = ............... 136   
+    sizeof(ucs_pgt_region_t) = ............ 16    
+    sizeof(ucs_rcache_t) = ................ 320   
+    sizeof(ucs_rcache_region_t) = ......... 80    
+    sizeof(ucs_conn_match_elem_t) = ....... 16    
+    sizeof(ucs_memory_info_t) = ........... 24    
+
+UCT:
+    sizeof(uct_am_handler_t) = ............ 24    
+    sizeof(uct_base_iface_t) = ............ 1280  
+    sizeof(uct_completion_t) = ............ 16    
+    sizeof(uct_ep_t) = .................... 8     
+    sizeof(uct_mem_h) = ................... 8     
+    sizeof(uct_rkey_t) = .................. 8     
+    sizeof(uct_iface_t) = ................. 400   
+    sizeof(uct_iface_attr_t) = ............ 536   
+    sizeof(uct_iface_config_t) = .......... 32    
+    sizeof(uct_iface_mpool_config_t) = .... 8     
+    sizeof(uct_md_config_t) = ............. 1     
+    sizeof(uct_iface_ops_t) = ............. 400   
+    sizeof(uct_md_t) = .................... 16    
+    sizeof(uct_md_attr_t) = ............... 224   
+    sizeof(uct_md_ops_t) = ................ 88    
+    sizeof(uct_tl_resource_desc_t) = ...... 52    
+    sizeof(uct_rkey_bundle_t) = ........... 24    
+    sizeof(uct_tcp_ep_t) = ................ 144   
+    sizeof(uct_self_ep_t) = ............... 8     
+
+IB:
+    sizeof(uct_ib_address_t) = ............ 1     
+    sizeof(uct_ib_device_t) = ............. 800   
+    sizeof(uct_ib_md_t) = ................. 1008  
+    sizeof(uct_ib_mem_t) = ................ 20    
+    sizeof(uct_ib_rcache_region_t) = ...... 104   
+    sizeof(uct_ib_iface_t) = .............. 1424  
+    sizeof(uct_ib_iface_config_t) = ....... 232   
+    sizeof(uct_ib_iface_recv_desc_t) = .... 4     
+    sizeof(uct_ib_recv_wr_t) = ............ 48    
+
+RC:
+    sizeof(uct_rc_am_short_hdr_t) = ....... 9     
+    sizeof(uct_rc_ep_t) = ................. 64    
+    sizeof(uct_rc_hdr_t) = ................ 1     
+    sizeof(uct_rc_iface_t) = .............. 34448 
+    sizeof(uct_rc_iface_config_t) = ....... 352   
+    sizeof(uct_rc_iface_send_op_t) = ...... 40    
+    sizeof(uct_rc_iface_send_desc_t) = .... 56    
+    sizeof(uct_rc_iface_send_desc_t) = .... 56    
+    sizeof(uct_rc_verbs_ep_t) = ........... 80    
+    sizeof(uct_rc_verbs_iface_config_t) = . 368   
+    sizeof(uct_rc_verbs_iface_t) = ........ 34912 
+    sizeof(uct_rc_mlx5_am_short_hdr_t) = .. 10    
+    sizeof(uct_rc_mlx5_ep_t) = ............ 240   
+    sizeof(uct_rc_mlx5_hdr_t) = ........... 2     
+    sizeof(uct_rc_mlx5_iface_common_config_t) =  96    
+    sizeof(uct_rc_mlx5_iface_common_t) = .. 35472 
+
+DC:
+    sizeof(uct_dc_mlx5_ep_t) = ............ 32    
+    sizeof(uct_dc_mlx5_iface_t) = ......... 35960 
+    sizeof(uct_dc_mlx5_iface_config_t) = .. 472   
+
+UD:
+    sizeof(uct_ud_ep_t) = ................. 248   
+    sizeof(uct_ud_neth_t) = ............... 8     
+    sizeof(uct_ud_iface_t) = .............. 1896  
+    sizeof(uct_ud_iface_config_t) = ....... 304   
+    sizeof(uct_ud_ep_pending_op_t) = ...... 48    
+    sizeof(uct_ud_send_skb_t) = ........... 64    
+    sizeof(uct_ud_recv_skb_t) = ........... 40    
+    sizeof(uct_rc_iface_send_desc_t) = .... 56    
+    sizeof(uct_ud_verbs_ep_t) = ........... 264   
+    sizeof(uct_ud_verbs_iface_t) = ........ 2296  
+    sizeof(uct_ud_mlx5_ep_t) = ............ 296   
+    sizeof(uct_ud_mlx5_iface_t) = ......... 2424  
+
+
+UCP:
+    sizeof(ucp_context_t) = ............... 840   
+    sizeof(ucp_worker_t) = ................ 134688
+    sizeof(ucp_ep_t) = .................... 64    
+    sizeof(ucp_ep_ext_gen_t) = ............ 64    
+    sizeof(ucp_ep_ext_proto_t) = .......... 64    
+    sizeof(ucp_ep_config_key_t) = ......... 168   
+    sizeof(ucp_ep_config_t) = ............. 1696  
+    sizeof(ucp_datatype_iter_t) = ......... 56    
+    sizeof(ucp_request_t) = ............... 264   
+    sizeof(ucp_recv_desc_t) = ............. 48    
+    sizeof(ucp_tag_recv_info_t) = ......... 16    
+    sizeof(ucp_mem_t) = ................... 104   
+    sizeof(ucp_rkey_t) = .................. 32    
+    sizeof(ucp_wireup_msg_t) = ............ 20    
+
+ucx -s // 系统信息
+# Timer frequency: 2400.000 MHz
+# Timer accuracy: 99.765 %
+# CPU vendor: Intel
+# CPU model: unknown
+
+
+ucx_info -h help, 帮助信息
+Please select at least one of 'a','r','t','m' UCP features using -u switch.
+Usage: ucx_info [options]
+At least one of the following options has to be set:
+  -v              Show version information
+  -d              Show devices and transports
+  -b              Show build configuration
+  -y              Show type and structures information
+  -s              Show system information
+  -c              Show UCX configuration
+  -C              Comment-out default configuration values
+  -a              Show also hidden configuration
+  -f              Display fully decorated output
+
+UCP information (-u is required):
+  -p              Show UCP context information
+  -w              Show UCP worker information
+  -e              Show UCP endpoint configuration
+  -m <size>       Show UCP memory allocation method for a given size
+  -u <features>   UCP context features to use. String of one or more of:
+                    'a' : atomic operations
+                    'r' : remote memory access
+                    't' : tag matching 
+                    's' : stream 
+                    'm' : active messages 
+                  Modifiers to use in combination with above features:
+                    'w' : wakeup
+                    'e' : error handling
+
+Other settings:
+  -t <name>       Filter devices information using specified transport (requires -d)
+  -n <count>      Estimated UCP endpoint count (for ucp_init)
+  -N <count>      Estimated UCP endpoint count per node (for ucp_init)
+  -D <type>       Set which device types to use when creating UCP context:
+                    'all'  : all possible devices (default)
+                    'shm'  : shared memory devices only
+                    'net'  : network devices only
+                    'self' : self transport only
+  -P <type>       Set peer process placement for printing UCP endpoint configuration:
+                    'self'  : same process (default)
+                    'intra' : same node
+                    'inter' : different node
+  -A <ip>         Local IP device address to use for creating
+                  endpoint in client/server mode
+  -6              IPv6 address specified with option -A
+  -T              Print system topology
+  -M              Print memory copy bandwidth
+  -h              Show this help message
+
+[root@node63 ucx]# ucx_info -um -p 
+#
+# UCP context
+#
+#     component 0  :  self
+#     component 1  :  tcp
+#     component 2  :  sysv
+#     component 3  :  posix
+#     component 4  :  ib
+#     component 5  :  rdmacm
+#     component 6  :  cma
+#     component 7  :  knem
+#     component 8  :  xpmem
+#
+#            md 0  :  component 0  self 
+#            md 1  :  component 1  tcp 
+#            md 2  :  component 2  sysv 
+#            md 3  :  component 3  posix 
+#            md 4  :  component 4  mlx5_0 
+#            md 5  :  component 4  mlx5_2 
+#            md 6  :  component 6  cma 
+#            md 7  :  component 7  knem 
+#            md 8  :  component 8  xpmem 
+#
+#      resource 0  :  md 0  dev 0  flags -- self/memory0
+#      resource 1  :  md 1  dev 1  flags -- tcp/lo
+#      resource 2  :  md 1  dev 2  flags -- tcp/ib98-0
+#      resource 3  :  md 1  dev 3  flags -- tcp/ib17-0
+#      resource 4  :  md 1  dev 4  flags -- tcp/ethA69-0
+#      resource 5  :  md 2  dev 5  flags -- sysv/memory
+#      resource 6  :  md 3  dev 5  flags -- posix/memory
+#      resource 7  :  md 4  dev 6  flags -- rc_verbs/mlx5_0:1
+#      resource 8  :  md 4  dev 6  flags -- rc_mlx5/mlx5_0:1
+#      resource 9  :  md 4  dev 6  flags -- ud_verbs/mlx5_0:1
+#      resource 10 :  md 4  dev 6  flags -- ud_mlx5/mlx5_0:1
+#      resource 11 :  md 5  dev 7  flags -- rc_verbs/mlx5_2:1
+#      resource 12 :  md 5  dev 7  flags -- rc_mlx5/mlx5_2:1
+#      resource 13 :  md 5  dev 7  flags -- ud_verbs/mlx5_2:1
+#      resource 14 :  md 5  dev 7  flags -- ud_mlx5/mlx5_2:1
+#      resource 15 :  md 6  dev 5  flags -- cma/memory
+#      resource 16 :  md 7  dev 5  flags -- knem/memory
+#      resource 17 :  md 8  dev 5  flags -- xpmem/memory
+#
+# memory: 2.98MB, file descriptors: 11
+# create time: 34.670 ms
+#
+
+
+[root@node63 ucx]# ucx_info -um -w
+#
+# UCP worker 'node63:2016978'
+#
+#                 address: 553 bytes
+#
+# memory: 14.30MB, file descriptors: 24
+# create time: 46.956 ms
+#
+
+[root@node63 ucx]# ucx_info -um -e
+#
+# UCP endpoint 
+#
+#               peer: <no debug data>
+#                 lane[0]:  0:self/memory0.0 md[0]          -> md[0]/self/sysdev[255] am am_bw#0
+#                 lane[1]: 17:xpmem/memory.0 md[8]          -> md[8]/xpmem/sysdev[255] rkey_ptr
+#                 lane[2]: 16:knem/memory.0 md[7]           -> md[7]/knem/sysdev[255] rma_bw#0
+#                 lane[3]:  8:rc_mlx5/mlx5_0:1.0 md[4]      -> md[4]/ib/sysdev[255] rma_bw#1 wireup
+#
+#                 am_send: 0..<egr/short>..8185..<egr/bcopy>..8192..<rndv>..(inf)
+#
+#                  rma_bw: mds [4] [7] [8] rndv_rkey_size 60
+#
+[root@node63 ucx]# 
+
+
+
