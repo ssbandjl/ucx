@@ -1,5 +1,7 @@
+ucx_info -f // 显示完全配置及包装说明(输出)
+
 # UCX library configuration file
-# Uncomment to modify values
+# Uncomment to modify values  ucx配置文件, 修改未注释的行即可
 
 #
 # UCS global configuration
@@ -13,7 +15,7 @@
 #
 UCX_LOG_LEVEL=WARN
 
-#
+# 日志过滤
 # Set a filter for log message according to source file path. See glob (7) for
 # pattern syntax.
 # NOTE: The source file path must fully match the given pattern.
@@ -118,7 +120,7 @@ UCX_ASYNC_MAX_EVENTS=1024
 #
 UCX_ASYNC_SIGNO=ALRM
 
-#
+# memtrack 分配的内存限制。 如果达到限制，则会生成 memtrack 报告并终止进程
 # Memory limit allocated by memtrack. In case if limit is reached then
 # memtrack report is generated and process is terminated.
 #
@@ -126,7 +128,7 @@ UCX_ASYNC_SIGNO=ALRM
 #
 UCX_MEMTRACK_LIMIT=inf
 
-#
+# 注册缓存用于检查找到的内存区域的物理页帧号自该区域注册以来没有更改。 要检查的页数，0 - 禁用检查
 # Registration cache to check that the physical pages frame number of a found
 # memory region were not changed since the time the region was registered.
 # Number of pages to check, 0 - disable checking.
@@ -192,7 +194,7 @@ UCX_LOG_FILE=
 #
 UCX_LOG_FILE_SIZE=inf
 
-#
+# 在先前的日志文件（如果有）完全填满后，可以创建用于保存日志的最大备份日志文件数。 该值必须小于最大有符号整数值
 # The maximal number of backup log files that could be created to save logs
 # after the previous ones (if any) are completely filled. The value has to be
 # less than the maximal signed integer value.
@@ -208,14 +210,14 @@ UCX_LOG_FILE_ROTATE=0
 #
 UCX_ERROR_SIGNALS=ILL,SEGV,BUS,FPE
 
-#
+# 启用虚拟的监控文件系统(VFS)
 # Enable virtual monitoring filesystem
 #
 # syntax:    <y|n>
 #
 UCX_VFS_ENABLE=y
 
-#
+# 为虚拟监控文件系统服务线程启用继承主进程关联。 将此值设置为“n”将允许服务线程在任何 CPU 核心上运行
 # Enable inheriting main process affinity for virtual monitoring filesystem
 # service thread. Setting this value to 'n' will allow the service thread to
 # run on any CPU core.
@@ -235,7 +237,7 @@ UCX_VFS_THREAD_AFFINITY=n
 #
 UCX_MEMTRACK_DEST=
 
-#
+# 配置文件收集模式。 如果未指定，则禁用分析，1. log - 记录所有时间戳，2. Accum - 累积每个位置的测量值
 # Profile collection modes. If none is specified, profiling is disabled.
 #  - log   - Record all timestamps.
 #  - accum - Accumulate measurements per location.
@@ -259,7 +261,7 @@ UCX_PROFILE_FILE=ucx_%h_%p.prof
 #
 UCX_PROFILE_LOG_SIZE=4M
 
-#
+# 注册缓存最小区域大小，用于 2 的幂大小分布统计。 有关较小区域的统计数据将归因于这个指定的最小大小。 四舍五入到下一个 2 的幂值
 # Registration cache minimum region size, for power-of-2 size distribution statistics.
 # Statistics about smaller regions will be attributed to this specified minimal size.
 # Rounded up to the next power-of-2 value.
@@ -324,7 +326,7 @@ UCX_MEM_EVENTS=y
 # MMAP hook mode
 #  none   - Don't set mmap hooks.
 #  reloc  - Use ELF relocation table to set hooks.
-#  bistro - Use binary instrumentation to set hooks.
+#  bistro - Use binary instrumentation to set hooks. 使用二进制检测来设置钩子
 # 
 #
 # syntax:    [none|reloc|bistro]
@@ -338,7 +340,7 @@ UCX_MEM_MMAP_HOOK_MODE=bistro
 #
 UCX_MEM_MALLOC_HOOKS=y
 
-#
+# 启用在重定位表中安装 malloc 符号。这是不安全的，默认情况下是关闭的，因为有时 glibc 调用 malloc/free 而不经过重定位表，这将使用原始实现而不是我们的实现
 # Enable installing malloc symbols in the relocation table.
 # This is unsafe and off by default, because sometimes glibc
 # calls malloc/free without going through the relocation table,
@@ -362,7 +364,7 @@ UCX_MEM_MALLOC_RELOC=y
 #
 UCX_MEM_CUDA_HOOK_MODE=bistro
 
-#
+# 启用动态mmap阈值：对于每个释放的块，mmap阈值向上调整到块大小的大小，并且trim阈值调整到动态mmap阈值大小的两倍。 注意：在 valgrind 上运行时动态 mmap 阈值被禁用
 # Enable dynamic mmap threshold: for every released block, the
 # mmap threshold is adjusted upward to the size of the size of
 # the block, and trim threshold is adjust to twice the size of

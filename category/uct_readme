@@ -1380,3 +1380,29 @@ ucx_info -f
 print_flags |= UCS_CONFIG_PRINT_CONFIG | UCS_CONFIG_PRINT_HEADER | UCS_CONFIG_PRINT_DOC
 if (flags & UCS_CONFIG_PRINT_DOC)
   ucs_config_print_doc_line_by_line
+
+
+ppn: 每个节点的进程
+每节点, 每个进程 (PPN) 的带宽规范：f(ppn) = 专用 + 共享 / ppn，该结构指定了一个函数，该函数用作各种 UCT 操作的带宽估计的基础。 此信息可用于选择 UCT 操作的最佳性能组合
+typedef struct uct_ppn_bandwidth {
+    double                   dedicated; /**< Dedicated bandwidth, bytes/second */
+    double                   shared;    /**< Shared bandwidth, bytes/second */
+} uct_ppn_bandwidth_t;
+bandwidth: 11.91/ppn + 0.00 MB/sec
+           共享         专用
+
+
+打印系统信息, 获取cpu型号
+void print_sys_info(int print_opts)
+{
+    size_t size;
+
+    if (print_opts & PRINT_SYS_INFO) {
+        printf("# Timer frequency: %.3f MHz\n",
+               ucs_get_cpu_clocks_per_sec() / 1e6);
+        printf("# Timer accuracy: %.3f %%\n", measure_timer_accuracy() * 100);
+        printf("# CPU vendor: %s\n",
+               cpu_vendor_names[ucs_arch_get_cpu_vendor()]);
+        printf("# CPU model: %s\n", cpu_model_names[ucs_arch_get_cpu_model()]);
+
+

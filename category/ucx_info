@@ -6,7 +6,7 @@
 
 
 
-ucx_info -d >> category/ucx_info
+ucx_info -d // 查看传输层设备
 #
 # Memory domain: self
 #     Component: self
@@ -633,7 +633,7 @@ ucx_info -d >> category/ucx_info
 #
 
 
-ucx_info -b  >> category/ucx_info
+ucx_info -b // 打印编译参数, build
 
 #define UCX_CONFIG_H              
 #define ENABLE_BUILTIN_MEMCPY     1
@@ -852,7 +852,7 @@ ucx_info -b  >> category/ucx_info
 
 
 
-ucx_info -y   // 类型
+ucx_info -y   // 打印结构体类型及字节大小
 UCS:
     sizeof(ucs_mpool_t) = ................. 16    
     sizeof(ucs_mpool_chunk_t) = ........... 24    
@@ -1110,6 +1110,104 @@ Other settings:
 #                  rma_bw: mds [4] [7] [8] rndv_rkey_size 60
 #
 [root@node63 ucx]# 
+
+
+[root@node63 ucx]# ucx_info -um -m1024 -t rc_verbs -d mlx5_0:1
+#
+# Connection manager: tcp
+#      max_conn_priv: 2064 bytes
+#
+# Memory domain: mlx5_0
+#     Component: ib
+#             register: unlimited, cost: 180 nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#
+#      Transport: rc_verbs
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (0)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 75 nsec
+#            put_short: <= 124
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 5 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 5 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 123
+#             am_bcopy: <= 8255
+#             am_zcopy: <= 8255, up to 4 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 127
+#               domain: device
+#           atomic_add: 64 bit
+#          atomic_fadd: 64 bit
+#         atomic_cswap: 64 bit
+#           connection: to ep
+#      device priority: 28
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 5 bytes
+#       error handling: peer failure, ep_check
+#
+#
+# Memory domain: mlx5_2
+#     Component: ib
+#             register: unlimited, cost: 180 nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#
+#      Transport: rc_verbs
+#         Device: mlx5_2:1
+#           Type: network
+#  System device: mlx5_2 (2)
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 75 nsec
+#            put_short: <= 124
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 5 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 5 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 123
+#             am_bcopy: <= 8255
+#             am_zcopy: <= 8255, up to 4 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 127
+#               domain: device
+#           atomic_add: 64 bit
+#          atomic_fadd: 64 bit
+#         atomic_cswap: 64 bit
+#           connection: to ep
+#      device priority: 28
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 5 bytes
+#       error handling: peer failure, ep_check
+#
+#
+# Connection manager: rdmacm
+#      max_conn_priv: 54 bytes
+[1697789119.433239] [node63:679264:0]         knem_md.c:135  UCX  ERROR KNEM create region failed: Bad address
+[1697789119.433252] [node63:679264:0]          ucp_mm.c:330  UCX  ERROR failed to register 0x7f86851c8000 length 4096 on md[7]=knem: Input/output error
+<Failed to map memory of size 1024>
 
 
 
