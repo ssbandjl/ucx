@@ -596,11 +596,16 @@ int main(int argc, char **argv)
     uct_ep_params_t     ep_params;
     int                 res;
 
-    #if 0 /* 抓火焰图时开启此选项,暂停程序 */
-    char word[128];
-    printf("%d, input:", getpid());
-    scanf("%s", word);
-    printf("your input:%s\n", word);
+    #if 1 /* 抓火焰图时开启此选项,暂停程序 */
+    char  *env;
+    /* 通过环境变量控制执行逻辑 export FLAME_GRAPH=1 */
+    env = getenv("FLAME_GRAPH");
+    if (env) {
+        char word[128];
+        printf("%d, input:", getpid());
+        scanf("%s", word);
+        printf("your input:%s\n", word);
+    }
     #endif    
     
     /* Parse the command line */

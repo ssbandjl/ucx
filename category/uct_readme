@@ -21,8 +21,21 @@ server:  exec /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d ib17-0 -
 gdb --args /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs
 
 
-启动服务端: 主函数中解析命令行参数, 设置默认服务端口, 初始化上下文,
-异步事件上下文: 管理定时器和FD通知
+主流程(服务端或客户端): 
+1. 主函数中解析命令行参数(parse_cmd), 设置默认服务端口
+2. 初始化上下文(ucs_async_context_create, 异步事件上下文用于管理定时器和FD通知), 在其中, 初始化多生产者/多消费者队列(ucs_mpmc_queue_init), 初始化非阻塞异步轮询器(ucs_async_poll_init), 初始化可重入自旋锁上下文等
+3. 创建工人(uct_worker_create), 工人代表着 progress 的引擎。 可以在应用程序中创建多个进度引擎，例如供多个线程使用
+4. 根据入参查找期望的传输层(dev_tl_lookup, 由最小延迟决定要使用的设备和传输)
+5. 设置回调(uct_iface_set_am_handler), 设置服务端接收到客户端数据后的回调
+6. 建立socket连接(connect_common), 服务端监听端口, 等待客户端发起socket连接
+7. 客户端连接服务端后, 两边交换地址(sendrecv, 先通过socket发送和接收长度, 然后发送和接收地址, 交换地址)
+8. 创建端点(uct_ep_create), 获取端点地址(uct_ep_get_address), 连接对等端点(uct_ep_connect_to_ep, 内部通过 ibv_modify_qp 设置QP状态机建立QP连接)
+9. 连接建立后, 客户端调用短消息(do_am_short)/缓冲区(do_am_bcopy)/零拷贝(do_am_zcopy)发送数据
+10. 显示驱动工人推进(uct_worker_progress, 该例程显式地处理任何未完成的通信操作和活动消息请求, 底层通过poll网卡完成事件,ibv_poll_cq)
+11. 资源销毁(uct_ep_destroy,free其他资源等)
+
+
+启动服务端: 
 gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
   if (parse_cmd(argc, argv, &cmd_args)) -> int parse_cmd(int argc, char * const argv[], cmd_args_t *args)
     args->server_port   = 13337
@@ -34,7 +47,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       status = ucs_mpmc_queue_init(&async->missed) -> 初始化多生产者/多消费者队列
         ucs_queue_head_init(&mpmc->queue)
         pthread_spin_init(&lock->lock, lock_flags) -> 初始化自旋锁, 标志: PTHREAD_PROCESS_SHARED 或 PTHREAD_PROCESS_PRIVATE
-      status = ucs_async_method_call(mode, context_init, async) -> .context_init       = ucs_async_poll_init -> 异步轮训初始化, 不阻塞
+      status = ucs_async_method_call(mode, context_init, async) -> .context_init       = ucs_async_poll_init -> 异步轮询初始化, 不阻塞
       async->last_wakeup = ucs_get_time() -> asm volatile("rdtsc" : "=a"(low), "=d"(high)) 汇编获取时间 -> UCS/ARCH/INFO：如果无法从CPU型号中读取x86 TSC值，请不要从/proc/cpuinfo中读取测量的CPU频率，因为它只能代表核心频率而不是TSC频率。 相反，通过一个短循环进行测量，当频率测量收敛或达到 1ms 时间限制时停止
         ucs_async_thread_spinlock_ops.context_init(async) -> ucs_async_thread_spinlock_init -> 可重入自旋锁上下文初始化
   status = uct_worker_create(async, UCS_THREAD_MODE_SINGLE, &if_info.worker) -> 创建工人(独立资源) -> UCS_CLASS_DEFINE_NAMED_NEW_FUNC(uct_worker_create -> 用宏初始化工人(类似面向对象实例化) -> 创建一个工作对象。 工人代表着progress的引擎。 可以在应用程序中创建多个进度引擎，例如供多个线程使用。 Transports 可以为每个 Worker 分配单独的通信资源，以便每个 Worker 都可以独立于其他 Worker 进行操作 -> 声明/定义一个创建类实例的函数, 初始化工人私有worker, 传输层链表
@@ -79,23 +92,26 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
           ucs_config_parser_get_sub_prefix(env_prefix, &sub_prefix)
           ucs_config_parse_config_files()
           ucs_config_apply_config_vars -> 应用环境变量, 以及自定义前缀的环境变量
+    for 迭代内存域资源
     uct_md_open -> 重要函数, 打开内存域
-      status = component->md_open(component, md_name, config, &md) -> ucs_status_t uct_ib_md_open
-        ib_device_list = ibv_get_device_list(&num_devices) -> 获取所有网卡列表, 获取设备列表
-        ibv_fork_init
+      status = component->md_open(component, md_name, config, &md) -> ucs_status_t uct_ib_md_open -> IB实现的内存域打开函数
+        ib_device_list = ibv_get_device_list(&num_devices) -> 获取所有网卡列表, 获取设备列表, 比如4个网口(网卡设备), 可通过 ibdev2netdev 查询rdma网口映射
+        ibv_fork_init -> 核心原理: 通过对所有已注册的MR所在内存页打MADV_DONTFORK标记，创建子进程后，MR所在内存页不会触发COW拷贝，避免了前面所说的COW带来网卡DMA内存地址不一致的问题, 但会引入额外的内存记录和查找开销(降低性能)
         status = uct_ib_ops[i]->ops->open(ib_device, md_config, &md) -> static ucs_status_t uct_ib_mlx5_devx_md_open
-          ctx = uct_ib_mlx5_devx_open_device(ibv_device)
+          vhca_id -> 虚拟主机通道适配器ID
+          ctx = uct_ib_mlx5_devx_open_device(ibv_device) -> 通过创建完成队列和事件通道来检查网卡设备是否支持事件通道
             ctx = mlx5dv_open_device(ibv_device, &dv_attr) -> verbs_open_device -> rdma-core
             ibv_create_cq(ctx, 1, NULL, NULL, 0)
             ibv_destroy_cq(cq)
             event_channel = mlx5dv_devx_create_event_channel
             mlx5dv_devx_destroy_event_channel(event_channel)
           md = ucs_derived_of(uct_ib_md_alloc(sizeof(*md), "ib_mlx5_devx_md", ctx)
-          status = uct_ib_mlx5_check_uar(md)
+          status = uct_ib_mlx5_check_uar(md) -> 用户访问区域
             uct_ib_mlx5_devx_uar_init
               uct_ib_mlx5_devx_alloc_uar
                 mlx5dv_devx_alloc_uar
             uct_ib_mlx5_devx_uar_cleanup
+          md->mkey_tag = 0; -> 使用间接密钥使 MR 无效
           uct_ib_mlx5_devx_mr_lru_init(md)
           status = uct_ib_device_query(dev, ibv_device)
             uct_ib_query_device
@@ -106,7 +122,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
             ucs_topo_resolve_sysfs_path ->  "/sys/devices/pci0000:15/0000:15:04.0/0000:17:00.0" -> PCI地址
             ucs_topo_get_sysfs_dev
             uct_ib_device_set_pci_id
-            ucs_topo_get_pci_bw
+            ucs_topo_get_pci_bw -> 获取PCI带宽
               effective_bw = (p->bw_gbps * 1e9 / 8.0) * width * ((double)p->encoding / p->decoding) * link_utilization; -> 计算带宽
           ret = mlx5dv_devx_general_cmd -> ucs_status_t uct_ib_mlx5_devx_general_cmd
 
@@ -130,7 +146,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
             uct_ib_reg_mr
         ....
         static ucs_status_t uct_self_md_open
-        uct_md_vfs_init(component, md, md_name)
+      uct_md_vfs_init(component, md, md_name)
     uct_config_release
     uct_md_query
       status = uct_md_attr_v2_init(md, &md_attr_v2) -> static ucs_status_t uct_self_md_query -> ucs_status_t uct_ib_md_query
@@ -203,7 +219,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       qp_attr.qp_state              = IBV_QPS_RTS
       ret = ibv_modify_qp(qp, &qp_attr, qp_attr_mask)
       ucs_debug("connected rc qp 0x%x on " -> 打印debug日志 -> connected rc qp 0x1a91b on mlx5_0:1/RoCE to lid 49152(+0) sl 0 remote_qp 0x1a91a mtu 1024 timer 18x7 rnr 13x7 rd_atom 16
-  uct_worker_progress(if_info.worker) -> UCT 工作人员的显着进展。 该例程显式地处理任何未完成的通信操作和活动消息请求 -> uct_rc_verbs_iface_progress
+  uct_worker_progress(if_info.worker) -> UCT 显示驱动工人推进。 该例程显式地处理任何未完成的通信操作和活动消息请求 -> uct_rc_verbs_iface_progress
     count = uct_rc_verbs_iface_poll_rx_common(iface) -> ibv_poll_cq
       uct_rc_verbs_iface_post_recv_common(iface, 0)
     return count + uct_rc_verbs_iface_poll_tx(iface) -> always_inline
@@ -258,7 +274,7 @@ uct_rc_verbs_ep_connect_to_ep_v2
 
 
 
-client:
+client: 客户端流程
 [root@node63 ucx]# /home/xb/project/ucx/examples/.libs/lt-uct_hello_world -d mlx5_0:1 -t rc_verbs -n 172.17.29.63 -z
 ...
 if (connect(sockfd, t->ai_addr, t->ai_addrlen) == 0)
@@ -453,7 +469,14 @@ ucs_status_t uct_rc_verbs_ep_t_new(const uct_ep_params_t * arg0,  uct_ep_t **obj
     if (_status == UCS_OK) { *(obj_p) = (__typeof__(*(obj_p)))obj; } else { ucs_class_free(obj); *(obj_p) = ((void *)0); } } else { _status = UCS_ERR_NO_MEMORY; *(obj_p) = ((void *)0); } (_status); }); ucs_class_check_new_func_result(status, *obj_p); return status; }
 
 
-数据结构: src/ucs/datastruct
+重要数据结构: 
+基础数据结构: src/ucs/datastruct
+
+异步上下文: ucs_async_context
+
+struct uct_ib_iface_config  传输层IB接口配置, 继承父类接口配置,自己的发送和接收配置, 内联, IB流分类, MTU, 计数器等配置
+
+
 
 
 日志级别: 
@@ -580,8 +603,7 @@ typedef struct ucs_arbiter        ucs_arbiter_t;
 
 
 
-数据结构, data_struct
-ucs_async_context
+
 
 
 创建工人的宏展开: 声明/定义一个创建类实例的函数
@@ -657,7 +679,7 @@ typedef struct uct_priv_worker {
 
 
 /**
- * IB port active speed. IB端口速度
+ * IB port active speed. IB端口活动速度
  */
 enum {
     UCT_IB_SPEED_SDR     = 1,
@@ -671,7 +693,7 @@ enum {
     UCT_IB_SPEED_LAST
 };
 
-
+线速计算：Width * SignalRate * Encoding * Num_paths
 
 注册tl, 传输层, 通过宏展开实现, 取消注册
 _dl_init_internal
@@ -873,15 +895,27 @@ case 'b':
 case 'z':
     args->func_am_type = FUNC_AM_ZCOPY;
 
-
+#if 1 /* 抓火焰图时开启此选项,暂停程序 */
+char  *env;
+/* 通过环境变量控制执行逻辑 export FLAME_GRAPH=1 */
+env = getenv("FLAME_GRAPH");
+if (env) {
+    char word[128];
+    printf("%d, input:", getpid());
+    scanf("%s", word);
+    printf("your input:%s\n", word);
+}
+#endif    
 火焰图:
 cd /home/xb/fire/FlameGraph
-perf record -e cpu-clock  --call-graph dwarf -p 512634
+perf record -e cpu-clock  --call-graph dwarf -p 4080036
 
 perf script -i perf.data &> perf.unfold
 ./stackcollapse-perf.pl ./perf.unfold &> ../perf.folded
 ./flamegraph.pl ../perf.folded > ../perf.svg
-sz -y ../perf.svg 
+mv ../perf.svg ../ucx_uct_client_am_short_flame_graph.svg 
+cd /home/xb/fire/FlameGraph
+sz -y ../ucx_uct_client_am_short_flame_graph.svg 
 
 
 do_am_bcopy
@@ -1404,5 +1438,45 @@ void print_sys_info(int print_opts)
         printf("# CPU vendor: %s\n",
                cpu_vendor_names[ucs_arch_get_cpu_vendor()]);
         printf("# CPU model: %s\n", cpu_model_names[ucs_arch_get_cpu_model()]);
+
+
+
+IB内存域
+typedef struct uct_ib_md
+int                      relaxed_order;
+UCT/IB：如果需要，默认启用 pci 宽松顺序
+
+
+API详解:
+ucs_status_t uct_md_open(uct_component_h component, const char *md_name, const uct_md_config_t *config, uct_md_h *md_p)
+打开一个内存域。 打开特定的内存域。 所有通信和内存操作都在特定内存域的上下文中执行。 因此必须在通信资源之前创建它。
+
+用法: 
+status = uct_md_open(components[cmpt_index], component_attr.md_resources[md_index] md_name, md_config, &iface_p->md);
+
+参数：
+[in] – 组件 要在其上打开内存域的组件，从 uct_query_components 返回。
+[in] – md_name 内存域名，从 * uct_component_query 返回。
+[in] – config MD 配置选项。 应从 uct_md_config_read() 函数获取，或指向扩展 uct_md_config_t 的 MD 特定结构。
+[out] – md_p 填充内存域的句柄。
+
+
+ucs_derived_of
+派生结构的地址。 它必须在偏移量 0 处有一个“超级”成员。注意：我们在这里使用内置的 offsetof，因为我们不能在常量表达式中使用 ucs_offsetof()
+
+
+cppcheck-suppress autoVariables: 检查抑制自动变量
+Suppress clang warning: 抑制告警
+
+
+uct_ib_md_config_t IB内存域配置
+devx支持
+DevX库通过使用KABI机制实现从用户空间区域直接访问mlx5设备驱动程序。这里的主要目的是使用户空间驱动程序尽可能独立于内核，以便可以通过以下方式激活未来的设备功能和命令 内核更改最少甚至没有
+
+重要概念
+vhca_id 用于 vport rx 规则中的设备索引, 设备索引类似于 PF 索引，并且仅限于最大物理端口。 例如，在PF下创建的SF，设备索引就是PF设备索引。 使用 vhca_id 获取每个 vport 的固件索引，用于 vport rx 规则和 vport 对事件
+
+用户访问区域（UAR），通过用户访问区域（UAR）机制实现多个进程对HCA HW的隔离、受保护、独立的直接访问。 UAR 是 PCI 地址空间的一部分，映射为从 CPU 直接访问 HCA。 UAR 由多个页面组成，每个页面包含控制 HCA 操作的寄存器。 UAR机制用于向HCA发送执行或控制请求。 HCA 使用它来加强不同进程之间的保护和隔离。 跨进程隔离和保护通过四个关键机制实现： 1. 主机SW将不同的UAR页面映射到不同的消费者，从而在不同的消费者访问HCA控制空间中的同一页面时强制隔离。 2. 每个控制对象都可以通过UAR页面来访问（控制）。 3. HCA 驱动程序在初始化（“打开”）对象时将 UAR 页面与控制对象相关联。 4. 在对对象执行控制操作之前，HCA 验证用于发布命令的 UAR 页面是否与该对象上下文中指定的页面相匹配。 通过将 WQE 发布到相应的工作 WQ、更新门铃记录（如果适用）以及写入与该工作 WQ 关联的 UAR 页面中的相应门铃寄存器，将操作传递给 HCA。 写入 HCA 的门铃寄存器进一步称为响铃门铃。 UAR中的DoorBell寄存器是蓝焰缓冲区的前2个DWORDS
+
 
 

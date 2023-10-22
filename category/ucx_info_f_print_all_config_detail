@@ -375,7 +375,7 @@ UCX_MEM_CUDA_HOOK_MODE=bistro
 #
 UCX_MEM_DYNAMIC_MMAP_THRESH=y
 
-#
+# 在动态库打开期间处理调用者模块的 RPATH 部分
 # Process RPATH section of caller module during dynamic libraries opening.
 #
 # syntax:    <y|n>
@@ -560,7 +560,7 @@ UCX_TCP_TX_SEG_SIZE=8K
 #
 UCX_TCP_RX_SEG_SIZE=64K
 
-#
+# 在对非阻塞向量套接字发送的单次调用中可包含用户定义有效负载的最大 IOV 计数
 # Maximum IOV count that can contain user-defined payload in a single
 # call to non-blocking vector socket send
 #
@@ -603,14 +603,14 @@ UCX_TCP_CONN_NB=n
 #
 UCX_TCP_MAX_POLL=16
 
-#
+# 如果由于缺乏系统资源而检测到连接断开，应尝试多少次连接建立
 # How many connection establishment attempts should be done if dropped connection was detected due to lack of system resources
 #
 # syntax:    unsigned integer
 #
 UCX_TCP_MAX_CONN_RETRIES=25
 
-#
+# 设置 TCP_NODELAY 套接字选项以禁用 Nagle 算法。 设置此选项通常可以提供更好的性能
 # Set TCP_NODELAY socket option to disable Nagle algorithm. Setting this
 # option usually provides better performance
 #
@@ -647,7 +647,7 @@ UCX_TCP_SYN_CNT=auto
 #
 UCX_TCP_TX_MAX_BUFS=-1
 
-#
+# 每次发送内存池增长时会添加多少缓冲区。 0 表示该值由传输选择
 # How much buffers are added every time the send memory pool grows.
 # 0 means the value is chosen by the transport.
 #
@@ -1497,9 +1497,9 @@ UCX_PROTO_INFO=n
 # IB memory domain configuration
 #
 
-#
+# 注册方法列表（按优先顺序排列）。 支持的方法有
 # List of registration methods in order of preference. Supported methods are:
-#   odp         - implicit on-demand paging
+#   odp         - implicit on-demand paging 隐式按需寻呼
 #   rcache      - userspace registration cache
 #   direct      - direct registration
 # 
@@ -1558,7 +1558,7 @@ UCX_IB_RCACHE_MAX_SIZE=inf
 #
 UCX_IB_RCACHE_MAX_UNRELEASED=512M
 
-#
+# fork时清除注册缓存
 # Purge registration cache upon fork
 #
 # syntax:    <y|n>
@@ -1566,7 +1566,7 @@ UCX_IB_RCACHE_MAX_UNRELEASED=512M
 #
 UCX_IB_RCACHE_PURGE_ON_FORK=y
 
-#
+# 内存注册开销
 # Memory registration overhead
 #
 # syntax:    time value: <number>[s|us|ms|ns]
@@ -1594,7 +1594,7 @@ UCX_IB_FORK_INIT=try
 #
 UCX_IB_ASYNC_EVENTS=y
 
-#
+# 以太网上是否启用“暂停帧”。 暂停帧是以太网计算机网络拥塞情况下暂时停止数据传输以保证零丢失的机制。 如果设置为“no”，此参数将取消 IB 传输的资格，这些 IB 传输在使用 RoCE 时可能在有损网络上表现不佳
 # Whether or not 'Pause Frame' is enabled on an Ethernet network.
 # Pause frame is a mechanism for temporarily stopping the transmission of data to
 # ensure zero loss under congestion on Ethernet family computer networks.
@@ -1605,7 +1605,10 @@ UCX_IB_ASYNC_EVENTS=y
 #
 UCX_IB_ETH_PAUSE_ON=y
 
-#
+# 覆盖 ODP 区域的 NUMA 策略，以避免额外的页面迁移。
+  - 默认：不更改现有策略。
+  - 首选/绑定：
+除非当前线程的内存策略为MPOL_BIND，否则将ODP区域的策略分别设置为MPOL_PREFERRED/MPOL_BIND。 如果当前线程的numa节点掩码未定义，则使用与其cpu亲和力掩码对应的numa节点
 # Override NUMA policy for ODP regions, to avoid extra page migrations.
 #  - default: Do no change existing policy.
 #  - preferred/bind:
@@ -1618,7 +1621,7 @@ UCX_IB_ETH_PAUSE_ON=y
 #
 UCX_IB_ODP_NUMA_POLICY=preferred
 
-#
+# 强制预取使用 ODP 创建的内存区域
 # Force prefetch of memory regions created with ODP.
 # 
 #
@@ -1656,7 +1659,7 @@ UCX_IB_ODP_MAX_SIZE=auto
 #
 UCX_IB_DEVICE_SPECS=
 
-#
+# 从 NET_DEVICES 列表中选择设备时，优先选择距离 CPU 最近的设备
 # Prefer nearest device to cpu when selecting a device from NET_DEVICES list.
 # 
 #
@@ -1679,7 +1682,7 @@ UCX_IB_INDIRECT_ATOMIC=y
 #
 UCX_IB_GID_INDEX=auto
 
-#
+# 用于过滤端口的 Infiniband 子网前缀，空表示不过滤。 仅与 IB 链路层相关 例如，默认子网前缀的过滤器可以指定为： fe80:0:0:0
 # Infiniband subnet prefix to filter ports by, empty means no filter. Relevant for IB link layer only
 # For example a filter for the default subnet prefix can be specified as: fe80:0:0:0
 #
@@ -1695,7 +1698,7 @@ UCX_IB_SUBNET_PREFIX=
 #
 UCX_IB_GPU_DIRECT_RDMA=try
 
-#
+# 连接到 HCA 的 PCI 总线的最大有效数据传输率
 # Maximum effective data transfer rate of PCI bus connected to HCA
 # 
 #
@@ -1719,7 +1722,7 @@ UCX_IB_MLX5_DEVX=try
 #
 UCX_IB_MLX5_DEVX_OBJECTS=rcqp,rcsrq,dct,dcsrq,dci
 
-#
+# 使用多个并行线程注册的最小 MR 大小。 使用的线程数量将由注册线程通过硬关联绑定到的 CPU 数量决定
 # Minimal MR size to be register using multiple parallel threads.
 # Number of threads used will be determined by number of CPUs which registering thread is bound to by hard affinity.
 #
@@ -1742,14 +1745,14 @@ UCX_IB_REG_MT_CHUNK=2G
 #
 UCX_IB_REG_MT_BIND=n
 
-#
+# 启用 PCIe 事务的宽松排序以提高某些系统的性能
 # Enable relaxed ordering for PCIe transactions to improve performance on some systems.
 #
 # syntax:    <on|off|auto>
 #
 UCX_IB_PCI_RELAXED_ORDERING=auto
 
-#
+# 重用前保持空闲的无效内存键的最大数量
 # Maximal number of invalidated memory keys that are kept idle before reuse.
 #
 # syntax:    unsigned integer
@@ -1761,11 +1764,11 @@ UCX_IB_MAX_IDLE_RKEY_COUNT=16
 # Uncomment to modify values
 
 #
-# dc_mlx5 transport configuration
+# dc_mlx5 transport configuration 迈络思5_动态连接传输层配置
 #
 
 #
-# Priority of methods to allocate intermediate buffers for communication
+# Priority of methods to allocate intermediate buffers for communication 为通信分配中间缓冲区的方法优先级
 #
 # syntax:    comma-separated list of: [thp|md|heap|mmap|huge]
 # inherits:  UCX_DC_ALLOC, UCX_RC_ALLOC, UCX_IB_ALLOC, UCX_ALLOC
@@ -1789,7 +1792,7 @@ UCX_DC_MLX5_FAILURE=DIAG
 UCX_DC_MLX5_MAX_NUM_EPS=inf
 
 #
-# Size of bounce buffers used for post_send and post_recv.
+# Size of bounce buffers used for post_send and post_recv. 用于 post_send 和 post_recv 的缓冲区的边界大小
 #
 # syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
 # inherits:  UCX_DC_SEG_SIZE, UCX_RC_SEG_SIZE, UCX_IB_SEG_SIZE
@@ -1797,7 +1800,7 @@ UCX_DC_MLX5_MAX_NUM_EPS=inf
 UCX_DC_MLX5_SEG_SIZE=8256
 
 #
-# Length of send queue in the QP.
+# Length of send queue in the QP. 队列对的发送队列长度为128
 #
 # syntax:    unsigned integer
 # inherits:  UCX_DC_TX_QUEUE_LEN, UCX_RC_TX_QUEUE_LEN, UCX_IB_TX_QUEUE_LEN
@@ -1807,7 +1810,7 @@ UCX_DC_MLX5_TX_QUEUE_LEN=128
 #
 # Number of send WQEs to batch in one post-send list. Larger values reduce
 # the CPU usage, but increase the latency and pipelining between sender and
-# receiver.
+# receiver. 在一个发送后列表中批量发送的 WQE 数量。 较大的值会减少 CPU 使用率，但会增加发送方和接收方之间的延迟和流水线
 #
 # syntax:    unsigned integer
 # inherits:  UCX_DC_TX_MAX_BATCH, UCX_RC_TX_MAX_BATCH, UCX_IB_TX_MAX_BATCH
@@ -1824,7 +1827,7 @@ UCX_DC_MLX5_TX_MAX_POLL=16
 
 #
 # Bytes to reserve in send WQE for inline data. Messages which are small
-# enough will be sent inline.
+# enough will be sent inline. 在工作队列元素中保留64B,用于内联小的消息数据
 #
 # syntax:    memory units: <number>[b|kb|mb|gb], "inf", or "auto"
 # inherits:  UCX_DC_TX_MIN_INLINE, UCX_RC_TX_MIN_INLINE, UCX_IB_TX_MIN_INLINE
@@ -1945,7 +1948,7 @@ UCX_DC_MLX5_IS_GLOBAL=n
 #
 UCX_DC_MLX5_SL=auto
 
-#
+# IB 流量分类/RoCEv2 差分服务代码点 (DSCP)配置,  如果配置为“auto”表示在 RoCEv2 上选择 106，否则选择 0
 # IB Traffic Class / RoCEv2 Differentiated Services Code Point (DSCP).
 # "auto" option selects 106 on RoCEv2 and 0 otherwise.
 #
@@ -1964,6 +1967,9 @@ UCX_DC_MLX5_TRAFFIC_CLASS=auto
 UCX_DC_MLX5_HOP_LIMIT=255
 
 #
+为了获得最佳性能，应在一对通信端点之间创建的连接数。 默认值“auto”根据端口链路层进行操作：
+RoCE - LAG 端口为 2，否则 - 1。
+InfiniBand - 作为由fabric的 LMC 值启用并由 UCX_IB_LID_PATH_BITS 配置选择的路径位数
 # Number of connections that should be created between a pair of communicating
 # endpoints for optimal performance. The default value 'auto' behaves according
 # to the port link layer:
@@ -1998,7 +2004,7 @@ UCX_DC_MLX5_ROCE_LOCAL_SUBNET=n
 #
 UCX_DC_MLX5_ROCE_SUBNET_PREFIX_LEN=auto
 
-#
+# RoCE LAG UDP 源端口计算的乘数。 UDP 源端口通常由交换机和网络适配器用于为同一对端点选择不同的路径
 # Multiplier for RoCE LAG UDP source port calculation. The UDP source port
 # is typically used by switches and network adapters to select a different
 # path for the same pair of endpoints.
@@ -2187,7 +2193,7 @@ UCX_DC_MLX5_MMIO_MODE=auto
 #
 UCX_DC_MLX5_AR_ENABLE=auto
 
-#
+# 启用 CQE 压缩功能。 CQE 压缩通过将多个相似的 CQE 合并到设备写入的单个 CQE 来降低 PCI 利用率
 # Enable CQE zipping feature. CQE zipping reduces PCI utilization by
 # merging several similar CQEs to a single CQE written by the device.
 #
@@ -2289,7 +2295,7 @@ UCX_DC_MLX5_LOG_ACK_REQ_FREQ=8
 #
 UCX_DC_MLX5_RX_QUEUE_LEN_INIT=128
 
-#
+# 动态连接初始化的QP数
 # Number of DC initiator QPs (DCI) used by the interface.
 #
 # syntax:    unsigned integer
