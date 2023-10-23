@@ -1,6 +1,12 @@
+术语:
+LAG (Link Aggregation Group): 链路汇聚(bonding), 网络绑定可以将两个或多个网络接口组合成一个接口。它可以提高网络吞吐量和带宽，并在其中一个接口发生故障时提供冗余。NVIDIA ® BlueField ® DPU 可以选择以对主机透明的方式在 Arm 端配置网络绑定。在这种配置下，主机只能看到一个 PF, 参考: https://docs.nvidia.com/networking/display/bluefielddpuosv385/link+aggregation
+
+
 总结:
 1. 通过socket交换地址
 2. 
+
+
 
 API头文件: src/uct/api/uct.h
 内存域资源描述符: typedef struct uct_md_resource_desc
@@ -124,13 +130,13 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
             uct_ib_device_set_pci_id
             ucs_topo_get_pci_bw -> 获取PCI带宽
               effective_bw = (p->bw_gbps * 1e9 / 8.0) * width * ((double)p->encoding / p->decoding) * link_utilization; -> 计算带宽
-          ret = mlx5dv_devx_general_cmd -> ucs_status_t uct_ib_mlx5_devx_general_cmd
-
-          status = uct_ib_mlx5_devx_query_lag(md, &lag_state)
+          ret = mlx5dv_devx_general_cmd(ctx, in, sizeof(in), out, sizeof(out)) -> ucs_status_t uct_ib_mlx5_devx_general_cmd -> rdma-core -> 通过 devx 接口发出通用命令, 介绍 DEVX 对象及其 DV API：创建/修改/读取/销毁。 还添加了 DEVX 通用命令 API，以便能够直接从固件读取 CAP, 参考: https://patchwork.kernel.org/project/linux-rdma/patch/1539190590-31186-2-git-send-email-yishaih@mellanox.com/
+          status = uct_ib_mlx5_devx_query_lag(md, &lag_state) UCT_IB_MLX5_CMD_OP_QUERY_LAG -> 链路汇聚(bonding), 参考: https://docs.nvidia.com/networking/display/bluefielddpuosv385/link+aggregation
           md->port_select_mode = uct_ib_mlx5_devx_query_port_select(md)
+            uct_ib_mlx5_devx_general_cmd UCT_IB_MLX5_CMD_OP_QUERY_LAG
           uct_ib_mlx5_is_xgvmi_alias_supported
           uct_ib_mlx5_devx_check_odp
-          uct_ib_mlx5_devx_general_cmd
+          uct_ib_mlx5_devx_general_cmd 
           uct_ib_md_open_common -> ucs_status_t uct_ib_md_open_common
             uct_ib_device_init
               uct_ib_device_get_locality
@@ -682,7 +688,7 @@ typedef struct uct_priv_worker {
  * IB port active speed. IB端口活动速度
  */
 enum {
-    UCT_IB_SPEED_SDR     = 1,
+    UCT_IB_SPEED_SDR     = 1,   //单通道数据速率
     UCT_IB_SPEED_DDR     = 2,
     UCT_IB_SPEED_QDR     = 4,
     UCT_IB_SPEED_FDR10   = 8,
@@ -1479,4 +1485,51 @@ vhca_id 用于 vport rx 规则中的设备索引, 设备索引类似于 PF 索�
 用户访问区域（UAR），通过用户访问区域（UAR）机制实现多个进程对HCA HW的隔离、受保护、独立的直接访问。 UAR 是 PCI 地址空间的一部分，映射为从 CPU 直接访问 HCA。 UAR 由多个页面组成，每个页面包含控制 HCA 操作的寄存器。 UAR机制用于向HCA发送执行或控制请求。 HCA 使用它来加强不同进程之间的保护和隔离。 跨进程隔离和保护通过四个关键机制实现： 1. 主机SW将不同的UAR页面映射到不同的消费者，从而在不同的消费者访问HCA控制空间中的同一页面时强制隔离。 2. 每个控制对象都可以通过UAR页面来访问（控制）。 3. HCA 驱动程序在初始化（“打开”）对象时将 UAR 页面与控制对象相关联。 4. 在对对象执行控制操作之前，HCA 验证用于发布命令的 UAR 页面是否与该对象上下文中指定的页面相匹配。 通过将 WQE 发布到相应的工作 WQ、更新门铃记录（如果适用）以及写入与该工作 WQ 关联的 UAR 页面中的相应门铃寄存器，将操作传递给 HCA。 写入 HCA 的门铃寄存器进一步称为响铃门铃。 UAR中的DoorBell寄存器是蓝焰缓冲区的前2个DWORDS
 
 
+UCT/IB/MLX5: Use mlx5dv_devx_general_cmd to query HCA 使用devx命令查询HCA
+struct uct_ib_mlx5_query_hca_cap_out_bits
 
+IB传输层mlx5通用查询网卡特性的hca命令(位)
+fpga, 
+struct uct_ib_mlx5_cmd_hca_cap_bits 
+- 启用硬件 DCS 支持
+- 添加了运行时配置以限制 DCI 流的使用
+- 更新了 *post_op 例程以设置 DCI 流通道 ID
+- 添加了读取 HCA 功能以获取最大 DCI 流数量
+
+
+IB传输层mlx5操作码
+enum {
+    UCT_IB_MLX5_CMD_OP_QUERY_HCA_CAP           = 0x100,
+    UCT_IB_MLX5_CMD_OP_CREATE_MKEY             = 0x200,
+    UCT_IB_MLX5_CMD_OP_CREATE_CQ               = 0x400,
+    UCT_IB_MLX5_CMD_OP_CREATE_QP               = 0x500,
+    UCT_IB_MLX5_CMD_OP_RST2INIT_QP             = 0x502,
+    UCT_IB_MLX5_CMD_OP_INIT2RTR_QP             = 0x503,
+    UCT_IB_MLX5_CMD_OP_RTR2RTS_QP              = 0x504,
+    UCT_IB_MLX5_CMD_OP_2ERR_QP                 = 0x507,
+    UCT_IB_MLX5_CMD_OP_2RST_QP                 = 0x50a,
+    UCT_IB_MLX5_CMD_OP_QUERY_QP                = 0x50b,
+    UCT_IB_MLX5_CMD_OP_CREATE_RMP              = 0x90c,
+    UCT_IB_MLX5_CMD_OP_CREATE_DCT              = 0x710,
+    UCT_IB_MLX5_CMD_OP_DRAIN_DCT               = 0x712,
+    UCT_IB_MLX5_CMD_OP_CREATE_XRQ              = 0x717,
+    UCT_IB_MLX5_CMD_OP_SET_XRQ_DC_PARAMS_ENTRY = 0x726,
+    UCT_IB_MLX5_CMD_OP_QUERY_HCA_VPORT_CONTEXT = 0x762,
+    UCT_IB_MLX5_CMD_OP_QUERY_LAG               = 0x842,
+    UCT_IB_MLX5_CMD_OP_CREATE_GENERAL_OBJECT   = 0xa00,
+    UCT_IB_MLX5_CMD_OP_MODIFY_GENERAL_OBJECT   = 0xa01,
+    UCT_IB_MLX5_CMD_OP_QUERY_GENERAL_OBJECT    = 0xa02,
+    UCT_IB_MLX5_CMD_OP_ALLOW_OTHER_VHCA_ACCESS = 0xb16
+};
+
+
+IB链路聚合配置
+typedef enum {
+    /* QP are associated with port affinity */
+    UCT_IB_MLX5_LAG_QUEUE_AFFINITY = 0x0,
+    /* packets go to egress port through FT */
+    UCT_IB_MLX5_LAG_PORT_SELECT_FT = 0x1,
+    /* FDB select packet flow egress port */
+    UCT_IB_MLX5_LAG_MULTI_PORT_ESW = 0x2,
+    UCT_IB_MLX5_LAG_INVALID_MODE   = 0xFF
+} uct_ib_port_select_mode_t;
