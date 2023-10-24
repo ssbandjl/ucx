@@ -134,10 +134,11 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
           status = uct_ib_mlx5_devx_query_lag(md, &lag_state) UCT_IB_MLX5_CMD_OP_QUERY_LAG -> 链路汇聚(bonding), 参考: https://docs.nvidia.com/networking/display/bluefielddpuosv385/link+aggregation
           md->port_select_mode = uct_ib_mlx5_devx_query_port_select(md)
             uct_ib_mlx5_devx_general_cmd UCT_IB_MLX5_CMD_OP_QUERY_LAG
-          uct_ib_mlx5_is_xgvmi_alias_supported
-          uct_ib_mlx5_devx_check_odp
-          uct_ib_mlx5_devx_general_cmd 
-          uct_ib_md_open_common -> ucs_status_t uct_ib_md_open_common
+          uct_ib_mlx5_is_xgvmi_alias_supported(ctx) -> 跨越GVMI (XGVMI) - DPU 可以代表主机常驻内存启动 RDMA 操作，仅当数据源自或目标为 DPU 内存时才涉及 DPU 内存, Guest VM ID 主机_虚机ID
+          uct_ib_mlx5_devx_check_odp(md, md_config, cap) -> 按需分页 (ODP) 是一种可以缓解内存注册缺点的技术。 应用程序不再需要确定地址空间的底层物理页，并跟踪映射的有效性。 相反，当页面不存在时，HCA 向操作系统请求最新的转换，并且操作系统使由于不存在页面或映射更改而不再有效的转换无效。 ODP 不支持连续页。ODP 可以进一步分为 2 个子类：显式 ODP 和隐式 ODP。显式 ODP 在显式 ODP 中，应用程序仍然注册内存缓冲区以进行通信，但此操作用于定义 IO 的访问控制而不是 pin-down 页面。 ODP 内存区域 (MR) 在注册时不需要具有有效的映射。 隐式 ODP 在隐式 ODP 中，为应用程序提供了一个特殊的内存密钥，该密钥代表其完整的地址空间。 所有引用该键的 IO 访问（受限于与该键关联的访问权限）不需要注册任何虚拟地址范围。 有关 ODP 的更多信息，请参阅了解按需寻呼 (ODP) 社区帖子
+          uct_ib_mlx5_devx_general_cmd
+          dev->atomic_align = ucs_rounddown_pow2(arg_size) -> 向下取整对齐 
+          uct_ib_md_open_common(&md->super, ibv_device, md_config) -> ucs_status_t uct_ib_md_open_common
             uct_ib_device_init
               uct_ib_device_get_locality
               ucs_sys_fcntl_modfl

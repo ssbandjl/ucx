@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <netdb.h>
 
-#define FFL_STR              "%s %s:%d"
+#define FFL_FMT              "%s %s:%d"
 #define FFL                  __FUNCTION__,__FILE__,__LINE__
 
 #ifdef HAVE_CUDA
@@ -235,7 +235,7 @@ int connect_common(const char *server, uint16_t server_port, sa_family_t af)
                 CHKERR_JUMP(ret < 0, "listen server", err_close_sockfd);
 
                 /* Accept next connection */
-                fprintf(stdout, "Waiting for connection... "FFL_STR" \n", FFL);
+                fprintf(stdout, "Waiting for connection... "FFL_FMT" \n", FFL);
                 listenfd = sockfd;
                 sockfd   = accept(listenfd, NULL, NULL);
                 close(listenfd);
