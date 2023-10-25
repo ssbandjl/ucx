@@ -157,12 +157,22 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
             uct_ib_md_check_dmabuf(md)                
               ibv_reg_dmabuf_mr(md->pd, 0, ucs_get_page_size(), 0, bad_fd, UCT_IB_MEM_ACCESS_FLAGS)
             uct_ib_md_set_pci_bw(md, md_config) -> 修复: PCI 速度和系统设备 ID 设置不正确, 先从系统获取, 没找到则从底层设备获取
-          uct_ib_mlx5_md_port_counter_set_id_init
-          ucs_mpool_init
-          uct_ib_mlx5_md_buf_alloc
-          uct_ib_md_parse_relaxed_order
-          uct_ib_mlx5_devx_init_flush_mr
-            uct_ib_reg_mr
+          uct_ib_mlx5_md_port_counter_set_id_init(md)
+            ucs_carray_for_each(counter_set_id, md->port_counter_set_ids, sizeof(md->port_counter_set_ids)) -> 遍历c语言数组
+          ucs_mpool_params_reset(&mp_params) -> 重置内存池参数
+          mp_params.ops             = &uct_ib_mlx5_dbrec_ops -> 设置池操作表
+          ucs_mpool_init(&mp_params, &md->dbrec_pool)
+            VALGRIND_CREATE_MEMPOOL(mp, 0, 0) -> valgrind内存池
+          uct_ib_mlx5_md_buf_alloc(md, ucs_get_page_size(), 0, &md->zero_buf, &md->zero_mem, 0, "zero umem");
+            先对齐内存
+            madvise(buf, size, MADV_DONTFORK) -> MADV_DONTFORK 在执行fork(2)后，子进程不允许使用此范围的页面。这样是为了避免COW机制导致父进程在写入页面时更改页面的物理位置
+            mlx5dv_devx_umem_reg(md->super.dev.ibv_context, buf, size, access_mode) -> 注册或取消注册由 devx 接口使用的用户内存。 寄存器动词公开 UMEM DEVX 对象，用于 DMA 的用户内存注册。 用于注册用户存储器的 API 将用户地址、长度和访问标志作为输入，并向用户提供一个对象作为输出，该对象保存由固件返回到该已注册存储器的 UMEM ID。 用户将在使用此内存而不是物理地址列表的设备直接命令中使用该 UMEM ID，例如在 mlx5dv_devx_obj_create 上创建 QP
+          uct_ib_md_parse_relaxed_order(&md->super, md_config, ksm_atomic)
+          uct_ib_mlx5_devx_init_flush_mr(md)
+            uct_ib_reg_mr(&md->super, md->zero_buf, UCT_IB_MD_FLUSH_REMOTE_LENGTH, &params, UCT_IB_MEM_ACCESS_FLAGS, &md->flush_mr); -> 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
+              UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr, md->pd, address, length, access_flags)
+              ibv_reg_dmabuf_mr -> 注册内存的另一种方式
+              uct_ib_md_print_mem_reg_err_msg -> 如果内存为空, 打印
         ....
         static ucs_status_t uct_self_md_open
       uct_md_vfs_init(component, md, md_name)
@@ -1603,4 +1613,15 @@ Memory domain capability flags 内存域功能标签
 UCT_MD_FLAG_ALLOC         = UCS_BIT(0),
 ...
 
+
+
+/*
+ * Iterate over all elements of a C-array 遍历c语言数组
+ */
+#define ucs_carray_for_each(_elem, _array, _length) \
+    for ((_elem) = (_array); (_elem) < ((_array) + (_length)); ++(_elem))
+
+
+
+执行并分析函数: UCS_PROFILE_CALL_ALWAYS
 
