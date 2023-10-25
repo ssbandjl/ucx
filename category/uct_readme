@@ -139,12 +139,24 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
           uct_ib_mlx5_devx_general_cmd
           dev->atomic_align = ucs_rounddown_pow2(arg_size) -> 向下取整对齐 
           uct_ib_md_open_common(&md->super, ibv_device, md_config) -> ucs_status_t uct_ib_md_open_common
-            uct_ib_device_init
-              uct_ib_device_get_locality
-              ucs_sys_fcntl_modfl
+            uct_ib_device_init -> 初始化IB设备
+              uct_ib_device_get_locality -> 获取cpu位置top
+              ucs_sys_fcntl_modfl O_NONBLOCK -> 设置fd为非阻塞模式
                 oldfl = fcntl(fd, F_GETFL)
+              ucs_async_set_event_handler uct_ib_async_event_handler -> 异步事件处理
+                ucs_async_method_call(mode, add_event_fd, async, event_fd, events)       
+                  ucs_async_thread_add_event_fd
+                    ucs_async_thread_start(&thread)
+                    ucs_event_set_add
+                      epoll_ctl(event_set->event_fd, EPOLL_CTL_ADD, fd, &raw_event)
+                    ucs_async_pipe_push(&thread->wakeup)
+                      ret = write(p->write_fd, &dummy, sizeof(dummy)) -> 写0通知对端
+            uct_ib_md_parse_subnet_prefix -> 添加UCT_IB_SUBNET_PREFIX=fe80::以按subnet_prefix过滤IB端口
+            uct_ib_check_gpudirect_driver /sys/kernel/mm/memory_peers/nv_mem/version
+            uct_ib_check_gpudirect_driver /dev/kfd
             uct_ib_md_check_dmabuf(md)                
-              ibv_reg_dmabuf_mr
+              ibv_reg_dmabuf_mr(md->pd, 0, ucs_get_page_size(), 0, bad_fd, UCT_IB_MEM_ACCESS_FLAGS)
+            uct_ib_md_set_pci_bw(md, md_config) -> 修复: PCI 速度和系统设备 ID 设置不正确, 先从系统获取, 没找到则从底层设备获取
           uct_ib_mlx5_md_port_counter_set_id_init
           ucs_mpool_init
           uct_ib_mlx5_md_buf_alloc
@@ -440,10 +452,6 @@ ucs_status_t uct_ep_create, 创建新端点。 以可用模式之一创建 UCT �
 返回：
 UCS_OK 端点创建成功。 这并不能保证端点已连接到参数中定义的目的地； 如果失败，错误将报告给通过 uct_iface_params_t.err_handler 提供给 uct_iface_open 的接口错误处理回调。 ucs_status_t 定义的错误代码
 
-
-ucs_async_thread_add_event_fd
-status = ucs_async_thread_start(&thread)
-ucs_pthread_create(&thread->thread_id, ucs_async_thread_func
 
 
 
@@ -1534,3 +1542,65 @@ typedef enum {
     UCT_IB_MLX5_LAG_MULTI_PORT_ESW = 0x2,
     UCT_IB_MLX5_LAG_INVALID_MODE   = 0xFF
 } uct_ib_port_select_mode_t;
+
+
+处理异步事件的线程线程函数(调用栈)
+ucs_async_thread_start
+ucs_pthread_create(&thread->thread_id, ucs_async_thread_func, thread, "async"); 
+  static void *ucs_async_thread_func(void *arg)
+    status = ucs_event_set_wait(thread->event_set ucs_async_thread_ev_handler
+      event_set_handler(events[i].data.ptr, io_events, arg)
+        status = ucs_async_dispatch_handlers(&fd, 1, events)
+          ucs_async_handler_dispatch(handler, events)
+            ucs_async_handler_invoke(handler, events)
+              handler->cb(handler->id, events, handler->arg)
+                uct_ib_async_event_handler 异步事件处理
+                  ibv_get_async_event(dev->ibv_context, &ibevent)
+                  uct_ib_handle_async_event(dev, &event) -> 处理异步事件
+                    switch (event->event_type)
+                    ...
+                    UCS_STATS_UPDATE_COUNTER(dev->stats, UCT_IB_DEVICE_STAT_ASYNC_EVENT, +1)
+                  ibv_ack_async_event(&ibevent)
+
+IB事件:
+enum ibv_event_type {
+	IBV_EVENT_CQ_ERR,
+	IBV_EVENT_QP_FATAL,
+	IBV_EVENT_QP_REQ_ERR,
+	IBV_EVENT_QP_ACCESS_ERR,
+	IBV_EVENT_COMM_EST,
+	IBV_EVENT_SQ_DRAINED,
+	IBV_EVENT_PATH_MIG,
+	IBV_EVENT_PATH_MIG_ERR,
+	IBV_EVENT_DEVICE_FATAL,
+	IBV_EVENT_PORT_ACTIVE,
+	IBV_EVENT_PORT_ERR,
+	IBV_EVENT_LID_CHANGE,
+	IBV_EVENT_PKEY_CHANGE,
+	IBV_EVENT_SM_CHANGE,
+	IBV_EVENT_SRQ_ERR,
+	IBV_EVENT_SRQ_LIMIT_REACHED,
+	IBV_EVENT_QP_LAST_WQE_REACHED,
+	IBV_EVENT_CLIENT_REREGISTER,
+	IBV_EVENT_GID_CHANGE,
+	IBV_EVENT_WQ_FATAL,
+};
+
+
+内存类型
+typedef enum ucs_memory_type {
+    UCS_MEMORY_TYPE_HOST,          /**< Default system memory */
+    UCS_MEMORY_TYPE_CUDA,          /**< NVIDIA CUDA memory */
+    UCS_MEMORY_TYPE_CUDA_MANAGED,  /**< NVIDIA CUDA managed (or unified) memory */
+    UCS_MEMORY_TYPE_ROCM,          /**< AMD ROCM memory */
+    UCS_MEMORY_TYPE_ROCM_MANAGED,  /**< AMD ROCM managed system memory */
+    UCS_MEMORY_TYPE_LAST,
+    UCS_MEMORY_TYPE_UNKNOWN = UCS_MEMORY_TYPE_LAST
+} ucs_memory_type_t;
+
+
+Memory domain capability flags 内存域功能标签
+UCT_MD_FLAG_ALLOC         = UCS_BIT(0),
+...
+
+
