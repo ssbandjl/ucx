@@ -190,23 +190,34 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       uct_md_vfs_init(component, md, md_name) -> 用vfs节点表示组件和内存域
     uct_config_release(md_config)
     uct_md_query(iface_p->md, &iface_p->md_attr)
-      status = uct_md_attr_v2_init(md, &md_attr_v2) -> static ucs_status_t uct_self_md_query -> ucs_status_t uct_ib_md_query
-      uct_md_attr_from_v2(md_attr, &md_attr_v2)
-    uct_md_query_tl_resources(iface_p->md, &tl_resources, &num_tl_resources)
-      uct_self_query_tl_devices | uct_dc_mlx5_query_tl_devices
-        uct_ib_device_query_ports
-          uct_ib_device_port_check
-            uct_ib_device_port_attr
-    status = init_iface(tl_resources[tl_index].dev_name,
+      status = uct_md_attr_v2_init(md, &md_attr_v2) -> static ucs_status_t uct_self_md_query -> ucs_status_t    uct_ib_md_query
+        md_attr->access_mem_types          = UCS_BIT(UCS_MEMORY_TYPE_HOST) -> 内存访问的类型
+        ucs_sys_cpuset_copy(&md_attr->local_cpus, &md->dev.local_cpus) -> for -> CPU_ISSET(c, src) -> 拷贝CPU参数
+      uct_md_attr_from_v2(md_attr, &md_attr_v2) -> 用源(参数2)赋值给目的(参数1), 并用内存拷贝(memcpy)cpu和组件名
+    uct_md_query_tl_resources(iface_p->md, &tl_resources, &num_tl_resources) -> 查询传输层资源。 该例程查询 uct_md_h“内存域”以获取可用的通信资源
+        uct_self_query_tl_devices | uct_dc_mlx5_query_tl_devices
+            uct_ib_device_query_ports
+            uct_ib_device_port_check
+                uct_ib_device_port_attr
+        ucs_realloc
+    for -> 遍历可用的传输层并找出合适的传输层名        
+    status = init_iface(tl_resources[tl_index].dev_name, tl_resources[tl_index].tl_name, cmd_args->func_am_type, iface_p) -> 按传输层名初始化接口, 入参为: 网卡设备名,传输层名,活动消息类型, 接口
       status = uct_md_iface_config_read(iface_p->md, tl_name, NULL, NULL, &config) -> 读取并填充配置
-      status = uct_iface_open(iface_p->md, iface_p->worker, &params, config
-        status = tl->iface_open -> static UCS_CLASS_DEFINE_NEW_FUNC(uct_rc_verbs_iface_t -> static UCS_CLASS_INIT_FUNC(uct_rc_verbs_iface_t
-          uct_rc_am_hdr_fill(&self->am_inl_hdr.rc_hdr, 0)
-          status = uct_iface_mpool_init -> 创建地址控制器和原子内存池
-          uct_rc_verbs_iface_init_inl_wrs
-          status = uct_rc_init_fc_thresh(&config->super, &self->super)
-          status = uct_rc_iface_qp_create
-          uct_ib_destroy_qp(qp)
+      status = uct_iface_open(iface_p->md, iface_p->worker, &params, config, &iface_p->iface) -> 打开通信接口
+        uct_find_tl(md->component, params->mode.device.tl_name) -> 查找传输层
+        status = tl->iface_open -> static UCS_CLASS_DEFINE_NEW_FUNC(uct_rc_verbs_iface_t -> static UCS_CLASS_INIT_FUNC(uct_rc_verbs_iface_t <- .iface_open         = UCS_CLASS_NEW_FUNC_NAME(_iface_class) <- UCT_TL_DEFINE_ENTRY -> 宏展开得到(uct_rc_verbs_iface_t_new)
+            init_attr.qp_type               = IBV_QPT_RC -> 设置QP属性
+            UCS_CLASS_CALL_SUPER_INIT(uct_rc_iface_t -> 执行父类的构造函数(初始化) -> uct_rc_verbs_iface_t_init -> UCS_CLASS_INIT_FUNC(uct_rc_iface_t
+                UCS_CLASS_CALL_SUPER_INIT(uct_ib_iface_t -> UCS_CLASS_INIT_FUNC(uct_ib_iface_t 
+            uct_rc_am_hdr_fill(&self->am_inl_hdr.rc_hdr, 0)
+            status = uct_iface_mpool_init -> 创建地址控制器和原子内存池
+            uct_rc_verbs_iface_init_inl_wrs
+            status = uct_rc_init_fc_thresh(&config->super, &self->super)
+            status = uct_rc_iface_qp_create
+            uct_ib_destroy_qp(qp)
+        ucs_vfs_obj_add_dir(worker, *iface_p, "iface/%p", *iface_p)
+        ucs_vfs_obj_add_sym_link(*iface_p, md, "memory_domain")
+        ucs_vfs_obj_set_dirty(*iface_p, uct_iface_vfs_refresh)
       uct_iface_progress_enable(iface_p->iface -> uct_base_iface_progress_enable_cb -> uct_rc_verbs_iface_common_progress_enable
         uct_rc_verbs_iface_common_prepost_recvs(iface)
           uct_rc_verbs_iface_post_recv_common
@@ -1657,4 +1668,13 @@ UCT/CONFIG：在UCT中使用配置解析基础设施。
 * 定义 iface 配置的层次结构：tl、ib、rc、rm_mlx5。
 * tl中添加max_short和max_bcopy配置。
 * 添加 ucx_info 实用程序来打印默认配置。
+
+
+无符号内部类型的最大值:
+/* Maximum of unsigned integral types.  */
+# define UINT8_MAX		(255)
+# define UINT16_MAX		(65535)
+# define UINT32_MAX		(4294967295U)
+# define UINT64_MAX		(__UINT64_C(18446744073709551615))
+
 
