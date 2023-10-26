@@ -172,15 +172,27 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
             uct_ib_reg_mr(&md->super, md->zero_buf, UCT_IB_MD_FLUSH_REMOTE_LENGTH, &params, UCT_IB_MEM_ACCESS_FLAGS, &md->flush_mr); -> 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
               UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr, md->pd, address, length, access_flags)
               ibv_reg_dmabuf_mr -> 注册内存的另一种方式
-              uct_ib_md_print_mem_reg_err_msg -> 如果内存为空, 打印
-        ....
-        static ucs_status_t uct_self_md_open
-      uct_md_vfs_init(component, md, md_name)
-    uct_config_release
-    uct_md_query
+              uct_ib_md_print_mem_reg_err_msg -> 如果内存为空, 打印错误
+                UCS_STRING_BUFFER_ONSTACK(msg, 256) -> 声明一个字符串缓冲区，该缓冲区使用现有字符串作为后备存储。 此类字符串缓冲区不会分配额外的内存，也不必进行清理，并且它还可以用于在作为函数参数传递的现有 C 字符串缓冲区上构建字符串。
+                uct_ib_memlock_limit_msg(&msg, err)
+                  ucs_sys_get_effective_memlock_rlimit
+                    getrlimit(RLIMIT_MEMLOCK, &limit_info) -> 获取内存限制
+                ucs_string_buffer_cstr(&msg)
+                  c_str = ucs_array_begin(&strb->str) -> 返回字符串数组第一个元素
+                    ((&strb->str)->buffer)
+            uct_ib_mlx5_devx_reg_ksm_data_addr
+              uct_ib_mlx5_alloc_mkey_inbox(list_size, &in)
+              uct_ib_mlx5_devx_reg_ksm(md, atomic, iova, length, list_size -> UCT/IB/MLX5：内存注册流程部分重构，使用params struct进行多线程注册（从上层传递），使用params struct注册flush_mr，改进调试日志记录
+                UCT_IB_MLX5DV_SET(create_mkey_in, in, opcode, UCT_IB_MLX5_CMD_OP_CREATE_MKEY) -> 往结构体中插入一个值
+                mkc = UCT_IB_MLX5DV_ADDR_OF(create_mkey_in, in, memory_key_mkey_entry) -> 限制所有条目的缓冲区大小以提高性能。 将密钥长度的虚拟地址 (KLM) 与固定内存大小关联时使用 KSM
+                mlx5dv_devx_obj_create
+        static ucs_status_t uct_self_md_open -> self模块实现的打开内存域
+      uct_md_vfs_init(component, md, md_name) -> 用vfs节点表示组件和内存域
+    uct_config_release(md_config)
+    uct_md_query(iface_p->md, &iface_p->md_attr)
       status = uct_md_attr_v2_init(md, &md_attr_v2) -> static ucs_status_t uct_self_md_query -> ucs_status_t uct_ib_md_query
       uct_md_attr_from_v2(md_attr, &md_attr_v2)
-    uct_md_query_tl_resources
+    uct_md_query_tl_resources(iface_p->md, &tl_resources, &num_tl_resources)
       uct_self_query_tl_devices | uct_dc_mlx5_query_tl_devices
         uct_ib_device_query_ports
           uct_ib_device_port_check
@@ -1624,4 +1636,25 @@ UCT_MD_FLAG_ALLOC         = UCS_BIT(0),
 
 
 执行并分析函数: UCS_PROFILE_CALL_ALWAYS
+
+
+UCS_ARRAY_ALLOC_ONSTACK
+UCS_ARRAY_IDENTIFIER
+字符串缓冲区 - 动态的以 NULL 结尾的字符缓冲区，可以根据需要增长。
+/**
+ * String buffer - a dynamic NULL-terminated character buffer which can grow
+ * on demand.
+ */
+typedef struct ucs_string_buffer {
+    ucs_array_t(string_buffer) str;
+} ucs_string_buffer_t;
+
+
+
+UCT/CONFIG：在UCT中使用配置解析基础设施。
+* 配置将针对每个接口。 每个端点只有一个是不可扩展的，而且看起来我们可以避免每个上下文的配置。
+* 用户必须通过调用 uct_iface_config_read() 创建配置对象，并可能稍后对其进行修改。 然后，将其传递给 uct_iface_open()。
+* 定义 iface 配置的层次结构：tl、ib、rc、rm_mlx5。
+* tl中添加max_short和max_bcopy配置。
+* 添加 ucx_info 实用程序来打印默认配置。
 
