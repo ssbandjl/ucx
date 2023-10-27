@@ -208,7 +208,72 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
         status = tl->iface_open -> static UCS_CLASS_DEFINE_NEW_FUNC(uct_rc_verbs_iface_t -> static UCS_CLASS_INIT_FUNC(uct_rc_verbs_iface_t <- .iface_open         = UCS_CLASS_NEW_FUNC_NAME(_iface_class) <- UCT_TL_DEFINE_ENTRY -> 宏展开得到(uct_rc_verbs_iface_t_new)
             init_attr.qp_type               = IBV_QPT_RC -> 设置QP属性
             UCS_CLASS_CALL_SUPER_INIT(uct_rc_iface_t -> 执行父类的构造函数(初始化) -> uct_rc_verbs_iface_t_init -> UCS_CLASS_INIT_FUNC(uct_rc_iface_t
-                UCS_CLASS_CALL_SUPER_INIT(uct_ib_iface_t -> UCS_CLASS_INIT_FUNC(uct_ib_iface_t 
+                UCS_CLASS_CALL_SUPER_INIT(uct_ib_iface_t -> UCS_CLASS_INIT_FUNC(uct_ib_iface_t
+                    preferred_cpu = ucs_cpu_set_find_lcs(&cpu_mask)
+                    UCS_CLASS_CALL_SUPER_INIT(uct_base_iface_t
+                        uct_base_iface_t_init (&self->super, _myclass->superclass, -> UCS_CLASS_INIT_FUNC(uct_base_iface_t
+                            UCS_CLASS_CALL_SUPER_INIT(uct_iface_t, ops)
+                                uct_iface_t_init (&self->super, _myclass->superclass -> UCS_CLASS_INIT_FUNC(uct_iface_t, uct_iface_ops_t *ops)
+                                    self->ops = *ops;
+                            UCT_CB_FLAGS_CHECK((params->field_mask
+                            self->internal_ops      = internal_ops -> UCS_CLASS_INIT_FUNC(uct_base_iface_t, uct_iface_ops_t *ops,
+                            uct_worker_progress_init(&self->prog)
+                            uct_iface_set_stub_am_handler(self, id);
+                                iface->am[id].cb    = uct_iface_stub_am_handler
+                            UCS_STATS_NODE_ALLOC(&self->stats -> ucs_status_t ucs_stats_node_alloc
+                                ucs_stats_node_new(cls, &node)
+                                ucs_stats_node_initv(node, cls, name, ap)
+                                    ucs_stats_name_check(cls->name)
+                                    ucs_vsnprintf_safe(node->name, UCS_STAT_NAME_MAX, name, ap)
+                                        vsnprintf(buf, size, fmt, ap)
+                                        buf[size - 1] = '\0' -> 字符串数组补0
+                                    ucs_list_head_init(&node->children[UCS_STATS_INACTIVE_CHILDREN])
+                                ucs_stats_filter_node_new(node->cls, &filter_node)
+                                ucs_stats_node_add(node, parent, filter_node)
+                                    ucs_list_add_tail(&parent->children[UCS_STATS_ACTIVE_CHILDREN], &node->list)
+                                    ucs_stats_add_to_filter(node, filter_node)
+                    uct_ib_device_find_port(dev, params->mode.device.dev_name, &port_num)
+                    uct_ib_iface_set_path_mtu(self, config)
+                        (IBV_DEV_ATTR(dev, vendor_id) == 0x02c9) -> #  define IBV_DEV_ATTR(_dev, _attr)        ((_dev)->dev_attr._attr) -> 常用操作定义为宏
+                    uct_ib_iface_init_pkey(self, config)
+                        ibv_query_pkey(dev->ibv_context, iface->config.port_num, pkey_index, &port_pkey)
+                        pkey = ntohs(port_pkey)
+                    uct_ib_iface_init_gid_info(self, config)
+                        uct_ib_iface_init_roce_gid_info(iface, cfg_gid_index)
+                            uct_ib_device_select_gid(dev, port_num, &iface->gid_info) -> 选择要使用的最佳 gid 并在 RoCE 端口上设置其信息 - gid 索引、RoCE 版本和地址家族
+                                uct_ib_device_query_gid_info
+                                    ibv_query_gid(ctx, port_num, gid_index, &info->gid)
+                                    uct_ib_device_get_addr_family(&info->gid, gid_index)
+                                        const uint32_t addr_last_bits = raw->s6_addr32[2] ^ htonl(0x0000ffff)
+                                        uct_ib_device_is_addr_ipv4_mcast(raw, addr_last_bits)
+                                            return (raw->s6_addr32[0] == htonl(0xff0e0000)) && !(raw->s6_addr32[1] | addr_last_bits) -> 编码IPv4多播地址
+                                uct_ib_device_test_roce_gid_index -> UCT/IB：使用 ibv_create_ah() 测试本地 gid 的有效性 在某些情况下，可能无法为 RoCE 设备正确配置网络地址，因此在选择要使用的默认 GID 索引时，我们希望跳过 GID 表中的条目 无法创建AH
+                                    ibv_create_ah(ucs_container_of(dev, uct_ib_md_t, dev)->pd, &ah_attr)
+                                    ibv_destroy_ah(ah)
+                            或 uct_ib_device_query_gid_info
+                        uct_ib_iface_init_roce_addr_prefix(iface, config)
+                            ucs_sockaddr_inet_addr_size(gid_info->roce_info.addr_family, &addr_size)
+                            uct_ib_device_get_roce_ndev_name
+                            ucs_netif_get_addr -> 获取给定接口的地址和网络掩码
+                            ucs_sockaddr_get_inet_addr
+                            ucs_count_ptr_trailing_zero_bits -> 计算缓冲区末尾有多少位等于零
+                            ucs_debug failed to detect RoCE subnet mask prefix on -> UCT：使用子网掩码确定 RoCE IP 的可达性
+                        uct_ib_device_query_gid
+                    uct_ib_iface_init_lmc(self, config)
+                    
+                    uct_ib_iface_set_num_paths(self, config)
+                    self->comp_channel = ibv_create_comp_channel(dev->ibv_context)
+                    ucs_sys_fcntl_modfl(self->comp_channel->fd, O_NONBLOCK, 0)
+                    self->ops->create_cq(self, UCT_IB_DIR_TX
+                    self->ops->create_cq(self, UCT_IB_DIR_RX
+                    self->addr_size  = uct_ib_iface_address_size(self)
+                uct_iface_set_async_event_params(params, &self->async.event_cb,&self->async.event_arg)
+                self->super.release_desc.cb = uct_ud_iface_release_desc
+                ucs_ptr_array_init(&self->eps, "ud_eps")
+                uct_ud_iface_create_qp(self, config)
+                uct_ib_iface_recv_mpool_init(&self->super, &config->super, params, "ud_recv_skb", &self->rx.mp)
+                ucs_mpool_grow(&self->rx.mp, self->rx.available)
+                uct_iface_mpool_init(&self->super.super, &self->tx.mp,  uct_ud_iface_send_skb_init
             uct_rc_am_hdr_fill(&self->am_inl_hdr.rc_hdr, 0)
             status = uct_iface_mpool_init -> 创建地址控制器和原子内存池
             uct_rc_verbs_iface_init_inl_wrs
@@ -1676,5 +1741,145 @@ UCT/CONFIG：在UCT中使用配置解析基础设施。
 # define UINT16_MAX		(65535)
 # define UINT32_MAX		(4294967295U)
 # define UINT64_MAX		(__UINT64_C(18446744073709551615))
+
+
+初始化工人驱动/推进
+void uct_worker_progress_init(uct_worker_progress_t *prog)
+UCS/CBQ/UCT/API：整合慢速/快速 API 并使所有操作为 O(1)。
++ 使用单一 API 进行慢速/快速回调，元素将从内部数组分配，而不是由用户分配。
++ 使用唯一的整数 id 跟踪回调，这样删除回调的时间复杂度为 O(1)。
++ 通过确保已删除回调的“arg”始终指向回调q 本身，从回调调度函数中删除内存加载栅栏。 这样，就可以从另一个线程添加服务回调，而不会出现内存排序问题，因为仅更新单个回调指针。
+这样，调度函数就可以内联在 API 中。
++ 通过首先将回调设置为慢速路径然后将其提升为快速路径来实现 add_safe。
++ 在callbackq 结构本身中保留较小的固定大小的快速路径回调，以减少内存取消引用。
++ 支持一次性慢速回调，在单次执行后自行删除。
++ 停止计算回调的引用，将其留给用户。
++ 删除“async”参数，并让用户负责在需要时阻止异步上下文
+
+
+MTU
+enum ibv_mtu {
+	IBV_MTU_256  = 1,
+	IBV_MTU_512  = 2,
+	IBV_MTU_1024 = 3,
+	IBV_MTU_2048 = 4,
+	IBV_MTU_4096 = 5
+};
+
+
+端口状态
+enum ibv_port_state {
+	IBV_PORT_NOP		= 0,
+	IBV_PORT_DOWN		= 1,
+	IBV_PORT_INIT		= 2,
+	IBV_PORT_ARMED		= 3,
+	IBV_PORT_ACTIVE		= 4,
+	IBV_PORT_ACTIVE_DEFER	= 5
+};
+
+链路
+enum {
+	IBV_LINK_LAYER_UNSPECIFIED,
+	IBV_LINK_LAYER_INFINIBAND,
+	IBV_LINK_LAYER_ETHERNET,
+};
+
+
+端口能力
+enum ibv_port_cap_flags {
+	IBV_PORT_SM				= 1 <<  1,
+	IBV_PORT_NOTICE_SUP			= 1 <<  2,
+	IBV_PORT_TRAP_SUP			= 1 <<  3,
+	IBV_PORT_OPT_IPD_SUP			= 1 <<  4,
+	IBV_PORT_AUTO_MIGR_SUP			= 1 <<  5,
+	IBV_PORT_SL_MAP_SUP			= 1 <<  6,
+	IBV_PORT_MKEY_NVRAM			= 1 <<  7,
+	IBV_PORT_PKEY_NVRAM			= 1 <<  8,
+	IBV_PORT_LED_INFO_SUP			= 1 <<  9,
+	IBV_PORT_SYS_IMAGE_GUID_SUP		= 1 << 11,
+	IBV_PORT_PKEY_SW_EXT_PORT_TRAP_SUP	= 1 << 12,
+	IBV_PORT_EXTENDED_SPEEDS_SUP		= 1 << 14,
+	IBV_PORT_CAP_MASK2_SUP			= 1 << 15,
+	IBV_PORT_CM_SUP				= 1 << 16,
+	IBV_PORT_SNMP_TUNNEL_SUP		= 1 << 17,
+	IBV_PORT_REINIT_SUP			= 1 << 18,
+	IBV_PORT_DEVICE_MGMT_SUP		= 1 << 19,
+	IBV_PORT_VENDOR_CLASS_SUP		= 1 << 20,
+	IBV_PORT_DR_NOTICE_SUP			= 1 << 21,
+	IBV_PORT_CAP_MASK_NOTICE_SUP		= 1 << 22,
+	IBV_PORT_BOOT_MGMT_SUP			= 1 << 23,
+	IBV_PORT_LINK_LATENCY_SUP		= 1 << 24,
+	IBV_PORT_CLIENT_REG_SUP			= 1 << 25,
+	IBV_PORT_IP_BASED_GIDS			= 1 << 26
+};
+
+
+roce版本
+typedef enum uct_ib_roce_version {
+    UCT_IB_DEVICE_ROCE_V1,
+    UCT_IB_DEVICE_ROCE_V1_5,
+    UCT_IB_DEVICE_ROCE_V2,
+    UCT_IB_DEVICE_ROCE_ANY
+} uct_ib_roce_version_t;
+
+
+IB设备(网卡)支持的功能
+enum {
+    UCT_IB_DEVICE_FLAG_MLX4_PRM = UCS_BIT(1),   /* Device supports mlx4 PRM */
+    UCT_IB_DEVICE_FLAG_MLX5_PRM = UCS_BIT(2),   /* Device supports mlx5 PRM */
+    UCT_IB_DEVICE_FLAG_MELLANOX = UCS_BIT(3),   /* Mellanox device */
+    UCT_IB_DEVICE_FLAG_LINK_IB  = UCS_BIT(5),   /* Require only IB */
+    UCT_IB_DEVICE_FLAG_DC_V1    = UCS_BIT(6),   /* Device supports DC ver 1 */
+    UCT_IB_DEVICE_FLAG_DC_V2    = UCS_BIT(7),   /* Device supports DC ver 2 */
+    UCT_IB_DEVICE_FLAG_AV       = UCS_BIT(8),   /* Device supports compact AV */
+    UCT_IB_DEVICE_FLAG_DC       = UCT_IB_DEVICE_FLAG_DC_V1 |
+                                  UCT_IB_DEVICE_FLAG_DC_V2, /* Device supports DC */
+    UCT_IB_DEVICE_FAILED        = UCS_BIT(9)    /* Got fatal error */
+};
+
+
+
+IB协议及RDMA相关参数
+#define UCT_IB_QPN_ORDER                  24  /* How many bits can be an IB QP number */
+#define UCT_IB_UIDX_SHIFT                 8   /* BE uidx shift */
+#define UCT_IB_LRH_LEN                    8   /* IB Local routing header */
+#define UCT_IB_GRH_LEN                    40  /* IB GLobal routing header */
+#define UCT_IB_BTH_LEN                    12  /* IB base transport header */
+#define UCT_IB_ROCE_LEN                   14  /* Ethernet header -
+                                                 6B for Destination MAC +
+                                                 6B for Source MAC + 2B Type (RoCE) */
+#define UCT_IB_DETH_LEN                   8   /* IB datagram header */
+#define UCT_IB_RETH_LEN                   16  /* IB RDMA header */
+#define UCT_IB_ATOMIC_ETH_LEN             28  /* IB atomic header */
+#define UCT_IB_AETH_LEN                   4   /* IB ack */
+#define UCT_IB_PAYLOAD_ALIGN              4   /* IB payload padding */
+#define UCT_IB_ICRC_LEN                   4   /* IB invariant crc footer */
+#define UCT_IB_VCRC_LEN                   2   /* IB variant crc footer */
+#define UCT_IB_DELIM_LEN                  2   /* IB wire delimiter */
+#define UCT_IB_FDR_PACKET_GAP             64  /* Minimal FDR packet gap */
+#define UCT_IB_MAX_MESSAGE_SIZE           (2UL << 30) /* Maximal IB message size */
+#define UCT_IB_PKEY_PARTITION_MASK        0x7fff /* IB partition number mask */
+#define UCT_IB_PKEY_MEMBERSHIP_MASK       0x8000 /* Full/send-only member */
+#define UCT_IB_PKEY_DEFAULT               0xffff /* Default PKEY */
+#define UCT_IB_FIRST_PORT                 1
+#define UCT_IB_DEV_MAX_PORTS              2
+#define UCT_IB_FABRIC_TIME_MAX            32
+#define UCT_IB_INVALID_MKEY               0xffffffffu
+#define UCT_IB_KEY                        0x1ee7a330
+#define UCT_IB_LINK_LOCAL_PREFIX          be64toh(0xfe80000000000000ul) /* IBTA 4.1.1 12a */
+#define UCT_IB_SITE_LOCAL_PREFIX          be64toh(0xfec0000000000000ul) /* IBTA 4.1.1 12b */
+#define UCT_IB_SITE_LOCAL_MASK            be64toh(0xffffffffffff0000ul) /* IBTA 4.1.1 12b */
+#define UCT_IB_DEFAULT_ROCEV2_DSCP        106  /* Default DSCP for RoCE v2 */
+#define UCT_IB_ROCE_UDP_SRC_PORT_BASE     0xC000
+#define UCT_IB_CQE_SL_PKTYPE_MASK         0x7 /* SL for IB or packet type
+                                                 (GRH/IPv4/IPv6) for RoCE in the
+                                                 CQE */
+#define UCT_IB_DEVICE_SYSFS_PFX           "/sys/class/infiniband/%s"
+#define UCT_IB_DEVICE_SYSFS_FMT           UCT_IB_DEVICE_SYSFS_PFX "/device/%s"
+#define UCT_IB_DEVICE_SYSFS_GID_ATTR_PFX  UCT_IB_DEVICE_SYSFS_PFX "/ports/%d/gid_attrs"
+#define UCT_IB_DEVICE_SYSFS_GID_TYPE_FMT  UCT_IB_DEVICE_SYSFS_GID_ATTR_PFX "/types/%d"
+#define UCT_IB_DEVICE_SYSFS_GID_NDEV_FMT  UCT_IB_DEVICE_SYSFS_GID_ATTR_PFX "/ndevs/%d"
+#define UCT_IB_DEVICE_ECE_DEFAULT         0x0         /* default ECE */
+#define UCT_IB_DEVICE_ECE_MAX             0xffffffffU /* max ECE */
 
 
