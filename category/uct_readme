@@ -260,8 +260,12 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
                             ucs_debug failed to detect RoCE subnet mask prefix on -> UCT：使用子网掩码确定 RoCE IP 的可达性
                         uct_ib_device_query_gid
                     uct_ib_iface_init_lmc(self, config)
-                    
-                    uct_ib_iface_set_num_paths(self, config)
+                        uct_ib_iface_port_attr(iface)->lmc -> LID mask control 当多个LID被分配给当前端口时使用
+                    uct_ib_iface_set_num_paths(self, config) -> UCT/IB：为 RoCE LAG(链路聚合,bond相关) 和 IB LMC 实现多路径
+                        iface->num_paths = uct_ib_iface_roce_lag_level(iface) -> 计算bond后的实际带宽, 端口数
+                            ucs_netif_bond_ad_num_ports(ndev_name) -> 获取绑定设备的活动 802.3ad 端口数。 如果设备不是绑定设备，或者未启用802.3ad，则返回1
+                                ucs_read_file_number(&ad_num_ports, 1, "%s/%s", bond_path, UCS_BOND_NUM_PORTS_FILE); -> 
+                        (uct_ib_iface_port_attr(iface)->active_speed == UCT_IB_SPEED_NDR))
                     self->comp_channel = ibv_create_comp_channel(dev->ibv_context)
                     ucs_sys_fcntl_modfl(self->comp_channel->fd, O_NONBLOCK, 0)
                     self->ops->create_cq(self, UCT_IB_DIR_TX
@@ -1881,5 +1885,91 @@ IB协议及RDMA相关参数
 #define UCT_IB_DEVICE_SYSFS_GID_NDEV_FMT  UCT_IB_DEVICE_SYSFS_GID_ATTR_PFX "/ndevs/%d"
 #define UCT_IB_DEVICE_ECE_DEFAULT         0x0         /* default ECE */
 #define UCT_IB_DEVICE_ECE_MAX             0xffffffffU /* max ECE */
+
+
+
+
+IB端口属性
+struct ibv_port_attr {
+	enum ibv_port_state	state;
+	enum ibv_mtu		max_mtu;
+	enum ibv_mtu		active_mtu;
+	int			gid_tbl_len;
+	uint32_t		port_cap_flags;
+	uint32_t		max_msg_sz;
+	uint32_t		bad_pkey_cntr;
+	uint32_t		qkey_viol_cntr;
+	uint16_t		pkey_tbl_len;
+	uint16_t		lid;
+	uint16_t		sm_lid;
+	uint8_t			lmc;
+	uint8_t			max_vl_num;
+	uint8_t			sm_sl;
+	uint8_t			subnet_timeout;
+	uint8_t			init_type_reply;
+	uint8_t			active_width;
+	uint8_t			active_speed;
+	uint8_t			phys_state;
+	uint8_t			link_layer;
+	uint8_t			flags;
+	uint16_t		port_cap_flags2;
+};
+
+ibv_query_port: 查询RDMA端口属性
+struct ibv_port_attr {
+    enum ibv_port_state     state;          /* Logical port state */
+    enum ibv_mtu            max_mtu;        /* Max MTU supported by port */
+    enum ibv_mtu            active_mtu;     /* Actual MTU */
+    int                     gid_tbl_len;    /* Length of source GID table */
+    uint32_t                port_cap_flags; /* Port capabilities */
+    uint32_t                max_msg_sz;     /* Maximum message size */
+    uint32_t                bad_pkey_cntr;  /* Bad P_Key counter */
+    uint32_t                qkey_viol_cntr; /* Q_Key violation counter */
+    uint16_t                pkey_tbl_len;   /* Length of partition table */
+    uint16_t                lid;            /* Base port LID */
+    uint16_t                sm_lid;         /* SM LID */
+    uint8_t                 lmc;            /* LMC of LID */ 
+    uint8_t                 max_vl_num;     /* Maximum number of VLs */
+    uint8_t                 sm_sl;          /* SM service level */
+    uint8_t                 subnet_timeout; /* Subnet propagation delay */
+    uint8_t                 init_type_reply;/* Type of initialization performed by SM */
+    uint8_t                 active_width;   /* Currently active link width */
+    uint8_t                 active_speed;   /* Currently active link speed */
+    uint8_t                 phys_state;     /* Physical port state */
+    uint8_t                 link_layer;     /* link layer protocol of the port */
+};
+
+struct ibv_port_attr
+{
+    enum ibv_port_state state;//端口状态
+    enum ibv_mtu max_mtu; //端口支持的最大传输单元MTU
+    enum ibv_mtu active_mtu; //当前的MTU
+    int gid_tbl_len; //GID表格的长度（source global id）
+    uint32_t port_cap_flags; //端口支持的容量大小
+    uint32_t max_msg_sz; //最大信息长度
+    uint32_t bad_pkey_cntr; //Bad P_key counter
+    uint32_t qkey_viol_cntr; //Q_Key violation counter
+    uint16_t pkey_tbl_len; //分区表长度
+    uint16_t lid; //该端口被分配的第一个LID
+    uint16_t sm_lid; //subet manager子网管理的LID
+    uint8_t lmc; //LID mask control 当多个LID被分配给当前端口时使用
+    uint8_t max_vl_num; //最大虚拟线路
+    uint8_t sm_sl; //SM服务等级SL
+    uint8_t subnet_timeout; //子网传播延时
+    uint8_t init_type_reply; //SM的初始化方式
+    uint8_t active_width; //当前带宽
+    uint8_t active_speed; //当前速度
+    uint8_t phys_state; //物理端口状态
+};
+
+
+网卡相关
+#define UCS_NETIF_DIR                    "/sys/class/net"
+#define UCS_BOND_NUM_PORTS_FILE          "bonding/ad_num_ports"
+#define UCS_SOCKET_MAX_CONN_PATH         "/proc/sys/net/core/somaxconn"
+/* The port space of IPv6 is shared with IPv4 */
+#define UCX_PROCESS_IP_PORT_RANGE        "/proc/sys/net/ipv4/ip_local_port_range"
+
+
 
 
