@@ -94,7 +94,6 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       status = uct_config_read(&bundle, &component->md_config, env_prefix)
         status = ucs_config_parser_fill_opts(config_bundle->data, entry, full_prefix, 0)
           ucs_config_parser_set_default_values(opts, entry->table) -> ucs_config_sscanf_table
-            
           ucs_config_parser_get_sub_prefix(env_prefix, &sub_prefix)
           ucs_config_parse_config_files()
           ucs_config_apply_config_vars -> 应用环境变量, 以及自定义前缀的环境变量
@@ -266,17 +265,38 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
                             ucs_netif_bond_ad_num_ports(ndev_name) -> 获取绑定设备的活动 802.3ad 端口数。 如果设备不是绑定设备，或者未启用802.3ad，则返回1
                                 ucs_read_file_number(&ad_num_ports, 1, "%s/%s", bond_path, UCS_BOND_NUM_PORTS_FILE); -> 
                         (uct_ib_iface_port_attr(iface)->active_speed == UCT_IB_SPEED_NDR))
-                    self->comp_channel = ibv_create_comp_channel(dev->ibv_context)
-                    ucs_sys_fcntl_modfl(self->comp_channel->fd, O_NONBLOCK, 0)
-                    self->ops->create_cq(self, UCT_IB_DIR_TX
+                    self->comp_channel = ibv_create_comp_channel(dev->ibv_context) -> 支持中断通知
+                    ucs_sys_fcntl_modfl(self->comp_channel->fd, O_NONBLOCK, 0) -> 设置事件通道fd为非阻塞模式
+                    self->ops->create_cq(self, UCT_IB_DIR_TX -> ucs_status_t uct_ib_verbs_create_cq
+                        ibv_cq_ex_to_cq(ibv_create_cq_ex(dev->ibv_context, &cq_attr))
                     self->ops->create_cq(self, UCT_IB_DIR_RX
-                    self->addr_size  = uct_ib_iface_address_size(self)
+                    self->addr_size  = uct_ib_iface_address_size(self) -> UCT/GTEST：CM 上的客户端-服务器 - 框架和 CM 基本功能。 重构 IB 地址函数，为在 qp-less 模式下通过 rdmacm 建立连接做准备，添加基本 gtest 来测试基本 CM（连接管理器）功能
+                        return uct_ib_address_size(&params) -> 根据地址打包标记判断
                 uct_iface_set_async_event_params(params, &self->async.event_cb,&self->async.event_arg)
-                self->super.release_desc.cb = uct_ud_iface_release_desc
-                ucs_ptr_array_init(&self->eps, "ud_eps")
-                uct_ud_iface_create_qp(self, config)
-                uct_ib_iface_recv_mpool_init(&self->super, &config->super, params, "ud_recv_skb", &self->rx.mp)
-                ucs_mpool_grow(&self->rx.mp, self->rx.available)
+                self->super.release_desc.cb = uct_ud_iface_release_desc -> 启用异步推进
+                ucs_ptr_array_init(&self->eps, "ud_eps") -> 初始化数组, 先清空结构体字段, 然后设置数组名
+                uct_ud_iface_create_qp(self, config) -> 创建队列对,设置类型(UD不可靠数据报), 
+                    qp_init_attr.qp_type             = IBV_QPT_UD
+                    ops->create_qp(&self->super, &qp_init_attr, &self->qp) -> ucs_status_t uct_ib_iface_create_qp
+                        ibv_create_qp
+                    qp_attr.qp_state   = IBV_QPS_INIT
+                    ibv_modify_qp(self->qp, &qp_attr, IBV_QP_STATE | IBV_QP_PKEY_INDEX | IBV_QP_PORT | IBV_QP_QKEY)
+                    qp_attr.qp_state = IBV_QPS_RTR
+                    ibv_modify_qp(self->qp, &qp_attr, IBV_QP_STATE)
+                    qp_attr.qp_state = IBV_QPS_RTS
+                    ibv_modify_qp(self->qp, &qp_attr, IBV_QP_STATE | IBV_QP_SQ_PSN)
+                uct_ib_iface_recv_mpool_init(&self->super, &config->super, params, "ud_recv_skb", &self->rx.mp) -> 创建接收描述符的内存池
+                    grow = 1024
+                    uct_iface_param_am_alignment(params, iface->config.seg_size, -> 根据接口参数中提供的用户配置初始化 AM 数据对齐及其偏移量
+                        *align        = UCS_SYS_CACHE_LINE_SIZE -> cacheline 缓存行对齐
+                    uct_iface_mpool_init uct_ib_iface_recv_desc_init
+                        ucs_mpool_params_reset(&mp_params)
+                        uct_iface_mpool_config_copy(&mp_params, config)
+                        ucs_mpool_init(&mp_params, mp) -> ucs_status_t ucs_mpool_init
+                            mp->data = ucs_malloc(sizeof(*mp->data) + params->priv_size, "mpool_data")
+                            mp->data->grow_factor     = params->grow_factor -> 增长因子
+                            VALGRIND_CREATE_MEMPOOL(mp, 0, 0); -> Memcheck：内存错误检测器, https://valgrind.org/docs/manual/mc-manual.html, 该请求将地址池注册为内存池的锚地址。 它还提供了 rzB 大小，指定放置在从池中分配的块周围的 redzone 应该有多大。 最后，它提供了一个 is_zeroed 参数，用于指定分配时池的块是否归零
+                ucs_mpool_grow(&self->rx.mp, self->rx.available) -> UCT/IB：减少接收缓冲区的内存消耗。 仅当接口上启用进度时才分配接收缓冲区。 对于 UD 和 DC，分配少量接收缓冲区，以便能够处理新的传入连接
                 uct_iface_mpool_init(&self->super.super, &self->tx.mp,  uct_ud_iface_send_skb_init
             uct_rc_am_hdr_fill(&self->am_inl_hdr.rc_hdr, 0)
             status = uct_iface_mpool_init -> 创建地址控制器和原子内存池
@@ -1972,4 +1992,50 @@ struct ibv_port_attr
 
 
 
+
+队列对类型: 
+enum ibv_qp_type {
+	IBV_QPT_RC = 2,
+	IBV_QPT_UC,
+	IBV_QPT_UD,
+	IBV_QPT_RAW_PACKET = 8, -> 添加原始数据包QP类型，IB_QPT_RAW_PACKET允许应用程序在发送时构建完整的数据包，包括L2标头； 在接收端，硬件不会剥离任何标头。 这种QP类型是为用户空间直接访问以太网而设计的； 例如，通过自己执行 TCP/IP 的应用程序。 仅允许具有 NET_RAW 功能的进程创建原始数据包 QP（名称“原始数据包 QP”应该与 AF_PACKET / SOL_RAW 套接字进行类比）
+	IBV_QPT_XRC_SEND = 9, -> 添加对 XRC QP、XRC 队列对的支持：XRC 定义了两种新类型的 QP。 发起方（或发送方）XRC QP 的行为类似于仅发送 RC QP。 XRC 发送 QP 通过现有 QP 功能进行管理。 send_wr 结构以向后兼容的方式扩展，以支持在发送 XRC QP 上发布发送，这需要指定远程 XRC SRQ。 目标或接收端 XRC QP 的行为与其他实现的 QP 不同。 可以像其他 QP 一样通过现有调用创建、修改和销毁 recv XRC QP。 qp_init_attr 结构针对 XRC QP 进行了扩展。 由于 XRC recv QP 绑定到 XRCD，而不是 PD，因此它们旨在在多个进程之间使用。 任何有权访问 XRCD 的进程都可以分配并连接 XRC recv QP。 实际的XRC recv QP 由内核分配和管理。 如果拥有进程显式销毁 XRC recv QP，则它会被销毁。 但是，如果当用户进程退出或关闭其设备时 XRC recv QP 保持打开状态，则 XRC recv QP 的生命周期与 XRCD 的生命周期相关
+	IBV_QPT_XRC_RECV, -> verbs：引入驱动程序QP类型，供应商可以实现InfiniBand规范中未描述的QP类型。 动词层不知道该 QP 提供哪些服务，但它假设硬件驱动程序提供。 新的 QP 类型 IBV_QPT_DRIVER 应该用于此类 QP。 描述此 QP 的任何额外数据应存储在与此 QP 关联的硬件驱动程序的上下文中
+	IBV_QPT_DRIVER = 0xff,
+};
+
+
+
+队列对属性的掩码
+enum ibv_qp_attr_mask {
+	IBV_QP_STATE			= 1 << 	0,
+	IBV_QP_CUR_STATE		= 1 << 	1,
+	IBV_QP_EN_SQD_ASYNC_NOTIFY	= 1 << 	2,
+	IBV_QP_ACCESS_FLAGS		= 1 << 	3,
+	IBV_QP_PKEY_INDEX		= 1 << 	4,
+	IBV_QP_PORT			= 1 << 	5,
+	IBV_QP_QKEY			= 1 << 	6,
+	IBV_QP_AV			= 1 << 	7,
+	IBV_QP_PATH_MTU			= 1 << 	8,
+	IBV_QP_TIMEOUT			= 1 << 	9,
+	IBV_QP_RETRY_CNT		= 1 << 10,
+	IBV_QP_RNR_RETRY		= 1 << 11,
+	IBV_QP_RQ_PSN			= 1 << 12,
+	IBV_QP_MAX_QP_RD_ATOMIC		= 1 << 13,
+	IBV_QP_ALT_PATH			= 1 << 14,
+	IBV_QP_MIN_RNR_TIMER		= 1 << 15,
+	IBV_QP_SQ_PSN			= 1 << 16,
+	IBV_QP_MAX_DEST_RD_ATOMIC	= 1 << 17,
+	IBV_QP_PATH_MIG_STATE		= 1 << 18,
+	IBV_QP_CAP			= 1 << 19,
+	IBV_QP_DEST_QPN			= 1 << 20,
+	/* These bits were supported on older kernels, but never exposed from
+	   libibverbs:
+	_IBV_QP_SMAC   			= 1 << 21,
+	_IBV_QP_ALT_SMAC		= 1 << 22,
+	_IBV_QP_VID    			= 1 << 23,
+	_IBV_QP_ALT_VID 		= 1 << 24,
+	*/
+	IBV_QP_RATE_LIMIT		= 1 << 25,
+};
 
