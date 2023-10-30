@@ -169,7 +169,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
           uct_ib_md_parse_relaxed_order(&md->super, md_config, ksm_atomic)
           uct_ib_mlx5_devx_init_flush_mr(md)
             uct_ib_reg_mr(&md->super, md->zero_buf, UCT_IB_MD_FLUSH_REMOTE_LENGTH, &params, UCT_IB_MEM_ACCESS_FLAGS, &md->flush_mr); -> 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
-              UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr, md->pd, address, length, access_flags)
+              UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr, md->pd, address, length, access_flags) -> 调用verbs接口注册内存
               ibv_reg_dmabuf_mr -> 注册内存的另一种方式
               uct_ib_md_print_mem_reg_err_msg -> 如果内存为空, 打印错误
                 UCS_STRING_BUFFER_ONSTACK(msg, 256) -> 声明一个字符串缓冲区，该缓冲区使用现有字符串作为后备存储。 此类字符串缓冲区不会分配额外的内存，也不必进行清理，并且它还可以用于在作为函数参数传递的现有 C 字符串缓冲区上构建字符串。
@@ -455,12 +455,21 @@ char *str = (char *)mem_type_malloc(cmd_args.test_strlen) -> 分配16字节的�
 generate_test_string -> 生成测试字符串
   memcpy(dst, src, count) -> 拷贝16字节的字符串到str
 do_am_zcopy(&if_info, ep, id, &cmd_args, str) -> str -> char *buf 字符串地址转为buf地址
-  uct_md_mem_reg -> uct_ib_mlx5_devx_mem_reg -> 将buf地址进行内存注册得到内存控制器
+  uct_md_mem_reg -> uct_ib_mlx5_devx_mem_reg -> 将buf地址进行内存注册得到内存控制器(memh->address = address)
     uct_ib_memh_alloc(&md->super, length,
+        memh = ucs_calloc(1, memh_base_size + (mr_size * num_mrs), "ib_memh")
     uct_ib_mlx5_devx_reg_mr(md, memh, address,
+        access_flags & IBV_ACCESS_ON_DEMAND -> 按需注册
+        uct_ib_reg_mr(&md->super, address, length, params, access_flags,
+        *lkey_p = memh->mrs[mr_type].super.ib->lkey
+        *rkey_p = memh->mrs[mr_type].super.ib->rkey
+        uct_ib_mem_prefetch(&md->super, &memh->super, address, length) -> 支持内存预取
+            UCS_PROFILE_CALL(ibv_advise_mr -> 提供有关 MR 中地址范围的建议
     mr = UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr, md->pd, address, length, access_flags) -> 注册该段内存
   iov.buffer = buf -> buf转iov
   iov.memh   = memh -> 空指针
+  iov.stride = 0;
+  iov.count  = 1;
   ...
 if (barrier(oob_sock, progress_worker, if_info.worker))
 
@@ -1096,12 +1105,13 @@ do_am_bcopy
 
 
 ucs_status_t do_am_zcopy -> 零拷贝
-  uct_md_mem_reg -> UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr -> 注册内存 -> 分析函数调用, 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
+  uct_md_mem_reg -> uct_md_mem_reg_v2 -> md->ops->mem_reg -> UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr -> 注册内存 -> 分析函数调用, 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
     __ibv_reg_mr
   comp.uct_comp.func   = zcopy_completion_cb -> 完成回调
   do ... while (status == UCS_ERR_NO_RESOURCE) -> 没资源时退出循环 
   status = uct_ep_am_zcopy(ep, id, NULL, 0, &iov, 1, 0, (uct_completion_t *)&comp) -> ep->iface->ops.ep_am_zcopy
     ucs_status_t uct_rc_mlx5_ep_am_zcopy | ucs_status_t uct_rc_verbs_ep_am_zcopy -> 可靠连接verbs端点的活动消息零拷贝
+      struct ibv_sge sge[UCT_IB_MAX_IOV];
       UCT_CHECK_IOV_SIZE -> 检查向量IO个数, 应该不超过网卡最大发送(SGE-1), 第一个sge给header使用
       UCT_RC_CHECK_AM_ZCOPY -> 检查零拷贝参数
       UCT_RC_CHECK_RES_AND_FC -> 检查资源和流控参数
