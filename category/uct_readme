@@ -296,13 +296,33 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
                             mp->data = ucs_malloc(sizeof(*mp->data) + params->priv_size, "mpool_data")
                             mp->data->grow_factor     = params->grow_factor -> 增长因子
                             VALGRIND_CREATE_MEMPOOL(mp, 0, 0); -> Memcheck：内存错误检测器, https://valgrind.org/docs/manual/mc-manual.html, 该请求将地址池注册为内存池的锚地址。 它还提供了 rzB 大小，指定放置在从池中分配的块周围的 redzone 应该有多大。 最后，它提供了一个 is_zeroed 参数，用于指定分配时池的块是否归零
-                ucs_mpool_grow(&self->rx.mp, self->rx.available) -> UCT/IB：减少接收缓冲区的内存消耗。 仅当接口上启用进度时才分配接收缓冲区。 对于 UD 和 DC，分配少量接收缓冲区，以便能够处理新的传入连接
+                ucs_mpool_grow(&self->rx.mp, self->rx.available) -> UCT/IB：减少接收缓冲区的内存消耗。 仅当接口上启用进度时才分配接收缓冲区。 对于 UD 和 DC，分配少量接收缓冲区，以便能够处理新的传入连接, 给内存池增加指定数量的元素
+                    data->ops->chunk_alloc(mp, &chunk_size, &ptr) -> UCS/UCT/TEST：重构和优化内存池基础设施 -> UCS_PROFILE_FUNC_ALWAYS(ucs_status_t, uct_iface_mp_chunk_alloc
+                        uct_iface_mem_alloc(&iface->super, length, UCT_MD_MEM_ACCESS_LOCAL_READ  | UCT_MD_MEM_ACCESS_LOCAL_WRITE | UCT_MD_MEM_FLAG_LOCK, ucs_mpool_name(mp), &mem) -> 分配可用于零拷贝通信的内存。 分配可用于特定传输接口上的零复制数据传输或远程访问的内存区域
+                            uct_md_query(iface->md, &md_attr)
+                            params.mem_type        = UCS_MEMORY_TYPE_HOST
+                            uct_mem_alloc(length, alloc_methods, num_alloc_methods, &params, mem) -> 为零拷贝通信和远程访问分配内存。 分配可能已注册的内存, 统一内存分配层?
+                                uct_mem_alloc_check_params(length, methods, num_methods, params)
+                                uct_md_mem_alloc(md, &alloc_length, &address,
+                            uct_md_mem_reg(iface->md, mem->address, mem->length, flags,    
+                    ucs_mpool_chunk_elems(mp, chunk)
+                    ucs_mpool_num_elems_per_chunk(mp, chunk, chunk_size)
+                    for (i = 0; i < chunk->num_elems; ++i)
+                        ucs_mpool_add_to_freelist(mp, elem)
+                            VALGRIND_MAKE_MEM_DEFINED(tail, sizeof *tail) -> UCS/MPOOL：在调试模式下添加 FIFO 行为选项，而不是 LIFO。FIFO 模式对于调试很有用，因为 mpool 对象不像 LIFO 那样被回收。 LIFO 的性能更好，因为它减少了缓存未命中和 mpool get/put 开销。 设置 UCS_MPOOL_FIFO=y 启用此模式
+                    VALGRIND_MAKE_MEM_NOACCESS(chunk + 1, chunk_size - sizeof(*chunk))
                 uct_iface_mpool_init(&self->super.super, &self->tx.mp,  uct_ud_iface_send_skb_init
             uct_rc_am_hdr_fill(&self->am_inl_hdr.rc_hdr, 0)
             status = uct_iface_mpool_init -> 创建地址控制器和原子内存池
-            uct_rc_verbs_iface_init_inl_wrs
+            uct_rc_verbs_iface_init_inl_wrs -> 初始化可靠连接接口上的工作请求和内联请求,设置RDMA操作码
+                iface->inl_am_wr.opcode         = IBV_WR_SEND;
+                iface->inl_am_wr.send_flags     = IBV_SEND_INLINE;
+                iface->inl_rwrite_wr.opcode     = IBV_WR_RDMA_WRITE;
+                iface->inl_rwrite_wr.send_flags = IBV_SEND_SIGNALED | IBV_SEND_INLINE;
             status = uct_rc_init_fc_thresh(&config->super, &self->super)
             status = uct_rc_iface_qp_create
+                UCS_PROFILE_CALL_ALWAYS(ibv_create_qp_ex, 或
+                UCS_PROFILE_CALL_ALWAYS(ibv_create_qp
             uct_ib_destroy_qp(qp)
         ucs_vfs_obj_add_dir(worker, *iface_p, "iface/%p", *iface_p)
         ucs_vfs_obj_add_sym_link(*iface_p, md, "memory_domain")
@@ -2037,5 +2057,79 @@ enum ibv_qp_attr_mask {
 	_IBV_QP_ALT_VID 		= 1 << 24,
 	*/
 	IBV_QP_RATE_LIMIT		= 1 << 25,
+};
+
+
+
+/**
+ * Memory pool slow-path data. 满路径数据内存池
+ */
+struct ucs_mpool_data {
+    size_t                 elem_size;       /* Size of element in the chunk */
+    size_t                 alignment;       /* Element alignment */
+    size_t                 align_offset;    /* Offset to alignment point */
+    double                 grow_factor;     /* Grow factor for number of elements per chunk */
+    size_t                 max_chunk_size;  /* Maximum chunk size to decide if chunk grows
+                                             * only take effect on grow_factor=1 */
+    unsigned               elems_per_chunk; /* Number of elements per chunk */
+    unsigned               quota;           /* How many more elements can be allocated */
+    int                    malloc_safe;     /* Avoid triggering malloc() during put/get */
+    ucs_mpool_elem_t       *tail;           /* Free list tail */
+    ucs_mpool_chunk_t      *chunks;         /* List of allocated chunks */
+    const ucs_mpool_ops_t  *ops;            /* Memory pool operations */
+    char                   *name;           /* Name - used for debugging */
+};
+
+
+
+UCS/UCT/TEST：重构和优化内存池基础设施。
++ 将 mpool 结构嵌入到结构中而不是指向它 - 减少对象分配/释放时的缓存未命中。
++ 添加内联分配函数。
++ 支持任意验证数据。
++ 支持对象清理功能。
++ 增强内存泄漏检查 - 打印哪些对象没有被释放
+
+
+
+/**
+ * @ingroup UCT_MD
+ * @brief  Memory allocation/registration flags. 内存分配或注册的控制标记位
+ */
+enum uct_md_mem_flags {
+    UCT_MD_MEM_FLAG_NONBLOCK    = UCS_BIT(0), /**< Hint to perform non-blocking
+                                                   allocation/registration: page
+                                                   mapping may be deferred until
+                                                   it is accessed by the CPU or a
+                                                   transport. */
+    UCT_MD_MEM_FLAG_FIXED       = UCS_BIT(1), /**< Place the mapping at exactly
+                                                   defined address */
+    UCT_MD_MEM_FLAG_LOCK        = UCS_BIT(2), /**< Registered memory should be
+                                                   locked. May incur extra cost for
+                                                   registration, but memory access
+                                                   is usually faster. */
+    UCT_MD_MEM_FLAG_HIDE_ERRORS = UCS_BIT(3), /**< Hide errors on memory registration.
+                                                   In some cases registration failure
+                                                   is not an error (e. g. for merged
+                                                   memory regions). */
+
+    /* memory access flags */
+    UCT_MD_MEM_ACCESS_REMOTE_PUT    = UCS_BIT(5), /**< enable remote put access */
+    UCT_MD_MEM_ACCESS_REMOTE_GET    = UCS_BIT(6), /**< enable remote get access */
+    UCT_MD_MEM_ACCESS_REMOTE_ATOMIC = UCS_BIT(7), /**< enable remote atomic access */
+    UCT_MD_MEM_ACCESS_LOCAL_READ    = UCS_BIT(8), /**< enable local read access */
+    UCT_MD_MEM_ACCESS_LOCAL_WRITE   = UCS_BIT(9), /**< enable local write access */
+
+    /** enable local and remote access for all operations */
+    UCT_MD_MEM_ACCESS_ALL =  (UCT_MD_MEM_ACCESS_REMOTE_PUT|
+                              UCT_MD_MEM_ACCESS_REMOTE_GET|
+                              UCT_MD_MEM_ACCESS_REMOTE_ATOMIC|
+                              UCT_MD_MEM_ACCESS_LOCAL_READ|
+                              UCT_MD_MEM_ACCESS_LOCAL_WRITE),
+
+    /** enable local and remote access for put and get operations */
+    UCT_MD_MEM_ACCESS_RMA = (UCT_MD_MEM_ACCESS_REMOTE_PUT|
+                             UCT_MD_MEM_ACCESS_REMOTE_GET|
+                             UCT_MD_MEM_ACCESS_LOCAL_READ|
+                             UCT_MD_MEM_ACCESS_LOCAL_WRITE)
 };
 
