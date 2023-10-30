@@ -367,7 +367,7 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
   sendrecv(oob_sock, own_dev, if_info.iface_attr.device_addr_len, (void**)&peer_dev) -> 先通过socket发送和接收长度, 然后发送和接收地址, 交换地址
   uct_iface_is_reachable 检查地址是否可达 -> uct_ib_iface_is_reachable_v2 -> static int uct_ib_iface_dev_addr_is_reachable -> ucs_test_all_flags
     device_addr = (const uct_ib_address_t*) UCS_PARAM_VALUE -> 如果设置了字段掩码中的标志，则有条件地返回参数值。 否则，返回默认值
-  status = uct_ep_create(&ep_params, &ep) -> 创建新端点 -> UCS_CLASS_DEFINE_NEW_FUNC
+  status = uct_ep_create(&ep_params, &ep) -> 创建新端点 -> UCS_CLASS_DEFINE_NEW_FUNC(uct_rc_verbs_ep_t, uct_ep_t, const uct_ep_params_t *)
   ucs_vfs_obj_set_dirty(params->iface, uct_iface_vfs_refresh)
     ucs_vfs_global_init() -> UCS_INIT_ONCE(&ucs_vfs_init_once) 单例
     ucs_vfs_node_find_by_obj -> ucs_vfs_kh_find -> klib -> kh_get -> 独立且轻量级c库: https://github.com/attractivechaos/klib
@@ -451,13 +451,15 @@ uct_iface_get_device_address
 uct_iface_get_address
 uct_ep_create
 sendrecv
-char *str = (char *)mem_type_malloc(cmd_args.test_strlen) -> 分配16字节的字符, malloc | cudaMalloc | cudaMallocManaged
-generate_test_string
+char *str = (char *)mem_type_malloc(cmd_args.test_strlen) -> 分配16字节的字符(待发送的数据), malloc | cudaMalloc | cudaMallocManaged
+generate_test_string -> 生成测试字符串
   memcpy(dst, src, count) -> 拷贝16字节的字符串到str
-do_am_zcopy(&if_info, ep, id, &cmd_args, str) -> 
-  uct_md_mem_reg -> uct_ib_mlx5_devx_mem_reg
+do_am_zcopy(&if_info, ep, id, &cmd_args, str) -> str -> char *buf 字符串地址转为buf地址
+  uct_md_mem_reg -> uct_ib_mlx5_devx_mem_reg -> 将buf地址进行内存注册得到内存控制器
+    uct_ib_memh_alloc(&md->super, length,
+    uct_ib_mlx5_devx_reg_mr(md, memh, address,
     mr = UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr, md->pd, address, length, access_flags) -> 注册该段内存
-  iov.buffer = buf
+  iov.buffer = buf -> buf转iov
   iov.memh   = memh -> 空指针
   ...
 if (barrier(oob_sock, progress_worker, if_info.worker))
@@ -1093,13 +1095,13 @@ do_am_bcopy
           ucs_queue_push(&txqp->outstanding, &op->queue)
 
 
-ucs_status_t do_am_zcopy
+ucs_status_t do_am_zcopy -> 零拷贝
   uct_md_mem_reg -> UCS_PROFILE_CALL_ALWAYS(ibv_reg_mr -> 注册内存 -> 分析函数调用, 当 access_flags 包含 IBV_ACCESS_ON_DEMAND 时，ibv_reg_mr() 可能会失败并出现 EAGAIN。 这意味着预取由于与失效冲突而失败
     __ibv_reg_mr
-  comp.uct_comp.func   = zcopy_completion_cb
+  comp.uct_comp.func   = zcopy_completion_cb -> 完成回调
   do ... while (status == UCS_ERR_NO_RESOURCE) -> 没资源时退出循环 
-  status = uct_ep_am_zcopy -> ep->iface->ops.ep_am_zcopy
-    ucs_status_t uct_rc_mlx5_ep_am_zcopy | uct_rc_verbs_ep_am_zcopy -> 可靠连接verbs端点的活动消息零拷贝
+  status = uct_ep_am_zcopy(ep, id, NULL, 0, &iov, 1, 0, (uct_completion_t *)&comp) -> ep->iface->ops.ep_am_zcopy
+    ucs_status_t uct_rc_mlx5_ep_am_zcopy | ucs_status_t uct_rc_verbs_ep_am_zcopy -> 可靠连接verbs端点的活动消息零拷贝
       UCT_CHECK_IOV_SIZE -> 检查向量IO个数, 应该不超过网卡最大发送(SGE-1), 第一个sge给header使用
       UCT_RC_CHECK_AM_ZCOPY -> 检查零拷贝参数
       UCT_RC_CHECK_RES_AND_FC -> 检查资源和流控参数
@@ -2132,4 +2134,6 @@ enum uct_md_mem_flags {
                              UCT_MD_MEM_ACCESS_LOCAL_READ|
                              UCT_MD_MEM_ACCESS_LOCAL_WRITE)
 };
+
+
 
