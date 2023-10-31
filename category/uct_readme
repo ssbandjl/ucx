@@ -1,10 +1,10 @@
 术语:
 LAG (Link Aggregation Group): 链路汇聚(bonding), 网络绑定可以将两个或多个网络接口组合成一个接口。它可以提高网络吞吐量和带宽，并在其中一个接口发生故障时提供冗余。NVIDIA ® BlueField ® DPU 可以选择以对主机透明的方式在 Arm 端配置网络绑定。在这种配置下，主机只能看到一个 PF, 参考: https://docs.nvidia.com/networking/display/bluefielddpuosv385/link+aggregation
 
+seg: Size of each RMPP segment, 每个 RMPP 段的大小, 可靠多分组处理, https://patents.google.com/patent/CN104205079B/zh, RMPP(可靠多分组处理)头部部分、SA头部、SA记录以及SA数据部分。SA头部可包括可包含RDMA启用标志的一个或多个保留字段。RMPP头部包括用于使卸载引擎能处理分组分段和重组的信息。存在各种类型的SA数据。这些类型被定义为“记录”。每个记录描述有关网络或网络上的节点的不同类型的信息。示例性记录包括例如描述有关交换机的信息、描述节点信息的记录、用于性能计数器的记录等等。这些记录是正在被请求的实际数据。这些头部用于标识查询和响应，从而使得响应可与正确的查询匹配
 
-总结:
-1. 通过socket交换地址
-2. 
+
+
 
 
 
@@ -1113,9 +1113,21 @@ ucs_status_t do_am_zcopy -> 零拷贝
     ucs_status_t uct_rc_mlx5_ep_am_zcopy | ucs_status_t uct_rc_verbs_ep_am_zcopy -> 可靠连接verbs端点的活动消息零拷贝
       struct ibv_sge sge[UCT_IB_MAX_IOV];
       UCT_CHECK_IOV_SIZE -> 检查向量IO个数, 应该不超过网卡最大发送(SGE-1), 第一个sge给header使用
-      UCT_RC_CHECK_AM_ZCOPY -> 检查零拷贝参数
+      UCT_RC_CHECK_AM_ZCOPY -> 检查零拷贝参数, 检查数据和长度
       UCT_RC_CHECK_RES_AND_FC -> 检查资源和流控参数
-      UCT_RC_IFACE_GET_TX_AM_ZCOPY_DESC -> 从内存池获取发送端零拷贝内存描述 -> UCT/RC：使用恒定的标头大小，无论 TM 状态如何
+      UCT_RC_IFACE_GET_TX_AM_ZCOPY_DESC -> 从内存池获取发送端零拷贝内存描述 -> UCT/RC：使用恒定的标头大小，无论 TM 状态如何, 从内存池中获取一个描述符，告诉valgrind它已经定义了，如果内存池为空则返回错误
+          UCT_RC_IFACE_GET_TX_DESC(_iface, _mp, _desc) -> _desc = ucs_mpool_get_inline(_mp)
+          uct_rc_zcopy_desc_set_comp(_desc, _comp, _send_flags)
+            desc->super.handler   = (uct_rc_send_handler_t)ucs_mpool_put -> 如果完成为空,则发送完成, 将内存放回池子
+            desc->super.handler   = uct_rc_ep_am_zcopy_handler -> 完成不为空,设置回调
+                uct_invoke_completion(desc->super.user_comp, UCS_OK) -> 调用发送完成
+                    ucs_debug_get_symbol_name((void*)comp->func)
+                    uct_completion_update_status(comp, status)
+                    comp->func(comp) -> 执行完成回调
+                ucs_mpool_put(desc)
+            desc->super.user_comp = comp;
+            *send_flags           = IBV_SEND_SIGNALED
+          uct_rc_zcopy_desc_set_header((uct_rc_hdr_t*)(_desc + 1), _id, _header, _header_length)
       sge_cnt = uct_ib_verbs_sge_fill_iov(sge + 1, iov, iovcnt) -> 填充IO(将iov设置到sge上), 通过 uct_iov_t 中提供的数据填充 ibv_sge 数据结构 该函数避免复制零长度的 IOV
         sge[sge_it].addr   = (uintptr_t)(iov[iov_it].buffer) -> buffer地址转sge地址
         sge[sge_it].lkey = uct_ib_memh_get_lkey(iov[iov_it].memh) -> 设置本地键
@@ -2144,6 +2156,38 @@ enum uct_md_mem_flags {
                              UCT_MD_MEM_ACCESS_LOCAL_READ|
                              UCT_MD_MEM_ACCESS_LOCAL_WRITE)
 };
+
+
+字符串操作函数: src/ucs/sys/string.c
+
+const char *ucs_debug_get_symbol_name(void *address) -> 根据地址获取符号, 缓存地址与符号表的映射, 可用于调试调用栈
+    hash_it = kh_put(ucs_debug_symbol, &ucs_debug_symbols_cache, (uintptr_t)address, &hash_extra_status);
+    sym = kh_value(&ucs_debug_symbols_cache, hash_it)
+    status = ucs_debug_lookup_address(address, &info)
+        ret = dladdr(address, &dl_info)
+        ucs_strncpy_safe(info->file.path, dl_info.dli_fname, sizeof(info->file.path))
+        ucs_strncpy_safe(info->function
+        ucs_strncpy_safe(info->source_file
+    ucs_strncpy_safe(sym, info.function, length + 1) -> 安全拷贝字符串,最后一个字符置零('\0')
+    kh_value(&ucs_debug_symbols_cache, hash_it) = sym
+
+
+
+
+
+
+
+发送回调的调用栈:
+uct_work_progress
+    ucs_callbackq_dispatch
+        count += cb(elem->arg) -> uct_rc_verbs_iface_progress
+            uct_rc_verbs_iface_poll_tx
+                uct_rc_txqp_completion_desc(&ep->super.txqp, ep->txcnt.ci + count)
+                    uct_rc_txqp_completion_op(op, ucs_derived_of(op, uct_rc_iface_send_desc_t) + 1);
+                        op->handler(op, resp) -> void uct_rc_ep_am_zcopy_handler
+                            comp->func(comp) -> void zcopy_completion_cb(uct_completion_t *self)
+                                uct_md_mem_dereg(comp->md, comp->memh)
+                                desc_holder = (void *)0xDEADBEEF
 
 
 
