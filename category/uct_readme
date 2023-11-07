@@ -393,6 +393,10 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
         uct_rc_iface_add_cq_credits -> UCT/IB：修复错误处理后清除待处理请求的问题
       ucs_arbiter_dispatch(&iface->super.tx.arbiter, 1, uct_rc_ep_process_pending, NULL) -> 在仲裁器中调度工作元素。 对于每个组，只要回调返回 REMOVE_ELEM 或 NEXT_GROUP，最多会调度 per_group 工作元素。 然后，对下一组执行相同的操作，直到仲裁器变空或回调返回 STOP。 如果一个组没有元素，或其回调返回 REMOVE_GROUP，则它将被删除，直到使用 ucs_arbiter_group_schedule() 将其放回到仲裁器上
   if (barrier(oob_sock, progress_worker, if_info.worker)) -> TCP/TEST：修复 ucp_hello_world 同时 ep close 的问题
+    send(oob_sock, &dummy, sizeof(dummy), 0)
+    do while -> res = poll(&pfd, 1, 1)
+    progress_cb(arg) -> progress_worker -> uct_worker_progress((uct_worker_h)arg) -> ...
+    recv(oob_sock, &dummy, sizeof(dummy), MSG_WAITALL)
   out_free_ep -> 释放资源
   ...
 
@@ -400,12 +404,14 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
 server:
 while (desc_holder == NULL) 
 uct_worker_progress(if_info.worker) -> static inline unsigned ucs_callbackq_dispatch -> count += cb(elem->arg)
-  static unsigned uct_rc_verbs_iface_progress(void *arg) <- self->super.progress
+    static unsigned uct_rc_verbs_iface_progress(void *arg) <- self->super.progress
     count = uct_rc_verbs_iface_poll_rx_common(iface)
-      uct_rc_verbs_iface_handle_am
+        uct_rc_verbs_iface_handle_am
         uct_iface_invoke_am
-          status = handler->cb(handler->arg, data, length, flags) -> hello_world -> 服务端收到数据后回调
-            print_strings
+            status = handler->cb(handler->arg, data, length, flags) -> hello_world -> 服务端收到数据后回调
+            print_strings("callback", func_am_t_str(func_am_type), data, length)
+            ...
+
 
 
 
