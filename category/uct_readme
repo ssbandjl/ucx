@@ -337,26 +337,30 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
                     ucs_mpool_grow -> chunk_alloc -> uct_iface_mp_chunk_alloc
                       uct_iface_mem_alloc
                     ...
-                    ibv_reg_mr_iova2
+                    ibv_reg_mr_iova2 -> 使用虚拟偏移地址注册内存区域, 参考RDMA内存注册: https://gwzlchn.github.io/202208/rdma-stack-02/#
               ibv_post_srq_recv  
       uct_rc_verbs_iface_progress(search) -> 驱动接口运转
         ucs_callbackq_add_safe
       status = uct_iface_query(iface_p->iface, &iface_p->iface_attr) -> uct_rc_verbs_iface_query
         status = uct_rc_iface_query
-          status = uct_ib_iface_query -> ucs_status_t uct_ib_iface_query
+          status = uct_ib_iface_query -> ucs_status_t uct_ib_iface_query -> 可靠IB连接,接口属性查询
             static const uint8_t ib_port_widths[] = {[1] = 1, [2] = 4, [4] = 8, [8] = 12, [16] = 2};
             uct_base_iface_query(&iface->super, iface_attr)
-            active_width = uct_ib_iface_port_attr(iface)->active_width
-            case UCT_IB_SPEED_EDR -> 网卡速度
-              iface_attr->latency.c = 600e-9
-              signal_rate           = 25.78125e9
-              encoding              = 64.0/66.0
-            num_path   = uct_ib_iface_is_roce(iface) 
+                active_width = uct_ib_iface_port_attr(iface)->active_width -> 获取IB接口实际带宽
+                switch (active_speed)
+                    case UCT_IB_SPEED_EDR -> 网卡速度
+                    iface_attr->latency.c = 600e-9
+                    signal_rate           = 25.78125e9
+                    encoding              = 64.0/66.0
+            num_path   = uct_ib_iface_is_roce(iface) -> 计算线速(公式): Width(位宽) * SignalRate(速率) * Encoding(编码) * Num_paths(路径数量)
+            extra_pkt_len = UCT_IB_BTH_LEN + xport_hdr_len +  UCT_IB_ICRC_LEN + UCT_IB_VCRC_LEN + UCT_IB_DELIM_LEN -> 计算包开销(额外的), 基本传输头(12字节) + CRC(4B) + VCRC(2B) + IB 线分隔符(2B)
+            extra_pkt_len += UCT_IB_GRH_LEN + UCT_IB_ROCE_LEN -> 全局路由头(40B) + ROCE(14B)
+            iface_attr->bandwidth.shared    = ucs_min((wire_speed * mtu) / (mtu + extra_pkt_len), md->pci_bw) -> 共享带宽计算公式, 与PCI带宽比较,取较小的值
           uct_ib_device_has_pci_atomics(dev))
-        iface_attr->latency.m += 1e-9 -> 1ns 纳秒
-        iface_attr->overhead   = 75e-9
+        iface_attr->latency.m += 1e-9 -> 1ns 纳秒(每个附加QP)
+        iface_attr->overhead   = 75e-9 -> 软件开销
         iface_attr->ep_addr_len = uct_ib_md_is_flush_rkey_valid
-  status = uct_iface_set_am_handler(if_info.iface, id, hello_world, &cmd_args.func_am_type, 0) -> 设置服务端接收到客户端数据后的回调
+  status = uct_iface_set_am_handler(if_info.iface, id, hello_world, &cmd_args.func_am_type, 0) -> 设置服务端接收到客户端数据后的回调 -> static ucs_status_t hello_world
     iface->am[id].cb    = cb
   connect_common
     ret = getaddrinfo(server, service, &hints, &res)
@@ -387,12 +391,16 @@ gdb: examples/uct_hello_world.c -> int main(int argc, char **argv)
       UCT_RC_VERBS_IFACE_FOREACH_TXWQE(&iface->super, i, wc, num_wcs) -> 遍历宏
       uct_rc_txqp_completion_desc
       ucs_arbiter_group_schedule -> 安排一个小组进行仲裁。 如果该组已经存在，则该操作将无效
+        ucs_arbiter_schedule_head_if_not_scheduled(arbiter, head)
+            ucs_list_add_tail(&arbiter->list, &head->list)
       uct_rc_verbs_update_tx_res(&iface->super, ep, count)
         uct_rc_txqp_available_add
         uct_rc_iface_update_reads -> 将 RDMA_READ 积分释放回 RC iface。 RDMA_READ 积分在完成回调中释放，但不会释放到 RC iface 以避免 OOO 发送。 否则，如果读取信用是唯一缺少的资源并在完成回调中释放，则即使挂起队列不为空，下一个完成回调也将能够发送
         uct_rc_iface_add_cq_credits -> UCT/IB：修复错误处理后清除待处理请求的问题
       ucs_arbiter_dispatch(&iface->super.tx.arbiter, 1, uct_rc_ep_process_pending, NULL) -> 在仲裁器中调度工作元素。 对于每个组，只要回调返回 REMOVE_ELEM 或 NEXT_GROUP，最多会调度 per_group 工作元素。 然后，对下一组执行相同的操作，直到仲裁器变空或回调返回 STOP。 如果一个组没有元素，或其回调返回 REMOVE_GROUP，则它将被删除，直到使用 ucs_arbiter_group_schedule() 将其放回到仲裁器上
-  if (barrier(oob_sock, progress_worker, if_info.worker)) -> TCP/TEST：修复 ucp_hello_world 同时 ep close 的问题
+        ucs_arbiter_dispatch_nonempty -> 仲裁器可以以循环方式安排组之间的工作，为每个组使用最少数量的内存
+            ucs_arbiter_elem_init
+  if (barrier(oob_sock, progress_worker, if_info.worker)) -> TCP/TEST：修复 ucp_hello_world 同时 ep close 的问题, UCP：当双方都关闭其 TCP 端点时，一方在尝试关闭刷新其端点时可以接收连接重置事件。 在这种情况下，我们不应该尝试调用用户错误回调。 相反，关闭操作应以 CONNECTION_RESET 状态完成。 UCT/TCP：出现错误时需要清除未完成的 PUT 操作。 测试：在多个传输上运行 ucp_hello_world。 目前，它仅在 docker 内运行时才使用 TCP，因此未检测到问题。 修复 hello_world 测试中的屏障以防止失败。
     send(oob_sock, &dummy, sizeof(dummy), 0)
     do while -> res = poll(&pfd, 1, 1)
     progress_cb(arg) -> progress_worker -> uct_worker_progress((uct_worker_h)arg) -> ...
@@ -1156,7 +1164,11 @@ ucs_status_t do_am_zcopy -> 零拷贝
                 uct_ib_mlx5_bf_copy_bb -> UCP/UCT/IB：修复UCT中的线程模式,当以“序列化”模式创建 IB 接口时，请确保刷新写入组合缓冲区，以避免在另一个线程使用同一 MMIO 寄存器时数据损坏
                   UCS_WORD_COPY(uint64_t, dst, uint64_t, src, MLX5_SEND_WQE_BB) -> UCT/IB：为 DM 字节复制循环解决无效的 GCC 矢量化问题 GCC 可以生成“movdqa”指令，该指令假定源缓冲区与 16 字节对齐，但是源缓冲区是由用户提供的，并且可能未对齐。 将源缓冲区类型声明为严格未对齐，以防止 GCC 进行无效矢量化
             uct_rc_txqp_posted
-        uct_rc_txqp_add_send_comp
+        uct_rc_txqp_add_send_comp op_flags | UCT_RC_IFACE_SEND_OP_FLAG_ZCOPY
+            uct_rc_ep_send_op_set_iov
+                uct_iov_to_iovec -> 通过 UCT IOV 数组中提供的数据填充 IOVEC 数据结构。 该函数避免复制长度为零的 IOV
+                    UCS_PTR_BYTE_OFFSET -> ((void *)((intptr_t)(_ptr) + (intptr_t)(_offset))) -> 通过内存地址偏移找到指定的内存地址
+            uct_rc_txqp_add_send_op_sn(txqp, op, sn)
       UCT_RC_UPDATE_FC -> 更新流控
   uct_worker_progress
 
@@ -2197,3 +2209,54 @@ uct_work_progress
 
 
 
+常用宏:src/ucs/sys/compiler_def.h
+#define UCS_F_PRINTF(fmtargN, vargN) __attribute__((format(printf, fmtargN, vargN)))
+
+/* Unused variable */
+#define UCS_V_UNUSED __attribute__((unused))
+
+/* Aligned variable */
+#define UCS_V_ALIGNED(_align) __attribute__((aligned(_align)))
+
+/* Used for labels */
+#define UCS_EMPTY_STATEMENT {}
+
+/* Helper macro for address arithmetic in bytes */
+#define UCS_PTR_BYTE_OFFSET(_ptr, _offset) \
+    ((void *)((intptr_t)(_ptr) + (intptr_t)(_offset)))
+
+/* Helper macro to calculate an address with offset equal to size of _type */
+#define UCS_PTR_TYPE_OFFSET(_ptr, _type) \
+    ((void *)((ucs_typeof(_type) *)(_ptr) + 1))
+
+/* Helper macro to calculate ptr difference (_end - _start) */
+#define UCS_PTR_BYTE_DIFF(_start, _end) \
+    ((ptrdiff_t)((uintptr_t)(_end) - (uintptr_t)(_start)))
+
+
+/**
+ * Size of statically-declared array
+ */
+#define ucs_static_array_size(_array) \
+    (sizeof(_array) / sizeof((_array)[0]))
+
+
+/**
+ * @return Offset of _member in _type. _type is a structure type.
+ */
+#define ucs_offsetof(_type, _member) \
+    ((unsigned long)&( ((_type*)0)->_member ))
+
+
+uct_ib_mlx5_check_completion_with_err
+handle_failure
+uct_dc_mlx5_iface_handle_failure
+    uct_dc_mlx5_dci_keepalive_handle_failure
+        ucs_queue_pull(&txqp->outstanding)
+
+
+
+uct_rc_mlx5_iface_common_poll_rx
+    uct_rc_mlx5_iface_poll_rx_cq
+        uct_ib_mlx5_poll_cq uct_rc_mlx5_iface_check_rx_completion
+        
