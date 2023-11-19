@@ -1159,16 +1159,18 @@ ucs_status_t do_am_zcopy -> 零拷贝
               uct_ib_mlx5_txwq_validate
               ucs_memory_cpu_store_fence -> 内存屏障 -> asm volatile(""::: "memory") -> 防止编译器重新排序指令
               *wq->dbrec = htonl(sw_pi += num_bb) -> 写门铃记录, volatile uint32_t           *dbrec;
-              ucs_memory_bus_store_fence()
+              ucs_memory_bus_store_fence() -> asm volatile ("sfence" ::: "memory") -> sfence:  store| 在sfence指令前的写操作当必须在sfence指令后的写操作前完成。
               ucs_likely uct_ib_mlx5_bf_copy
                 uct_ib_mlx5_bf_copy_bb -> UCP/UCT/IB：修复UCT中的线程模式,当以“序列化”模式创建 IB 接口时，请确保刷新写入组合缓冲区，以避免在另一个线程使用同一 MMIO 寄存器时数据损坏
                   UCS_WORD_COPY(uint64_t, dst, uint64_t, src, MLX5_SEND_WQE_BB) -> UCT/IB：为 DM 字节复制循环解决无效的 GCC 矢量化问题 GCC 可以生成“movdqa”指令，该指令假定源缓冲区与 16 字节对齐，但是源缓冲区是由用户提供的，并且可能未对齐。 将源缓冲区类型声明为严格未对齐，以防止 GCC 进行无效矢量化
             uct_rc_txqp_posted
+                UCS_STATS_UPDATE_COUNTER(txqp->stats, UCT_RC_TXQP_STAT_SIGNAL, 1);
         uct_rc_txqp_add_send_comp op_flags | UCT_RC_IFACE_SEND_OP_FLAG_ZCOPY
             uct_rc_ep_send_op_set_iov
                 uct_iov_to_iovec -> 通过 UCT IOV 数组中提供的数据填充 IOVEC 数据结构。 该函数避免复制长度为零的 IOV
                     UCS_PTR_BYTE_OFFSET -> ((void *)((intptr_t)(_ptr) + (intptr_t)(_offset))) -> 通过内存地址偏移找到指定的内存地址
             uct_rc_txqp_add_send_op_sn(txqp, op, sn)
+                ucs_queue_push(&txqp->outstanding, &op->queue);
       UCT_RC_UPDATE_FC -> 更新流控
   uct_worker_progress
 
@@ -2260,3 +2262,6 @@ uct_rc_mlx5_iface_common_poll_rx
     uct_rc_mlx5_iface_poll_rx_cq
         uct_ib_mlx5_poll_cq uct_rc_mlx5_iface_check_rx_completion
         
+
+
+uct_rc_txqp_purge_outstanding        
