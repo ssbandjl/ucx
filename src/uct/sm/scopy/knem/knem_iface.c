@@ -44,7 +44,7 @@ uct_knem_iface_is_reachable_v2(const uct_iface_h tl_iface,
 {
     return uct_iface_is_reachable_params_valid(
                    params, UCT_IFACE_IS_REACHABLE_FIELD_DEVICE_ADDR) &&
-           uct_sm_iface_is_reachable(tl_iface, params->device_addr) &&
+           uct_sm_iface_is_reachable(tl_iface, params) &&
            uct_iface_scope_is_reachable(tl_iface, params);
 }
 
@@ -75,7 +75,7 @@ static uct_iface_ops_t uct_knem_iface_tl_ops = {
 
 static uct_scopy_iface_ops_t uct_knem_iface_ops = {
     .super = {
-        .iface_estimate_perf   = uct_base_iface_estimate_perf,
+        .iface_estimate_perf   = uct_scopy_iface_estimate_perf,
         .iface_vfs_refresh     = (uct_iface_vfs_refresh_func_t)ucs_empty_function,
         .ep_query              = (uct_ep_query_func_t)ucs_empty_function_return_unsupported,
         .ep_invalidate         = (uct_ep_invalidate_func_t)ucs_empty_function_return_unsupported,
