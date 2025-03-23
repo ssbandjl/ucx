@@ -45,7 +45,7 @@ ucs_status_t ucp_tag_rndv_process_rts(ucp_worker_h worker,
         ucp_tag_offload_try_cancel(worker, rreq, UCP_TAG_OFFLOAD_CANCEL_FORCE);
         ucp_tag_rndv_matched(worker, rreq, rts_hdr, length);
 
-        UCP_WORKER_STAT_RNDV(worker, EXP, 1);
+        UCP_WORKER_STAT_RNDV(worker, RX_EXP, 1);
         return UCS_OK;
     }
 
@@ -153,21 +153,21 @@ UCS_PROFILE_FUNC(ucs_status_t, ucp_tag_rndv_rts_progress, (self),
     return status;
 }
 
-ucs_status_t ucp_tag_rndv_rts_init(const ucp_proto_init_params_t *init_params)
+static void ucp_tag_rndv_rts_probe(const ucp_proto_init_params_t *init_params)
 {
     if (!ucp_tag_rndv_check_op_id(init_params) ||
         ucp_ep_config_key_has_tag_lane(init_params->ep_config_key)) {
-        return UCS_ERR_UNSUPPORTED;
+        return;
     }
 
-    return ucp_proto_rndv_rts_init(init_params);
+    ucp_proto_rndv_rts_probe(init_params);
 }
 
 ucp_proto_t ucp_tag_rndv_proto = {
     .name     = "tag/rndv",
     .desc     = NULL,
     .flags    = 0,
-    .init     = ucp_tag_rndv_rts_init,
+    .probe    = ucp_tag_rndv_rts_probe,
     .query    = ucp_proto_rndv_rts_query,
     .progress = {ucp_tag_rndv_rts_progress},
     .abort    = ucp_proto_rndv_rts_abort,

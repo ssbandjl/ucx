@@ -10,51 +10,11 @@
 #include <ucs/sys/preprocessor.h>
 #include <ucs/profile/profile.h>
 #include <ucs/async/eventfd.h>
-#include <cuda_runtime.h>
 #include <cuda.h>
 #include <nvml.h>
 
 
 const char *uct_cuda_base_cu_get_error_string(CUresult result);
-
-
-#if CUDART_VERSION >= 11010
-#define UCT_CUDA_FUNC_PTX_ERR(_result, _func, _err_str)         \
-    do {                                                        \
-        if (_result == cudaErrorUnsupportedPtxVersion) {        \
-            ucs_error("%s() failed: %s",                        \
-                      UCS_PP_MAKE_STRING(_func), _err_str);     \
-        }                                                       \
-    } while (0);
-#else
-#define UCT_CUDA_FUNC_PTX_ERR(_result, _func, _err_str)         \
-    do {                                                        \
-    } while (0);
-#endif
-
-
-#define UCT_CUDA_CALL(_log_level, _func, ...) \
-    ({ \
-        ucs_status_t _status = UCS_OK; \
-        { \
-            cudaError_t _result = UCS_PROFILE_CALL_ALWAYS(_func, __VA_ARGS__); \
-            if (cudaSuccess != _result) { \
-                if ((_log_level) != UCS_LOG_LEVEL_ERROR) { \
-                    UCT_CUDA_FUNC_PTX_ERR(_result, _func, \
-                                          cudaGetErrorString(_result)); \
-                } \
-                ucs_log((_log_level), "%s() failed: %s", \
-                        UCS_PP_MAKE_STRING(_func), \
-                        cudaGetErrorString(_result)); \
-                _status = UCS_ERR_IO_ERROR; \
-            } \
-        } \
-        _status; \
-    })
-
-
-#define UCT_CUDA_CALL_LOG_ERR(_func, ...) \
-    UCT_CUDA_CALL(UCS_LOG_LEVEL_ERROR, _func, __VA_ARGS__)
 
 
 #define UCT_NVML_FUNC(_func, _log_level) \
@@ -78,6 +38,12 @@ const char *uct_cuda_base_cu_get_error_string(CUresult result);
 #define UCT_NVML_FUNC_LOG_ERR(_func) \
     UCT_NVML_FUNC(_func, UCS_LOG_LEVEL_ERROR)
 
+
+#define UCT_CUDADRV_LOG(_func, _log_level, _result) \
+    ucs_log((_log_level), "%s failed: %s", UCS_PP_MAKE_STRING(_func), \
+            uct_cuda_base_cu_get_error_string(_result))
+
+
 #define UCT_CUDADRV_FUNC(_func, _log_level) \
     ({ \
         ucs_status_t _status = UCS_OK; \
@@ -86,9 +52,7 @@ const char *uct_cuda_base_cu_get_error_string(CUresult result);
             if (CUDA_ERROR_NOT_READY == _result) { \
                 _status = UCS_INPROGRESS; \
             } else if (CUDA_SUCCESS != _result) { \
-                ucs_log((_log_level), "%s failed: %s", \
-                        UCS_PP_MAKE_STRING(_func), \
-                        uct_cuda_base_cu_get_error_string(_result)); \
+                UCT_CUDADRV_LOG(_func, _log_level, _result); \
                 _status = UCS_ERR_IO_ERROR; \
             } \
         } while (0); \
@@ -98,6 +62,10 @@ const char *uct_cuda_base_cu_get_error_string(CUresult result);
 
 #define UCT_CUDADRV_FUNC_LOG_ERR(_func) \
     UCT_CUDADRV_FUNC(_func, UCS_LOG_LEVEL_ERROR)
+
+
+#define UCT_CUDADRV_FUNC_LOG_WARN(_func) \
+    UCT_CUDADRV_FUNC(_func, UCS_LOG_LEVEL_WARN)
 
 
 #define UCT_CUDADRV_FUNC_LOG_DEBUG(_func) \
@@ -112,10 +80,39 @@ static UCS_F_ALWAYS_INLINE int uct_cuda_base_is_context_active()
 }
 
 
+static UCS_F_ALWAYS_INLINE int uct_cuda_base_is_context_valid(CUcontext ctx)
+{
+    unsigned version;
+    ucs_status_t status;
+
+    /* Check if CUDA context is valid by running a dummy operation on it */
+    status = UCT_CUDADRV_FUNC_LOG_DEBUG(cuCtxGetApiVersion(ctx, &version));
+    return (status == UCS_OK);
+}
+
+
 static UCS_F_ALWAYS_INLINE int uct_cuda_base_context_match(CUcontext ctx1,
                                                            CUcontext ctx2)
 {
-    return ((ctx1 != NULL) && (ctx1 == ctx2));
+    return ((ctx1 != NULL) && (ctx1 == ctx2) &&
+            uct_cuda_base_is_context_valid(ctx1));
+}
+
+
+static UCS_F_ALWAYS_INLINE CUresult
+uct_cuda_base_ctx_get_id(CUcontext ctx, unsigned long long *ctx_id_p)
+{
+    unsigned long long ctx_id = 0;
+
+#if CUDA_VERSION >= 12000
+    CUresult result = cuCtxGetId(ctx, &ctx_id);
+    if (ucs_unlikely(result != CUDA_SUCCESS)) {
+        return result;
+    }
+#endif
+
+    *ctx_id_p = ctx_id;
+    return CUDA_SUCCESS;
 }
 
 
@@ -123,7 +120,8 @@ typedef enum uct_cuda_base_gen {
     UCT_CUDA_BASE_GEN_P100 = 6,
     UCT_CUDA_BASE_GEN_V100 = 7,
     UCT_CUDA_BASE_GEN_A100 = 8,
-    UCT_CUDA_BASE_GEN_H100 = 9
+    UCT_CUDA_BASE_GEN_H100 = 9,
+    UCT_CUDA_BASE_GEN_B100 = 10
 } uct_cuda_base_gen_t;
 
 
@@ -154,5 +152,21 @@ UCS_CLASS_INIT_FUNC(uct_cuda_iface_t, uct_iface_ops_t *tl_ops,
                     uct_iface_internal_ops_t *ops, uct_md_h md,
                     uct_worker_h worker, const uct_iface_params_t *params,
                     const uct_iface_config_t *tl_config, const char *dev_name);
+
+
+/**
+ * Retain the primary context on the given CUDA device.
+ *
+ * @param [in]  cuda_device Device for which primary context is requested.
+ * @param [in]  force       Retain the primary context regardless of its state.
+ * @param [out] cuda_ctx_p  Returned context handle of the retained context.
+ *
+ * @return UCS_OK if the method completes successfully. UCS_ERR_NO_DEVICE if the
+ *         primary device context is inactive on the given CUDA device and
+ *         retaining is not forced. UCS_ERR_IO_ERROR if the CUDA driver API
+ *         methods called inside failed with an error.
+ */
+ucs_status_t uct_cuda_primary_ctx_retain(CUdevice cuda_device, int force,
+                                         CUcontext *cuda_ctx_p);
 
 #endif

@@ -32,18 +32,14 @@ static ucs_config_field_t uct_rocm_copy_iface_config_table[] = {
      ucs_offsetof(uct_rocm_copy_iface_config_t, h2d_thresh),
      UCS_CONFIG_TYPE_MEMUNITS},
 
-    {"ENABLE_ASYNC_ZCOPY", "y",
-     "Enable asynchronous zcopy operations",
+    {"ENABLE_ASYNC_ZCOPY", "y", "Enable asynchronous zcopy operations",
      ucs_offsetof(uct_rocm_copy_iface_config_t, enable_async_zcopy),
      UCS_CONFIG_TYPE_BOOL},
 
-    {"LAT", "2e-7",
-     "Latency",
-     ucs_offsetof(uct_rocm_copy_iface_config_t, latency),
-     UCS_CONFIG_TYPE_TIME},
+    {"LAT", "1e-7", "Latency",
+     ucs_offsetof(uct_rocm_copy_iface_config_t, latency), UCS_CONFIG_TYPE_TIME},
 
-    {"SIGPOOL_MAX_ELEMS", "1024",
-     "Maximum number of elements in signal pool",
+    {"SIGPOOL_MAX_ELEMS", "1024", "Maximum number of elements in signal pool",
      ucs_offsetof(uct_rocm_copy_iface_config_t, sigpool_max_elems),
      UCS_CONFIG_TYPE_UINT},
 
@@ -76,9 +72,18 @@ static int uct_rocm_copy_iface_is_reachable_v2(
     }
 
     addr = (uct_rocm_copy_iface_addr_t*)params->iface_addr;
+    if (addr == NULL) {
+        uct_iface_fill_info_str_buf(params, "device address is empty");
+        return 0;
+    }
 
-    return (addr != NULL) && (iface->id == *addr) &&
-           uct_iface_scope_is_reachable(tl_iface, params);
+    if (iface->id != *addr) {
+        uct_iface_fill_info_str_buf(
+                params, "different iface id %"PRIx64" vs %"PRIx64"", iface->id, *addr);
+        return 0;
+    }
+
+    return uct_iface_scope_is_reachable(tl_iface, params);
 }
 
 static ucs_status_t uct_rocm_copy_iface_query(uct_iface_h tl_iface,
@@ -166,8 +171,8 @@ static uct_iface_ops_t uct_rocm_copy_iface_ops = {
     .ep_put_short             = uct_rocm_copy_ep_put_short,
     .ep_get_zcopy             = uct_rocm_copy_ep_get_zcopy,
     .ep_put_zcopy             = uct_rocm_copy_ep_put_zcopy,
-    .ep_pending_add           = ucs_empty_function_return_busy,
-    .ep_pending_purge         = ucs_empty_function,
+    .ep_pending_add           = (uct_ep_pending_add_func_t)ucs_empty_function_return_busy,
+    .ep_pending_purge         = (uct_ep_pending_purge_func_t)ucs_empty_function,
     .ep_flush                 = uct_base_ep_flush,
     .ep_fence                 = uct_base_ep_fence,
     .ep_create                = UCS_CLASS_NEW_FUNC_NAME(uct_rocm_copy_ep_t),
@@ -184,33 +189,71 @@ static uct_iface_ops_t uct_rocm_copy_iface_ops = {
     .iface_is_reachable       = uct_base_iface_is_reachable
 };
 
+static UCS_F_ALWAYS_INLINE void
+uct_rocm_copy_set_default_bandwidth(uct_perf_attr_t *perf_attr)
+{
+    switch (perf_attr->operation) {
+    case UCT_EP_OP_GET_SHORT:
+        perf_attr->bandwidth.shared = 2000.0 * UCS_MBYTE;
+        break;
+    case UCT_EP_OP_GET_ZCOPY:
+        perf_attr->bandwidth.shared = 8000.0 * UCS_MBYTE;
+        break;
+    case UCT_EP_OP_PUT_SHORT:
+        perf_attr->bandwidth.shared = 10500.0 * UCS_MBYTE;
+        break;
+    case UCT_EP_OP_PUT_ZCOPY:
+        perf_attr->bandwidth.shared = 9500.0 * UCS_MBYTE;
+        break;
+    default:
+        perf_attr->bandwidth.shared = 0;
+        break;
+    }
+}
+
+static UCS_F_ALWAYS_INLINE void
+uct_rocm_copy_set_mi300a_bandwidth(uct_perf_attr_t *perf_attr)
+{
+    switch (perf_attr->operation) {
+    case UCT_EP_OP_GET_SHORT:
+        perf_attr->bandwidth.shared = 6000.0 * UCS_MBYTE;
+        break;
+    case UCT_EP_OP_GET_ZCOPY:
+        perf_attr->bandwidth.shared = 8000.0 * UCS_MBYTE;
+        break;
+    case UCT_EP_OP_PUT_SHORT:
+        perf_attr->bandwidth.shared = 10500.0 * UCS_MBYTE;
+        break;
+    case UCT_EP_OP_PUT_ZCOPY:
+        perf_attr->bandwidth.shared = 25000.0 * UCS_MBYTE;
+        break;
+    default:
+        perf_attr->bandwidth.shared = 0;
+        break;
+    }
+}
 
 static ucs_status_t
 uct_rocm_copy_estimate_perf(uct_iface_h tl_iface, uct_perf_attr_t *perf_attr)
 {
-    uct_rocm_copy_iface_t *iface = ucs_derived_of(tl_iface,
-                                                  uct_rocm_copy_iface_t);
+    uct_rocm_copy_iface_t *iface                  = ucs_derived_of(tl_iface,
+                                                                   uct_rocm_copy_iface_t);
+    static uct_rocm_amd_gpu_product_t gpu_product = UCT_ROCM_AMD_GPU_UNDEFINED;
+
+    if (gpu_product == UCT_ROCM_AMD_GPU_UNDEFINED) {
+        gpu_product = uct_rocm_base_get_gpu_product();
+    }
+
     if (perf_attr->field_mask & UCT_PERF_ATTR_FIELD_BANDWIDTH) {
         perf_attr->bandwidth.dedicated = 0;
         if (!(perf_attr->field_mask & UCT_PERF_ATTR_FIELD_OPERATION)) {
             perf_attr->bandwidth.shared = 0;
         } else {
-            switch (perf_attr->operation) {
-            case UCT_EP_OP_GET_SHORT:
-                perf_attr->bandwidth.shared = 2000.0 * UCS_MBYTE;
-                break;
-            case UCT_EP_OP_GET_ZCOPY:
-                perf_attr->bandwidth.shared = 8000.0 * UCS_MBYTE;
-                break;
-            case UCT_EP_OP_PUT_SHORT:
-                perf_attr->bandwidth.shared = 10500.0 * UCS_MBYTE;
-                break;
-            case UCT_EP_OP_PUT_ZCOPY:
-                perf_attr->bandwidth.shared = 9500.0 * UCS_MBYTE;
-                break;
-            default:
-                perf_attr->bandwidth.shared = 0;
-                break;
+            if (gpu_product == UCT_ROCM_AMD_GPU_MI300A ||
+                gpu_product == UCT_ROCM_AMD_GPU_MI300X) {
+                uct_rocm_copy_set_mi300a_bandwidth(perf_attr);
+            } else {
+                uct_rocm_copy_set_default_bandwidth(perf_attr);
             }
         }
     }
@@ -235,6 +278,10 @@ uct_rocm_copy_estimate_perf(uct_iface_h tl_iface, uct_perf_attr_t *perf_attr)
         perf_attr->max_inflight_eps = SIZE_MAX;
     }
 
+    if (perf_attr->field_mask & UCT_PERF_ATTR_FIELD_FLAGS) {
+        perf_attr->flags = 0;
+    }
+
     return UCS_OK;
 }
 
@@ -244,7 +291,7 @@ static uct_iface_internal_ops_t uct_rocm_copy_iface_internal_ops = {
     .iface_vfs_refresh     = (uct_iface_vfs_refresh_func_t)ucs_empty_function,
     .ep_query              = (uct_ep_query_func_t)ucs_empty_function_return_unsupported,
     .ep_invalidate         = (uct_ep_invalidate_func_t)ucs_empty_function_return_unsupported,
-    .ep_connect_to_ep_v2   = ucs_empty_function_return_unsupported,
+    .ep_connect_to_ep_v2   = (uct_ep_connect_to_ep_v2_func_t)ucs_empty_function_return_unsupported,
     .iface_is_reachable_v2 = uct_rocm_copy_iface_is_reachable_v2,
     .ep_is_connected       = uct_base_ep_is_connected
 };

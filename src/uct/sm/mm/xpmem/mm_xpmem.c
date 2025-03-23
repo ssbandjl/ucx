@@ -181,6 +181,7 @@ static void uct_xpmem_rcache_dump_region(void *context, ucs_rcache_t *rcache,
 static ucs_rcache_ops_t uct_xpmem_rcache_ops = {
     .mem_reg     = uct_xpmem_rcache_mem_reg,
     .mem_dereg   = uct_xpmem_rcache_mem_dereg,
+    .merge       = (void*)ucs_empty_function,
     .dump_region = uct_xpmem_rcache_dump_region
 };
 
@@ -248,8 +249,6 @@ uct_xpmem_rmem_add(xpmem_segid_t xsegid, uct_xpmem_remote_mem_t **rmem_p)
     }
 
     rcache_params.region_struct_size = sizeof(uct_xpmem_remote_region_t);
-    rcache_params.alignment          = ucs_get_page_size();
-    rcache_params.max_alignment      = ucs_get_page_size();
     rcache_params.ucm_events         = 0;
     rcache_params.ucm_event_priority = 0;
     rcache_params.ops                = &uct_xpmem_rcache_ops;
@@ -370,7 +369,8 @@ uct_xpmem_mem_attach_common(xpmem_segid_t xsegid, uintptr_t remote_address,
     end   = ucs_align_up_pow2  (remote_address + length, ucs_get_page_size());
 
     status = ucs_rcache_get(rmem->rcache, (void*)start, end - start,
-                            PROT_READ|PROT_WRITE, NULL, &rcache_region);
+			    ucs_get_page_size(), PROT_READ | PROT_WRITE, NULL,
+			    &rcache_region);
     if (status != UCS_OK) {
         goto err_rmem_put;
     }
@@ -423,9 +423,9 @@ uct_xmpem_mem_dereg(uct_md_h md,
 }
 
 static ucs_status_t
-uct_xpmem_mkey_pack(uct_md_h tl_md, uct_mem_h memh,
-                    const uct_md_mkey_pack_params_t *params,
-                    void *mkey_buffer)
+uct_xpmem_mkey_pack(uct_md_h tl_md, uct_mem_h memh, void *address,
+		    size_t length, const uct_md_mkey_pack_params_t *params,
+		    void *mkey_buffer)
 {
     uct_mm_seg_t                    *seg = memh;
     uct_xpmem_packed_rkey_t *packed_rkey = mkey_buffer;
@@ -534,21 +534,22 @@ static uct_mm_md_mapper_ops_t uct_xpmem_md_ops = {
     .super = {
         .close              = uct_mm_md_close,
         .query              = uct_xpmem_md_query,
-        .mem_alloc          = ucs_empty_function_return_unsupported,
-        .mem_free           = ucs_empty_function_return_unsupported,
-        .mem_advise         = ucs_empty_function_return_unsupported,
+        .mem_alloc          = (uct_md_mem_alloc_func_t)ucs_empty_function_return_unsupported,
+        .mem_free           = (uct_md_mem_free_func_t)ucs_empty_function_return_unsupported,
+        .mem_advise         = (uct_md_mem_advise_func_t)ucs_empty_function_return_unsupported,
         .mem_reg            = uct_xmpem_mem_reg,
         .mem_dereg          = uct_xmpem_mem_dereg,
-        .mem_attach         = ucs_empty_function_return_unsupported,
+        .mem_query          = (uct_md_mem_query_func_t)ucs_empty_function_return_unsupported,
         .mkey_pack          = uct_xpmem_mkey_pack,
-        .detect_memory_type = ucs_empty_function_return_unsupported
+        .mem_attach         = (uct_md_mem_attach_func_t)ucs_empty_function_return_unsupported,
+        .detect_memory_type = (uct_md_detect_memory_type_func_t)ucs_empty_function_return_unsupported
     },
     .query             = uct_xpmem_query,
     .iface_addr_length = uct_xpmem_iface_addr_length,
     .iface_addr_pack   = uct_xpmem_iface_addr_pack,
     .mem_attach        = uct_xpmem_mem_attach,
     .mem_detach        = uct_xpmem_mem_detach,
-    .is_reachable      = ucs_empty_function_return_one_int
+    .is_reachable      = (uct_mm_mapper_is_reachable_func_t)ucs_empty_function_return_one_int
 };
 
 static void uct_xpmem_global_init()

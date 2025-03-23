@@ -13,7 +13,7 @@
 
 #include <ucs/arch/cpu.h>
 #include <ucs/profile/profile.h>
-#include <ucs/sys/math.h>
+#include <ucs/sys/ptr_arith.h>
 
 
 typedef struct {
@@ -69,6 +69,7 @@ ucs_status_t uct_mem_alloc(size_t length, const uct_alloc_method_t *methods,
 {
     const char *alloc_name;
     const uct_alloc_method_t *method;
+    ucs_log_level_t log_level;
     ucs_memory_type_t mem_type;
     uct_md_attr_t md_attr;
     ucs_status_t status;
@@ -101,6 +102,8 @@ ucs_status_t uct_mem_alloc(size_t length, const uct_alloc_method_t *methods,
     mem_type     = (params->field_mask & UCT_MEM_ALLOC_PARAM_FIELD_MEM_TYPE) ?
                    params->mem_type : UCS_MEMORY_TYPE_HOST;
     alloc_length = length;
+    log_level    = (flags & UCT_MD_MEM_FLAG_HIDE_ERRORS) ? UCS_LOG_LEVEL_DEBUG :
+                   UCS_LOG_LEVEL_ERROR;
 
     ucs_trace("allocating %s: %s memory length %zu flags 0x%x", alloc_name,
               ucs_memory_type_names[mem_type], alloc_length, flags);
@@ -122,7 +125,7 @@ ucs_status_t uct_mem_alloc(size_t length, const uct_alloc_method_t *methods,
                 md           = params->mds.mds[md_index];
                 status = uct_md_query(md, &md_attr);
                 if (status != UCS_OK) {
-                    ucs_error("Failed to query MD");
+                    ucs_log(log_level, "Failed to query MD");
                     goto out;
                 }
 
@@ -152,9 +155,10 @@ ucs_status_t uct_mem_alloc(size_t length, const uct_alloc_method_t *methods,
                                           mem_type, flags, alloc_name,
                                           &memh);
                 if (status != UCS_OK) {
-                    ucs_error("failed to allocate %zu bytes using md %s for %s: %s",
-                              alloc_length, md->component->name,
-                              alloc_name, ucs_status_string(status));
+                    ucs_log(log_level,
+                            "failed to allocate %zu bytes using md %s for %s: %s",
+                            alloc_length, md->component->name, alloc_name,
+                            ucs_status_string(status));
                     goto out;
                 }
 
@@ -289,7 +293,10 @@ ucs_status_t uct_mem_alloc(size_t length, const uct_alloc_method_t *methods,
         }
     }
 
-    ucs_debug("could not allocate memory with any of the provided methods");
+    ucs_debug("could not allocate %s: %s memory length=%zu flags=0x%x "
+              "num_methods=%u",
+              alloc_name, ucs_memory_type_names[mem_type], alloc_length, flags,
+              num_methods);
     status = UCS_ERR_NO_MEMORY;
     goto out;
 
@@ -351,30 +358,33 @@ ucs_status_t uct_iface_mem_alloc(uct_iface_h tl_iface, size_t length, unsigned f
                                  const char *name, uct_allocated_memory_t *mem)
 {
     static uct_alloc_method_t method_md = UCT_ALLOC_METHOD_MD;
+    const ucs_memory_type_t mem_type    = UCS_MEMORY_TYPE_HOST;
     uct_base_iface_t *iface             = ucs_derived_of(tl_iface,
                                                          uct_base_iface_t);
     void *address                       = NULL;
-    uct_md_attr_t md_attr;
-    ucs_status_t status;
+    int need_mem_reg, support_mem_reg;
+    uct_alloc_method_t *alloc_methods;
     uct_mem_alloc_params_t params;
     unsigned num_alloc_methods;
-    uct_alloc_method_t *alloc_methods;
+    uct_md_attr_t md_attr;
+    ucs_status_t status;
 
     status = uct_md_query(iface->md, &md_attr);
     if (status != UCS_OK) {
         goto err;
     }
 
-    if (!(md_attr.cap.flags & UCT_MD_FLAG_REG) &&
+    need_mem_reg    = !!(md_attr.cap.flags &
+                         (UCT_MD_FLAG_NEED_MEMH | UCT_MD_FLAG_NEED_RKEY));
+    support_mem_reg = (md_attr.cap.flags & UCT_MD_FLAG_REG) &&
+                      (md_attr.cap.reg_mem_types & UCS_BIT(mem_type));
+
+    if (need_mem_reg && !support_mem_reg &&
+        (md_attr.cap.flags & UCT_MD_FLAG_ALLOC) &&
         uct_iface_is_allowed_alloc_method(iface, UCT_ALLOC_METHOD_MD)) {
-        /* If MD does not support registration, allow only the MD method */
+        /* Force allocation using MD */
         alloc_methods     = &method_md;
         num_alloc_methods = 1;
-    } else if (!(md_attr.cap.flags & UCT_MD_FLAG_REG)) {
-        /* If MD does not support registration and MD method is not in list
-         * return error */
-        status = UCS_ERR_NO_MEMORY;
-        goto err;
     } else {
         alloc_methods     = iface->config.alloc_methods;
         num_alloc_methods = iface->config.num_alloc_methods;
@@ -387,7 +397,7 @@ ucs_status_t uct_iface_mem_alloc(uct_iface_h tl_iface, size_t length, unsigned f
                              UCT_MEM_ALLOC_PARAM_FIELD_NAME;
     params.flags           = flags;
     params.name            = name;
-    params.mem_type        = UCS_MEMORY_TYPE_HOST;
+    params.mem_type        = mem_type;
     params.address         = address;
     params.mds.mds         = &iface->md;
     params.mds.count       = 1;
@@ -398,10 +408,9 @@ ucs_status_t uct_iface_mem_alloc(uct_iface_h tl_iface, size_t length, unsigned f
         goto err;
     }
 
-    /* If the memory was not allocated using MD, register it */
+    /* If the memory was not allocated using MD, register it if needed */
     if (mem->method != UCT_ALLOC_METHOD_MD) {
-        if ((md_attr.cap.flags & UCT_MD_FLAG_REG) &&
-            (md_attr.cap.reg_mem_types & UCS_BIT(mem->mem_type))) {
+        if (need_mem_reg && support_mem_reg) {
             status = uct_md_mem_reg(iface->md, mem->address, mem->length, flags,
                                     &mem->memh);
             if (status != UCS_OK) {
