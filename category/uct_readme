@@ -1,3 +1,9 @@
+git remote add upstream https://github.com/openucx/ucx.git
+git remote -v
+git fetch upstream
+git merge upstream/master
+
+
 术语:
 LAG (Link Aggregation Group): 链路汇聚(bonding), 网络绑定可以将两个或多个网络接口组合成一个接口。它可以提高网络吞吐量和带宽，并在其中一个接口发生故障时提供冗余。NVIDIA ® BlueField ® DPU 可以选择以对主机透明的方式在 Arm 端配置网络绑定。在这种配置下，主机只能看到一个 PF, 参考: https://docs.nvidia.com/networking/display/bluefielddpuosv385/link+aggregation
 
@@ -628,6 +634,96 @@ flow:
 端点(uct_ep_h) 中包含 iface_操作
 
 
+传输接口操作。API 中公开的每个操作都必须出现在下表中，以允许使用自定义操作创建接口/端点
+/**
+ * Transport interface operations.
+ * Every operation exposed in the API must appear in the table below, to allow
+ * creating interface/endpoint with custom operations.
+ */
+typedef struct uct_iface_ops {
+
+    /* endpoint - put */
+    uct_ep_put_short_func_t             ep_put_short;
+    uct_ep_put_bcopy_func_t             ep_put_bcopy;
+    uct_ep_put_zcopy_func_t             ep_put_zcopy;
+
+    /* endpoint - get */
+    uct_ep_get_short_func_t             ep_get_short;
+    uct_ep_get_bcopy_func_t             ep_get_bcopy;
+    uct_ep_get_zcopy_func_t             ep_get_zcopy;
+
+    /* endpoint - active message */
+    uct_ep_am_short_func_t              ep_am_short;
+    uct_ep_am_short_iov_func_t          ep_am_short_iov;
+    uct_ep_am_bcopy_func_t              ep_am_bcopy;
+    uct_ep_am_zcopy_func_t              ep_am_zcopy;
+
+    /* endpoint - atomics */
+    uct_ep_atomic_cswap64_func_t        ep_atomic_cswap64;
+    uct_ep_atomic_cswap32_func_t        ep_atomic_cswap32;
+    uct_ep_atomic32_post_func_t         ep_atomic32_post;
+    uct_ep_atomic64_post_func_t         ep_atomic64_post;
+    uct_ep_atomic32_fetch_func_t        ep_atomic32_fetch;
+    uct_ep_atomic64_fetch_func_t        ep_atomic64_fetch;
+
+    /* endpoint - tagged operations */
+    uct_ep_tag_eager_short_func_t       ep_tag_eager_short;
+    uct_ep_tag_eager_bcopy_func_t       ep_tag_eager_bcopy;
+    uct_ep_tag_eager_zcopy_func_t       ep_tag_eager_zcopy;
+    uct_ep_tag_rndv_zcopy_func_t        ep_tag_rndv_zcopy;
+    uct_ep_tag_rndv_cancel_func_t       ep_tag_rndv_cancel;
+    uct_ep_tag_rndv_request_func_t      ep_tag_rndv_request;
+
+    /* interface - tagged operations */
+    uct_iface_tag_recv_zcopy_func_t     iface_tag_recv_zcopy;
+    uct_iface_tag_recv_cancel_func_t    iface_tag_recv_cancel;
+
+    /* endpoint - pending queue */
+    uct_ep_pending_add_func_t           ep_pending_add;
+    uct_ep_pending_purge_func_t         ep_pending_purge;
+
+    /* endpoint - synchronization */
+    uct_ep_flush_func_t                 ep_flush;
+    uct_ep_fence_func_t                 ep_fence;
+    uct_ep_check_func_t                 ep_check;
+
+    /* endpoint - connection establishment */
+    uct_ep_create_func_t                ep_create;
+    uct_ep_connect_func_t               ep_connect;
+    uct_ep_disconnect_func_t            ep_disconnect;
+    uct_cm_ep_conn_notify_func_t        cm_ep_conn_notify;
+    uct_ep_destroy_func_t               ep_destroy;
+    uct_ep_get_address_func_t           ep_get_address;
+    uct_ep_connect_to_ep_func_t         ep_connect_to_ep;
+    uct_iface_accept_func_t             iface_accept;
+    uct_iface_reject_func_t             iface_reject;
+
+    /* interface - synchronization */
+    uct_iface_flush_func_t              iface_flush;
+    uct_iface_fence_func_t              iface_fence;
+
+    /* interface - progress control */
+    uct_iface_progress_enable_func_t    iface_progress_enable;
+    uct_iface_progress_disable_func_t   iface_progress_disable;
+    uct_iface_progress_func_t           iface_progress;
+
+    /* interface - events */
+    uct_iface_event_fd_get_func_t       iface_event_fd_get;
+    uct_iface_event_arm_func_t          iface_event_arm;
+
+    /* interface - management */
+    uct_iface_close_func_t              iface_close;
+    uct_iface_query_func_t              iface_query;
+
+    /* interface - connection establishment */
+    uct_iface_get_device_address_func_t iface_get_device_address;
+    uct_iface_get_address_func_t        iface_get_address;
+    uct_iface_is_reachable_func_t       iface_is_reachable;
+
+} uct_iface_ops_t;
+
+
+
 
 
 conjunction 连接
@@ -1151,8 +1247,8 @@ ucs_status_t do_am_zcopy -> 零拷贝
       uct_rc_verbs_ep_post_send_desc | status = uct_rc_mlx5_ep_zcopy_post(ep, MLX5_OPCODE_SEND, iov, iovcnt, 0ul, id, header, header_length, 0, 0, 0ul, 0, 0, MLX5_WQE_CTRL_SOLICITED, uct_rc_ep_send_op_completion_handler, 0, comp);
         ----------- rc_mlx5_iface 迈络思可靠连接接口的提交实现
         uct_rc_mlx5_txqp_dptr_post_iov
-          uct_rc_mlx5_am_hdr_fill
-          uct_ib_mlx5_inline_copy
+          uct_rc_mlx5_am_hdr_fill(rch, am_id)
+          uct_ib_mlx5_inline_copy(rch + 1, am_hdr, am_hdr_len, txwq)
           uct_rc_mlx5_common_post_send
             uct_ib_mlx5_post_send -> UCT/IB/MLX5：修复 TX WQ 溢出检查，当 WQE 恰好在 hw_ci+qp_length 结束时，当前检查失败，即使这是有效的情况，将溢出检查重构为特定断言并添加注释来解释它们，移动检查 函数到 C 文件，因为它不是快速路径
               num_bb  = ucs_div_round_up(wqe_size, MLX5_SEND_WQE_BB) -> 向上取大的
@@ -1403,24 +1499,38 @@ void UCS_F_CTOR ucm_init()
   ucm_init_malloc_hook() -> ucs_recursive_spinlock_init -> 初始化可重入锁
 
 void UCS_F_CTOR ucs_init()
-  ucs_check_cpu_flags -> 检查cpu特性
-  ucs_log_early_init -> 初始化日志,进程ID等
-  ucs_global_opts_init -> 初始化全局配置选项, 获取配置文件路径, 填充配置文件等, 添加全局vfs节点(ucs/global_opts), vfs日志级别等
-  ucs_init_ucm_opts -> 添加ucm全局配置表(内存对齐16, 日志级别为WARN等), 填充配置文件(包含环境变量,前缀为UCX_), 初始化ucs库(kh的hash表初始化, map初始化), 打开动态库: /home/xb/project/ucx/src/ucm/.libs/libucm.so.0, 为 aarch64 实现了 CUDA bistro 挂钩（以在此平台上启用内存缓存）
-  ucs_memtype_cache_global_init -> 互斥锁初始化
-  ucs_cpu_init -> 优化版本的memcpy, ucs_cpu_builtin_memcpy, 获取CPU提供者(ucs_cpu_vendor)
-  ucs_log_init -> 日志格式化宏, 打开日志文件,fork进程间互斥锁处理
-  ucs_stats_init -> 状态统计初始化, 链表初始化, 数据库等初始化
-  ucs_memtrack_init -> 内存跟踪初始化
-  ucs_debug_init -> 调试和信号堆栈(sigaltstack)初始化
-  ucs_profile_init -> 初始化线程私有上下文,私有数据
-  ucs_async_global_init -> 异步事件和定时器初始化
-  ucs_numa_init -> numa距离hash表初始化
-  ucs_topo_init -> 用总线id查找设备
-  ucs_rand_seed_init -> tcp允许使用端口范围, 生成高低位的启动ID(3817213743958597775), 随机值, 进程id, 时间, 线程id, 版本等
-  ucs_sys_get_lib_path -> 查找当前库 libucs.so.0 (多个路径下查找库)
-  ucs_get_process_cmdline -> 打印当前cmdline
-  ucs_modules_load -> 监控进程的虚拟文件系统初始化, 加载所有ucs模块
+    ucs_status_t status -> 为了评估从某个错误中恢复所需的步骤，外部 API 可以返回的所有错误代码都按永久受错误影响的最大实体分组。每个组的范围介于其 UCS_ERR_FIRST_<name> 和 UCS_ERR_LAST_<name> 枚举值之间。例如，如果链接失败，则可能足以销毁（并可能替换）它，这与端点级错误不同
+    ucs_check_cpu_flags -> 检查cpu特性
+    ucs_log_early_init -> 初始化日志,进程ID等
+    ucs_global_opts_init -> 初始化全局配置选项, 获取配置文件路径, 填充配置文件等, 添加全局vfs节点(ucs/global_opts), vfs日志级别等
+    ucs_init_ucm_opts -> 添加ucm全局配置表(内存对齐16, 日志级别为WARN等), 填充配置文件(包含环境变量,前缀为UCX_), 初始化ucs库(kh的hash表初始化, map初始化), 打开动态库: /home/xb/project/ucx/src/ucm/.libs/libucm.so.0, 为 aarch64 实现了 CUDA bistro 挂钩（以在此平台上启用内存缓存）
+        UCS_CONFIG_ADD_TABLE(ucm_global_config_table, &ucs_config_global_list)
+            ucs_list_insert_before(&ucs_config_global_list, &(ucm_global_config_table_config_entry).list)
+        ucs_config_parser_fill_opts
+        ucm_set_global_opts
+            ucm_library_init
+                kh_init_inplace
+                ucm_mmap_init
+    ucs_memtype_cache_global_init -> 互斥锁初始化
+    ucs_cpu_init -> 优化版本的memcpy, ucs_cpu_builtin_memcpy, 获取CPU提供者(ucs_cpu_vendor)
+        ucs_cpu_nt_bt_thresh_min
+            ucs_arch_get_cpu_vendor
+        ucs_cpu_nt_dest_thresh
+            ucs_cpu_get_cache_size
+                ucs_arch_get_cache_size
+                ucs_sysfs_get_cache_size
+    ucs_log_init -> 日志格式化宏, 打开日志文件,fork进程间互斥锁处理
+    ucs_stats_init -> 状态统计初始化, 链表初始化, 数据库等初始化
+    ucs_memtrack_init -> 内存跟踪初始化
+    ucs_debug_init -> 调试和信号堆栈(sigaltstack)初始化
+    ucs_profile_init -> 初始化线程私有上下文,私有数据
+    ucs_async_global_init -> 异步事件和定时器初始化
+    ucs_numa_init -> numa距离hash表初始化
+    ucs_topo_init -> 用总线id查找设备
+    ucs_rand_seed_init -> tcp允许使用端口范围, 生成高低位的启动ID(3817213743958597775), 随机值, 进程id, 时间, 线程id, 版本等
+    ucs_sys_get_lib_path -> 查找当前库 libucs.so.0 (多个路径下查找库)
+    ucs_get_process_cmdline -> 打印当前cmdline
+    ucs_modules_load -> 监控进程的虚拟文件系统初始化, 加载所有ucs模块
   
 
 
@@ -1473,6 +1583,7 @@ typedef enum ucs_cpu_vendor {
     UCS_CPU_VENDOR_FUJITSU_ARM,
     UCS_CPU_VENDOR_ZHAOXIN,
     UCS_CPU_VENDOR_GENERIC_RV64G,
+    UCS_CPU_VENDOR_NVIDIA,
     UCS_CPU_VENDOR_LAST
 } ucs_cpu_vendor_t;
 
@@ -1498,7 +1609,31 @@ struct { /* sysfs entries for system cache sizes */
 
 
 src/ucs/arch/cpu.c
-static void ucs_sysfs_get_cache_size() -> 获取缓存大小
+ucs_cpu_get_cache_size
+    static void ucs_sysfs_get_cache_size() -> 获取缓存大小
+        #define UCS_CPU_CACHE_FILE_FMT   UCS_SYS_FS_CPUS_PATH "/cpu%d/cache/index%d/%s" -> "/sys/devices/system" "/cpu" "/cpu%d/cache/index%d/%s"
+            cat /sys/devices/system/cpu/cpu0/cache/index0/size
+            cat /sys/devices/system/cpu/cpu0/cache/index0/type
+            cat /sys/devices/system/cpu/cpu0/cache/index0/level
+
+
+root@tipu-node15:~# ls -alh /sys/devices/system/cpu/cpu0/cache/index0/
+total 0
+drwxr-xr-x 2 root root    0 Sep 20 14:21 .
+drwxr-xr-x 6 root root    0 Sep 20 13:15 ..
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 coherency_line_size
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 id
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 level
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 number_of_sets
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 physical_line_partition
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 shared_cpu_list
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 shared_cpu_map
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 size
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 type
+-rw-r--r-- 1 root root 4.0K Sep 20 14:22 uevent
+-r--r--r-- 1 root root 4.0K Sep 20 14:22 ways_of_associativity
+
+
 double ucs_cpu_get_memcpy_bw() -> 获取内存带宽
 ucs_arch_get_cpu_model -> 获取cpu模式
 
@@ -2264,4 +2399,137 @@ uct_rc_mlx5_iface_common_poll_rx
         
 
 
-uct_rc_txqp_purge_outstanding        
+uct_rc_txqp_purge_outstanding
+
+
+static UCS_F_NOOPTIMIZE void ucs_check_cpu_flags(void)
+    ucs_cpu_flag_t value
+    cpu_flags_array[] = {
+        { "cmov", UCS_CPU_FLAG_CMOV },
+        { "mmx", UCS_CPU_FLAG_MMX },
+        { "mmx2", UCS_CPU_FLAG_MMX2 },
+        { "sse", UCS_CPU_FLAG_SSE },
+        { "sse2", UCS_CPU_FLAG_SSE2 },
+        { "sse3", UCS_CPU_FLAG_SSE3 },
+        { "ssse3", UCS_CPU_FLAG_SSSE3 },
+        { "sse41", UCS_CPU_FLAG_SSE41 },
+        { "sse42", UCS_CPU_FLAG_SSE42 },
+        { "avx", UCS_CPU_FLAG_AVX },
+        { "avx2", UCS_CPU_FLAG_AVX2 },
+        { NULL, UCS_CPU_FLAG_UNKNOWN },
+    }
+    cpu_flags = ucs_arch_get_cpu_flag()
+        ucs_x86_cpuid(X86_CPUID_GET_BASE_VALUE, &_eax, &_ebx, &_ecx, &_edx)
+            asm volatile ("cpuid\n\t"
+
+
+/* The i-th bit */
+#define UCS_BIT(i)               (1ul << (i))
+
+
+/* Mask of bits 0..i-1, set 0..i-1 to 1 , like: input 5(00100000), ->  output: 00011111 */
+#define UCS_MASK(_i)             (((_i) >= 64) ? ~0 : (UCS_BIT(_i) - 1))
+
+
+/* CPU flags */
+typedef enum ucs_cpu_flag {
+    UCS_CPU_FLAG_UNKNOWN    = (-1),
+    UCS_CPU_FLAG_CMOV       = UCS_BIT(0),
+    UCS_CPU_FLAG_MMX        = UCS_BIT(1),
+    UCS_CPU_FLAG_MMX2       = UCS_BIT(2),
+    UCS_CPU_FLAG_SSE        = UCS_BIT(3),
+    UCS_CPU_FLAG_SSE2       = UCS_BIT(4),
+    UCS_CPU_FLAG_SSE3       = UCS_BIT(5),
+    UCS_CPU_FLAG_SSSE3      = UCS_BIT(6),
+    UCS_CPU_FLAG_SSE41      = UCS_BIT(7),
+    UCS_CPU_FLAG_SSE42      = UCS_BIT(8),
+    UCS_CPU_FLAG_AVX        = UCS_BIT(9),
+    UCS_CPU_FLAG_AVX2       = UCS_BIT(10)
+} ucs_cpu_flag_t;
+
+
+
+
+
+static uct_iface_ops_t uct_rc_mlx5_iface_tl_ops = {
+    .ep_put_short             = uct_rc_mlx5_base_ep_put_short,
+    .ep_put_bcopy             = uct_rc_mlx5_base_ep_put_bcopy,
+    .ep_put_zcopy             = uct_rc_mlx5_base_ep_put_zcopy,
+    .ep_get_bcopy             = uct_rc_mlx5_base_ep_get_bcopy,
+    .ep_get_zcopy             = uct_rc_mlx5_base_ep_get_zcopy,
+    .ep_am_short              = uct_rc_mlx5_base_ep_am_short,
+    .ep_am_short_iov          = uct_rc_mlx5_base_ep_am_short_iov,
+    .ep_am_bcopy              = uct_rc_mlx5_base_ep_am_bcopy,
+    .ep_am_zcopy              = uct_rc_mlx5_base_ep_am_zcopy,
+        status = uct_rc_mlx5_base_ep_zcopy_post(ep, MLX5_OPCODE_SEND, iov, iovcnt, 0ul, id, header, header_length,
+            uct_rc_mlx5_txqp_dptr_post_iov(iface, IBV_QPT_RC,
+                                   &ep->super.txqp, &ep->tx.wq, opcode,
+                                   iov, iovcnt,
+                                   am_id, am_hdr, am_hdr_len,
+                                   rdma_raddr, uct_ib_md_direct_rkey(rdma_rkey),
+                                   tag, app_ctx, ib_imm_be,
+                                   0, fm_ce_se, 0,
+                                   UCT_IB_MAX_ZCOPY_LOG_SGE(&iface->super.super))
+                switch (opcode_flags)
+                case MLX5_OPCODE_SEND:
+                    uct_rc_mlx5_am_hdr_fill
+                    uct_ib_mlx5_inline_copy
+                uct_rc_mlx5_common_post_send
+            uct_rc_txqp_add_send_comp(&iface->super, &ep->super.txqp, handler, comp, sn,
+                              op_flags | UCT_RC_IFACE_SEND_OP_FLAG_ZCOPY,
+                              iov, iovcnt, iov_total_length)
+    .ep_atomic_cswap64        = uct_rc_mlx5_base_ep_atomic_cswap64,
+    .ep_atomic_cswap32        = uct_rc_mlx5_base_ep_atomic_cswap32,
+    .ep_atomic64_post         = uct_rc_mlx5_base_ep_atomic64_post,
+    .ep_atomic32_post         = uct_rc_mlx5_base_ep_atomic32_post,
+    .ep_atomic64_fetch        = uct_rc_mlx5_base_ep_atomic64_fetch,
+    .ep_atomic32_fetch        = uct_rc_mlx5_base_ep_atomic32_fetch,
+    .ep_pending_add           = uct_rc_ep_pending_add,
+    .ep_pending_purge         = uct_rc_ep_pending_purge,
+    .ep_flush                 = uct_rc_mlx5_base_ep_flush,
+    .ep_fence                 = uct_rc_mlx5_base_ep_fence,
+    .ep_check                 = uct_rc_ep_check,
+    .ep_create                = UCS_CLASS_NEW_FUNC_NAME(uct_rc_mlx5_ep_t),
+    .ep_destroy               = UCS_CLASS_DELETE_FUNC_NAME(uct_rc_mlx5_ep_t),
+    .ep_get_address           = uct_rc_mlx5_ep_get_address,
+    .ep_connect_to_ep         = uct_base_ep_connect_to_ep,
+#if IBV_HW_TM
+    .ep_tag_eager_short       = uct_rc_mlx5_ep_tag_eager_short,
+    .ep_tag_eager_bcopy       = uct_rc_mlx5_ep_tag_eager_bcopy,
+    .ep_tag_eager_zcopy       = uct_rc_mlx5_ep_tag_eager_zcopy,
+    .ep_tag_rndv_zcopy        = uct_rc_mlx5_ep_tag_rndv_zcopy,
+    .ep_tag_rndv_request      = uct_rc_mlx5_ep_tag_rndv_request,
+    .ep_tag_rndv_cancel       = uct_rc_mlx5_ep_tag_rndv_cancel,
+    .iface_tag_recv_zcopy     = uct_rc_mlx5_iface_tag_recv_zcopy,
+    .iface_tag_recv_cancel    = uct_rc_mlx5_iface_tag_recv_cancel,
+#endif
+    .iface_flush              = uct_rc_iface_flush,
+    .iface_fence              = uct_rc_iface_fence,
+    .iface_progress_enable    = uct_rc_mlx5_iface_progress_enable,
+    .iface_progress_disable   = uct_base_iface_progress_disable,
+    .iface_progress           = uct_rc_iface_do_progress,
+    .iface_event_fd_get       = uct_rc_mlx5_iface_event_fd_get,
+    .iface_event_arm          = uct_rc_mlx5_iface_arm,
+    .iface_close              = UCS_CLASS_DELETE_FUNC_NAME(uct_rc_mlx5_iface_t),
+    .iface_query              = uct_rc_mlx5_iface_query,
+    .iface_get_address        = uct_rc_mlx5_iface_get_address,
+    .iface_get_device_address = uct_ib_iface_get_device_address,
+    .iface_is_reachable       = uct_base_iface_is_reachable
+};
+
+
+iface_params.async_event_cb    = ucp_worker_iface_async_cb_event;
+ucp_worker_iface_async_cb_event
+ucp_worker_iface_event_common
+ucp_worker_iface_check_events
+ucp_worker_iface_check_events_progress
+    ucp_worker_iface_check_events_do
+        uct_iface_event_arm
+
+iface_event_arm
+uct_rc_iface_event_arm
+    uct_ib_iface_arm_cq
+        ibv_req_notify_cq
+
+multi_sge:
+
