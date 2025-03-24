@@ -151,7 +151,8 @@ gtest_SOURCES = \
 	ucp/test_ucp_mem_type.cc \
 	ucp/test_ucp_perf.cc \
 	ucp/test_ucp_proto.cc \
-	ucp/test_ucp_ep_reconfig.cc \	
+	ucp/test_ucp_proto_mock.cc \
+	ucp/test_ucp_ep_reconfig.cc \
 	ucp/test_ucp_rma.cc \
 	ucp/test_ucp_rma_mt.cc \
 	ucp/test_ucp_tag_cancel.cc \
@@ -253,12 +254,17 @@ if HAVE_MLX5_DV
 gtest_SOURCES += \
 	uct/ib/test_cqe_zipping.cc
 endif
+if HAVE_EFA
+gtest_SOURCES += \
+    uct/ib/test_srd.cc
+endif
 endif # HAVE_IB
 
 if HAVE_CUDA
 gtest_SOURCES += \
 	common/cuda_context.cc \
 	ucm/cuda_hooks.cc \
+	uct/cuda/test_switch_cuda_device.cc \
 	uct/cuda/test_cuda_ipc_md.cc
 gtest_CPPFLAGS += \
 	$(CUDA_CPPFLAGS)

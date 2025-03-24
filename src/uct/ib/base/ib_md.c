@@ -224,6 +224,11 @@ typedef struct {
     struct ibv_mr                 **mrs;
 } uct_ib_md_mem_reg_thread_t;
 
+typedef struct {
+    uct_ib_md_mem_reg_thread_t ctx;
+    int                        mr_count;
+} uct_ib_md_mem_reg_context_t;
+
 ucs_status_t uct_ib_md_query(uct_md_h uct_md, uct_md_attr_v2_t *md_attr)
 {
     uct_ib_md_t *md              = ucs_derived_of(uct_md, uct_ib_md_t);
@@ -282,13 +287,22 @@ uct_ib_md_print_mem_reg_err_msg(const char *title, void *address, size_t length,
     ucs_log(level, "%s", ucs_string_buffer_cstr(&msg));
 }
 
+static void uct_ib_dereg_mrs(struct ibv_mr **mrs, int count)
+{
+    int i;
+
+    for (i = 0; i < count; i++) {
+        (void)uct_ib_dereg_mr(mrs[i]);
+    }
+}
+
 void *uct_ib_md_mem_handle_thread_func(void *arg)
 {
+    int mr_idx                      = 0;
     uct_ib_md_mem_reg_thread_t *ctx = arg;
     size_t chunk_size               = ctx->md->config.mt_reg_chunk;
     ucs_time_t UCS_V_UNUSED t0      = ucs_get_time();
     void UCS_V_UNUSED *start        = ctx->address;
-    int mr_idx                      = 0;
     size_t length                   = ctx->first_mr_size;
     ucs_status_t status;
 
@@ -302,7 +316,7 @@ void *uct_ib_md_mem_handle_thread_func(void *arg)
         } else {
             status = uct_ib_dereg_mr(ctx->mrs[mr_idx]);
             if (status != UCS_OK) {
-                goto err;
+                ucs_warn("failed to deregister mr_idx=%d", mr_idx);
             }
         }
         ctx->address = UCS_PTR_BYTE_OFFSET(ctx->address, length);
@@ -315,13 +329,13 @@ void *uct_ib_md_mem_handle_thread_func(void *arg)
               (ctx->params != NULL) ? "reg_mr" : "dereg_mr",
               start, ctx->address, ctx->first_mr_size,
               ucs_time_to_usec(ucs_get_time() - t0));
-    return UCS_STATUS_PTR(UCS_OK);
+    return (void*)(intptr_t)mr_idx;
 
 err_dereg:
-    for (; mr_idx >= 0; --mr_idx) {
-        uct_ib_dereg_mr(ctx->mrs[mr_idx]);
-    }
-err:
+    uct_ib_dereg_mrs(ctx->mrs, mr_idx);
+
+    ucs_assertv(UCS_STATUS_IS_ERR(status),
+                "Cannot return in-progress memory thread handling");
     return UCS_STATUS_PTR(status);
 }
 
@@ -334,7 +348,8 @@ uct_ib_md_handle_mr_list_mt(uct_ib_md_t *md, void *address, size_t length,
     size_t chunk_size = md->config.mt_reg_chunk;
     int thread_num_mrs, thread_num, thread_idx, mr_idx, cpu_id;
     ucs_sys_cpuset_t parent_set, thread_set;
-    uct_ib_md_mem_reg_thread_t *ctxs, *ctx;
+    uct_ib_md_mem_reg_context_t *context;
+    uct_ib_md_mem_reg_thread_t *ctx;
     char UCS_V_UNUSED affinity_str[64];
     pthread_attr_t attr;
     ucs_status_t status;
@@ -359,8 +374,8 @@ uct_ib_md_handle_mr_list_mt(uct_ib_md_t *md, void *address, size_t length,
               ucs_make_affinity_str(&parent_set, affinity_str,
                                     sizeof(affinity_str)));
 
-    ctxs = ucs_calloc(thread_num, sizeof(*ctxs), "ib mr ctxs");
-    if (ctxs == NULL) {
+    context = ucs_calloc(thread_num, sizeof(*context), "ib mr context");
+    if (context == NULL) {
         return UCS_ERR_NO_MEMORY;
     }
 
@@ -375,7 +390,7 @@ uct_ib_md_handle_mr_list_mt(uct_ib_md_t *md, void *address, size_t length,
          * get proportional amount */
         thread_num_mrs    = ucs_div_round_up(mr_num - mr_idx,
                                              thread_num - thread_idx);
-        ctx               = &ctxs[thread_idx];
+        ctx               = &context[thread_idx].ctx;
         ctx->md           = md;
         ctx->address      = UCS_PTR_BYTE_OFFSET(address, offset);
         ctx->params       = params;
@@ -389,7 +404,6 @@ uct_ib_md_handle_mr_list_mt(uct_ib_md_t *md, void *address, size_t length,
         ucs_assertv((ctx->address == address) || (padding == 0),
                     "thread_idx=%d address=%p padding=%zu",
                     thread_idx, address, padding);
-
         ctx->length        = (thread_num_mrs - 1) * chunk_size +
                              ctx->first_mr_size;
         ctx->length        = ucs_min(ctx->length, length - offset);
@@ -420,23 +434,26 @@ uct_ib_md_handle_mr_list_mt(uct_ib_md_t *md, void *address, size_t length,
     }
 
     for (thread_idx = 0; thread_idx < thread_num; thread_idx++) {
-        ctx = &ctxs[thread_idx];
+        ctx = &context[thread_idx].ctx;
         pthread_join(ctx->thread, &thread_status);
+
         if (UCS_PTR_IS_ERR(thread_status)) {
             status = UCS_PTR_STATUS(thread_status);
+            context[thread_idx].mr_count = 0;
+        } else {
+            context[thread_idx].mr_count = (int)(intptr_t)thread_status;
         }
     }
 
-    ucs_free(ctxs);
+    if ((status != UCS_OK) && (params != NULL)) {
+        for (thread_idx = 0; thread_idx < thread_num; thread_idx++) {
+            uct_ib_dereg_mrs(context[thread_idx].ctx.mrs,
+                             context[thread_idx].mr_count);
+        }
+    }
+
+    ucs_free(context);
     pthread_attr_destroy(&attr);
-
-    if (status != UCS_OK) {
-        for (mr_idx = 0; mr_idx < mr_num; mr_idx++) {
-            /* coverity[check_return] */
-            uct_ib_dereg_mr(mrs[mr_idx]);
-        }
-    }
-
     return status;
 }
 
@@ -601,14 +618,17 @@ ucs_status_t uct_ib_memh_alloc(uct_ib_md_t *md, size_t length,
         memh->flags |= UCT_IB_MEM_ACCESS_REMOTE_RMA;
     }
 
+    if (mem_flags & UCT_MD_MEM_GVA) {
+        memh->flags |= UCT_IB_MEM_FLAG_GVA;
+    }
+
     *memh_p = memh;
     return UCS_OK;
 }
 
-uint64_t uct_ib_memh_access_flags(uct_ib_mem_t *memh, int relaxed_order)
+uint64_t uct_ib_memh_access_flags(uct_ib_mem_t *memh, int relaxed_order,
+                                  uint64_t access_flags)
 {
-    uint64_t access_flags = UCT_IB_MEM_ACCESS_FLAGS;
-
     if (memh->flags & UCT_IB_MEM_FLAG_ODP) {
         access_flags |= IBV_ACCESS_ON_DEMAND;
     }
@@ -640,7 +660,8 @@ ucs_status_t uct_ib_verbs_mem_reg(uct_md_h uct_md, void *address, size_t length,
     }
 
     memh         = ucs_derived_of(ib_memh, uct_ib_verbs_mem_t);
-    access_flags = uct_ib_memh_access_flags(&memh->super, md->relaxed_order);
+    access_flags = uct_ib_memh_access_flags(&memh->super, md->relaxed_order,
+                                            md->dev.mr_access_flags);
 
     status = uct_ib_reg_mr(md, address, length, params, access_flags, NULL,
                            &mr_default);
@@ -766,13 +787,21 @@ static const char *uct_ib_device_transport_type_name(struct ibv_device *device)
 static int uct_ib_device_is_supported(struct ibv_device *device)
 {
     /* TODO: enable additional transport types when ready */
-    int ret = device->transport_type == IBV_TRANSPORT_IB;
-    if (!ret) {
-        ucs_debug("device %s of type %s is not supported",
-                  device->dev_name, uct_ib_device_transport_type_name(device));
+    if (!IBV_DEVICE_TRANSPORT_UNSPECIFIED(device) &&
+        (device->transport_type != IBV_TRANSPORT_IB)) {
+        ucs_debug("%s: unsupported transport type %s",
+                  ibv_get_device_name(device),
+                  uct_ib_device_transport_type_name(device));
+        return 0;
     }
 
-    return ret;
+    if (uct_ib_device_is_smi(device)) {
+        ucs_debug("%s: smi device is not supported",
+                  ibv_get_device_name(device));
+        return 0;
+    }
+
+    return 1;
 }
 
 int uct_ib_device_is_accessible(struct ibv_device *device)
@@ -796,9 +825,10 @@ int uct_ib_device_is_accessible(struct ibv_device *device)
     return uct_ib_device_is_supported(device);
 }
 
-ucs_status_t uct_ib_query_md_resources(uct_component_t *component,
-                                       uct_md_resource_desc_t **resources_p,
-                                       unsigned *num_resources_p)
+ucs_status_t
+uct_ib_base_query_md_resources(uct_md_resource_desc_t **resources_p,
+                               unsigned *num_resources_p,
+                               uct_ib_check_device_cb_t check_device_cb)
 {
     int num_resources = 0;
     uct_md_resource_desc_t *resources;
@@ -835,6 +865,11 @@ ucs_status_t uct_ib_query_md_resources(uct_component_t *component,
     for (i = 0; i < num_devices; ++i) {
         /* Skip non-existent and non-accessible devices */
         if (!uct_ib_device_is_accessible(device_list[i])) {
+            continue;
+        }
+
+        /* Skip not applicable devices */
+        if (!check_device_cb(device_list[i])) {
             continue;
         }
 
@@ -1081,6 +1116,16 @@ uct_ib_fork_init(const uct_ib_md_config_t *md_config, int *fork_init_p)
 }
 
 static ucs_status_t
+uct_ib_query_md_resources(uct_component_t *component,
+                          uct_md_resource_desc_t **resources_p,
+                          unsigned *num_resources_p)
+{
+    return uct_ib_base_query_md_resources(
+        resources_p, num_resources_p,
+        (uct_ib_check_device_cb_t)ucs_empty_function_return_one_int);
+}
+
+static ucs_status_t
 uct_ib_md_open(uct_component_t *component, const char *md_name,
                const uct_md_config_t *uct_md_config, uct_md_h *md_p)
 {
@@ -1200,6 +1245,36 @@ static void uct_ib_md_check_dmabuf(uct_ib_md_t *md)
 #endif
 }
 
+int uct_ib_md_check_odp_common(uct_ib_md_t *md, const char **reason_ptr)
+{
+    if (IBV_ACCESS_ON_DEMAND == 0) {
+        *reason_ptr = "IBV_ACCESS_ON_DEMAND is not supported";
+        return 0;
+    }
+
+    if (!IBV_DEVICE_HAS_ODP(&md->dev)) {
+        *reason_ptr = "device does not support IBV_ACCESS_ON_DEMAND";
+        return 0;
+    }
+
+    return 1;
+}
+
+static void
+uct_ib_md_check_odp(uct_ib_md_t *md, const uct_ib_md_config_t *md_config)
+{
+    const char *device_name = uct_ib_device_name(&md->dev);
+    const char *reason;
+
+    if (!uct_ib_md_check_odp_common(md, &reason)) {
+        ucs_debug("%s: ODP is disabled because %s", device_name, reason);
+        return;
+    }
+
+    md->reg_nonblock_mem_types = md_config->ext.odp.mem_types;
+    ucs_debug("%s: ODP is supported", device_name);
+}
+
 ucs_status_t uct_ib_md_open_common(uct_ib_md_t *md,
                                    struct ibv_device *ib_device,
                                    const uct_ib_md_config_t *md_config)
@@ -1245,7 +1320,7 @@ ucs_status_t uct_ib_md_open_common(uct_ib_md_t *md,
 
     /* Check for GPU-direct support */
     if (md_config->enable_gpudirect_rdma != UCS_NO) {
-        /* Check peer memory driver is loaded, different driver versions use 
+        /* Check peer memory driver is loaded, different driver versions use
          * different paths */
         uct_ib_check_gpudirect_driver(
                 md, "/sys/kernel/mm/memory_peers/nv_mem/version",
@@ -1256,7 +1331,7 @@ ucs_status_t uct_ib_md_open_common(uct_ib_md_t *md,
         uct_ib_check_gpudirect_driver(
                 md, "/sys/module/nv_peer_mem/version",
                 UCS_MEMORY_TYPE_CUDA);
-                
+
 
         /* check if ROCM KFD driver is loaded */
         uct_ib_check_gpudirect_driver(md, "/dev/kfd", UCS_MEMORY_TYPE_ROCM);
@@ -1449,6 +1524,11 @@ static ucs_status_t uct_ib_verbs_md_open(struct ibv_device *ibv_device,
 
     md->super.ops = &uct_ib_verbs_md_ops.super;
 
+    dev->mr_access_flags       = UCT_IB_MEM_ACCESS_FLAGS;
+    dev->max_inline_data       = 4 * UCS_KBYTE;
+    dev->ordered_send_comp     = 1;
+    dev->req_notify_cq_support = 1;
+
     status = uct_ib_md_open_common(md, ibv_device, md_config);
     if (status != UCS_OK) {
         goto err_md_free;
@@ -1460,6 +1540,7 @@ static ucs_status_t uct_ib_verbs_md_open(struct ibv_device *ibv_device,
 
     uct_ib_md_ece_check(md);
     uct_ib_md_parse_relaxed_order(md, md_config, 0);
+    uct_ib_md_check_odp(md, md_config);
 
     *p_md = md;
     return UCS_OK;
@@ -1488,12 +1569,15 @@ static uct_ib_md_ops_t uct_ib_verbs_md_ops = {
     .super = {
         .close              = uct_ib_md_close,
         .query              = uct_ib_md_query,
+        .mem_alloc          = (uct_md_mem_alloc_func_t)ucs_empty_function_return_unsupported,
+        .mem_free           = (uct_md_mem_free_func_t)ucs_empty_function_return_unsupported,
+        .mem_advise         = uct_ib_mem_advise,
         .mem_reg            = uct_ib_verbs_mem_reg,
         .mem_dereg          = uct_ib_verbs_mem_dereg,
-        .mem_attach         = ucs_empty_function_return_unsupported,
-        .mem_advise         = uct_ib_mem_advise,
+        .mem_query          = (uct_md_mem_query_func_t)ucs_empty_function_return_unsupported,
         .mkey_pack          = uct_ib_verbs_mkey_pack,
-        .detect_memory_type = ucs_empty_function_return_unsupported,
+        .mem_attach         = (uct_md_mem_attach_func_t)ucs_empty_function_return_unsupported,
+        .detect_memory_type = (uct_md_detect_memory_type_func_t)ucs_empty_function_return_unsupported,
     },
     .open = uct_ib_verbs_md_open,
 };
@@ -1503,10 +1587,10 @@ static UCT_IB_MD_DEFINE_ENTRY(verbs, uct_ib_verbs_md_ops);
 uct_component_t uct_ib_component = {
     .query_md_resources = uct_ib_query_md_resources,
     .md_open            = uct_ib_md_open,
-    .cm_open            = ucs_empty_function_return_unsupported,
+    .cm_open            = (uct_component_cm_open_func_t)ucs_empty_function_return_unsupported,
     .rkey_unpack        = uct_ib_rkey_unpack,
-    .rkey_ptr           = ucs_empty_function_return_unsupported,
-    .rkey_release       = ucs_empty_function_return_success,
+    .rkey_ptr           = (uct_component_rkey_ptr_func_t)ucs_empty_function_return_unsupported,
+    .rkey_release       = (uct_component_rkey_release_func_t)ucs_empty_function_return_success,
     .rkey_compare       = uct_base_rkey_compare,
     .name               = "ib",
     .md_config          = {

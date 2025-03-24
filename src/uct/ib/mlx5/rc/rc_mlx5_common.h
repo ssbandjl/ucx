@@ -40,6 +40,8 @@
 
 #define UCT_RC_MLX5_OPCODE_FLAG_RAW         0x100
 #define UCT_RC_MLX5_OPCODE_FLAG_TM          0x200
+#define UCT_RC_MLX5_OPCODE_FLAG_MMO_PUT     0x400
+#define UCT_RC_MLX5_OPCODE_FLAG_MMO_GET     0x800
 #define UCT_RC_MLX5_OPCODE_MASK             0xff
 #define UCT_RC_MLX5_SINGLE_FRAG_MSG(_flags) \
     (((_flags) & UCT_CB_PARAM_FLAG_FIRST) && !((_flags) & UCT_CB_PARAM_FLAG_MORE))
@@ -407,6 +409,8 @@ typedef struct uct_rc_mlx5_iface_common {
         uint8_t                        atomic_fence_flag;
         uct_rc_mlx5_srq_topo_t         srq_topo;
         uint8_t                        log_ack_req_freq;
+        uint8_t                        dp_ordering;
+        uint8_t                        dp_ordering_force;
     } config;
     UCS_STATS_NODE_DECLARE(stats)
 } uct_rc_mlx5_iface_common_t;
@@ -426,6 +430,7 @@ typedef struct uct_rc_mlx5_iface_common_config {
     } tm;
     unsigned                             exp_backoff;
     unsigned                             log_ack_req_freq;
+    ucs_ternary_auto_value_t             ddp_enable;
     UCS_CONFIG_STRING_ARRAY_FIELD(types) srq_topo;
 } uct_rc_mlx5_iface_common_config_t;
 
@@ -476,11 +481,11 @@ UCS_CLASS_DECLARE(uct_rc_mlx5_iface_common_t, uct_iface_ops_t*,
 
 
 ucs_status_t
-uct_rc_mlx5_dp_ordering_ooo_init(uct_rc_mlx5_iface_common_t *iface,
-                                 uint64_t tl_flag,
+uct_rc_mlx5_dp_ordering_ooo_init(uct_ib_mlx5_md_t *md,
+                                 uct_rc_mlx5_iface_common_t *iface,
+                                 uct_ib_mlx5_dp_ordering_t dp_ordering_cap,
                                  uct_rc_mlx5_iface_common_config_t *config,
                                  const char *tl_name);
-
 
 #if IBV_HW_TM
 void uct_rc_mlx5_handle_unexp_rndv(uct_rc_mlx5_iface_common_t *iface,
@@ -661,6 +666,9 @@ ucs_status_t uct_rc_mlx5_devx_init_rx(uct_rc_mlx5_iface_common_t *iface,
                                       const uct_rc_iface_common_config_t *config);
 
 void uct_rc_mlx5_devx_cleanup_srq(uct_ib_mlx5_md_t *md, uct_ib_mlx5_srq_t *srq);
+
+void uct_ib_mlx5_devx_set_qpc_dp_ordering(uct_ib_mlx5_md_t *md, void *qpc,
+                                          uct_rc_mlx5_iface_common_t *iface);
 #else
 static UCS_F_MAYBE_UNUSED ucs_status_t
 uct_rc_mlx5_devx_init_rx(uct_rc_mlx5_iface_common_t *iface,

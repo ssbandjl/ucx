@@ -6,6 +6,14 @@ pr:
   - master
   - v*.*.x
 
+schedules:
+- cron: '0 0 * * 6'
+  displayName: Saturday night test
+  always: true
+  branches:
+    include:
+    - master
+
 variables:
   DOCKER_OPT_VOLUMES: -v /hpc/local:/hpc/local
   REPO_MIRROR: harbor-pdc.nvidia.com
@@ -34,8 +42,8 @@ resources:
       image: $(REPO_MIRROR)/ucx/x86_64/ubuntu18.04-mofed5-cuda12:3
     - container: ubuntu20_cuda12_x86_64
       image: $(REPO_MIRROR)/ucx/x86_64/ubuntu20.04-mofed5-cuda12:3
-    - container: ubuntu22_cuda12_x86_64
-      image: $(REPO_MIRROR)/ucx/x86_64/ubuntu22.04-mofed5-cuda12:3
+    - container: ubuntu24_cuda12_x86_64
+      image: $(REPO_MIRROR)/ucx/x86_64/ubuntu24.04-mofed24.10-cuda12.5:1
 
     # aarch64
     - container: centos8_cuda11_aarch64
@@ -51,6 +59,8 @@ resources:
       image: $(REPO_MIRROR)/ucx/aarch64/ubuntu20.04-mofed5-cuda12:3
     - container: ubuntu22_cuda12_aarch64
       image: $(REPO_MIRROR)/ucx/aarch64/ubuntu22.04-mofed5-cuda12:3
+    - container: ubuntu24_cuda12_aarch64
+      image: $(REPO_MIRROR)/ucx/aarch64/ubuntu24.04-mofed24.10-cuda12.5:1
 
 stages:
   - stage: Prepare
@@ -73,6 +83,8 @@ stages:
               check_release_build $(Build.Reason) $(Build.SourceVersion) "AZP/DRP-RELEASE: "
             name: Result
             displayName: Check build condition
+            env:
+              AZURE_DEVOPS_EXT_PAT: $(AZURE_DEVOPS_EXT_PAT)
 
   - stage: GitHubDraft
     condition: eq(dependencies.Prepare.outputs['CheckRelease.Result.Launch'], 'True')

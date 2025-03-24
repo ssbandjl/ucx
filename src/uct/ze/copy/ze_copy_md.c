@@ -62,8 +62,8 @@ static ucs_status_t uct_ze_copy_md_query(uct_md_h md, uct_md_attr_v2_t *md_attr)
 
 static ucs_status_t
 uct_ze_copy_mem_alloc(uct_md_h tl_md, size_t *length_p, void **address_p,
-                      ucs_memory_type_t mem_type, unsigned flags,
-                      const char *alloc_name, uct_mem_h *memh_p)
+                      ucs_memory_type_t mem_type, ucs_sys_device_t sys_dev,
+                      unsigned flags, const char *alloc_name, uct_mem_h *memh_p)
 {
     uct_ze_copy_md_t *md = ucs_derived_of(tl_md, uct_ze_copy_md_t);
     ze_host_mem_alloc_desc_t host_desc  = {};
@@ -245,11 +245,12 @@ static uct_md_ops_t md_ops = {
     .query              = uct_ze_copy_md_query,
     .mem_alloc          = uct_ze_copy_mem_alloc,
     .mem_free           = uct_ze_copy_mem_free,
-    .mkey_pack          = ucs_empty_function_return_success,
+    .mem_advise         = (uct_md_mem_advise_func_t)ucs_empty_function_return_unsupported,
     .mem_reg            = uct_ze_copy_mem_reg,
     .mem_dereg          = ucs_empty_function_return_success,
-    .mem_attach         = ucs_empty_function_return_unsupported,
     .mem_query          = uct_ze_copy_md_mem_query,
+    .mkey_pack          = ucs_empty_function_return_success,
+    .mem_attach         = (uct_md_mem_attach_func_t)ucs_empty_function_return_unsupported,
     .detect_memory_type = uct_ze_copy_md_detect_memory_type,
 };
 
@@ -299,10 +300,10 @@ uct_ze_copy_md_open(uct_component_h component, const char *md_name,
 uct_component_t uct_ze_copy_component = {
     .query_md_resources = uct_ze_base_query_md_resources,
     .md_open            = uct_ze_copy_md_open,
-    .cm_open            = ucs_empty_function_return_unsupported,
+    .cm_open            = (uct_component_cm_open_func_t)ucs_empty_function_return_unsupported,
     .rkey_unpack        = uct_ze_copy_rkey_unpack,
-    .rkey_ptr           = ucs_empty_function_return_unsupported,
-    .rkey_release       = ucs_empty_function_return_success,
+    .rkey_ptr           = (uct_component_rkey_ptr_func_t)ucs_empty_function_return_unsupported,
+    .rkey_release       = (uct_component_rkey_release_func_t)ucs_empty_function_return_success,
     .name               = "ze_cpy",
     .md_config = {
         .name       = "ze-copy memory domain",

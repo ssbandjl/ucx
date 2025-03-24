@@ -24,7 +24,6 @@
 
 
 #define UCT_IB_QPN_ORDER                  24  /* How many bits can be an IB QP number */
-#define UCT_IB_INVALID_QPN                UCS_MASK(UCT_IB_QPN_ORDER)
 #define UCT_IB_UIDX_SHIFT                 8   /* BE uidx shift */
 #define UCT_IB_LRH_LEN                    8   /* IB Local routing header */
 #define UCT_IB_GRH_LEN                    40  /* IB GLobal routing header */
@@ -238,6 +237,13 @@ typedef struct uct_ib_device {
     uint8_t                     pci_cswap_arg_sizes;
     uint8_t                     atomic_align;
     uint8_t                     lag_level;
+    uint8_t                     req_notify_cq_support; /* Also indicates
+                                                          IBV_SEND_SOLICITED
+                                                          support */
+    uint8_t                     ordered_send_comp;
+    uint64_t                    mr_access_flags;
+    uint32_t                    max_inline_data;
+
     /* AH hash */
     khash_t(uct_ib_ah)          ah_hash;
     ucs_recursive_spinlock_t    ah_lock;
@@ -403,6 +409,10 @@ ucs_status_t uct_ib_device_get_roce_ndev_name(uct_ib_device_t *dev,
                                               uint8_t gid_index,
                                               char *ndev_name, size_t max);
 
+ucs_status_t
+uct_ib_device_get_roce_ndev_index(uct_ib_device_t *dev, uint8_t port_num,
+                                  uint8_t gid_index, int *ndev_index_p);
+
 unsigned uct_ib_device_get_roce_lag_level(uct_ib_device_t *dev,
                                           uint8_t port_num,
                                           uint8_t gid_index);
@@ -495,5 +505,7 @@ static inline void uct_ib_destroy_cq(struct ibv_cq *cq, const char *desc)
 }
 
 void uct_ib_handle_async_event(uct_ib_device_t *dev, uct_ib_async_event_t *event);
+
+int uct_ib_device_is_smi(struct ibv_device *ibv_device);
 
 #endif

@@ -8,6 +8,8 @@
 
 #include <uct/uct_test.h>
 
+#include <vector>
+
 extern "C" {
 #include <ucs/time/time.h>
 #include <ucs/datastruct/queue.h>
@@ -534,10 +536,11 @@ UCS_TEST_SKIP_COND_P(test_ud, ca_ai,
     /* check initial window */
     disable_async(m_e1);
     disable_async(m_e2);
-    /* only test up to 'small' window when on valgrind
-     * valgrind drops rx packets when window is too big and resends are disabled in this test
+    /* only test up to 'small' window when on valgrind or EFA interface, as they
+     * drop rx packets when window is too big and resends are disabled in this test
      */
-    max_window = RUNNING_ON_VALGRIND ? 128 : UCT_UD_CA_MAX_WINDOW;
+    max_window = (ucs::is_aws() || RUNNING_ON_VALGRIND) ? 128 :
+                                                          UCT_UD_CA_MAX_WINDOW;
     connect();
     EXPECT_EQ(UCT_UD_CA_MIN_WINDOW, ep(m_e1)->ca.cwnd);
     EXPECT_EQ(UCT_UD_CA_MIN_WINDOW, ep(m_e2)->ca.cwnd);
@@ -757,10 +760,9 @@ UCS_TEST_P(test_ud, connect_iface_sim2v2) {
  * - flush() will also progress pending CREQs
  */
 UCS_TEST_P(test_ud, connect_iface_2k) {
-
     unsigned i;
-    unsigned cids[2000];
     unsigned count = 2000 / ucs::test_time_multiplier();
+    std::vector<unsigned> cids(count, 0);
 
     /* create 2k connections */
     for (i = 0; i < count; i++) {

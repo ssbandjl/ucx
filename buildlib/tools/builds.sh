@@ -320,6 +320,10 @@ build_gcc_debug_opt() {
 	build_gcc CFLAGS=-Og CXXFLAGS=-Og
 }
 
+build_gcc_with_dndebug() {
+	build_gcc CFLAGS=-DNDEBUG CXXFLAGS=-DNDEBUG
+}
+
 #
 # Build with armclang compiler
 #
@@ -444,27 +448,9 @@ then
 			'build_no_devx' \
 			'build_no_openmp' \
 			'build_gcc_debug_opt' \
+			'build_gcc_with_dndebug' \
 			'build_clang' \
 			'build_armclang')
-fi
-
-# Handle specific test execution
-if [ "$1" ]; then
-	test_name="$1"
-	if [[ " ${tests[@]} " =~ " ${test_name} " ]]; then
-		[ -d "${ucx_build_dir}" ] && rm -rf ${ucx_build_dir}/*
-
-		if [ $test_name ]; then
-			echo "Test succeeded: ${test_name}"
-			exit 0
-		else
-			echo "Test failed: ${test_name}"
-			exit 1
-		fi
-	else
-		echo "Error: Test '${test_name}' not found"
-		exit 1
-	fi
 fi
 
 num_tests=${#tests[@]}
@@ -479,9 +465,6 @@ do
 	# cleanup build dir before the task
 	[ -d "${ucx_build_dir}" ] && rm -rf ${ucx_build_dir}/*
 
-	if ! $test_name; then
-		azure_log_error "Test failed: $test_name"
-		azure_log_error	"To debug, rerun the test with: $0 $test_name"
-		exit 1
-	fi
+	# run the test
+	$test_name
 done

@@ -10,7 +10,7 @@
 AC_PREREQ([2.63])
 
 define([ucx_ver_major], 1)  # Major version. Usually does not change.
-define([ucx_ver_minor], 18) # Minor version. Increased for each release.
+define([ucx_ver_minor], 19) # Minor version. Increased for each release.
 define([ucx_ver_patch], 0)  # Patch version. Increased for a bugfix release.
 define([ucx_ver_extra], )   # Extra version string. Empty for a general release.
 
@@ -185,8 +185,10 @@ AS_IF([test "x$with_docs_only" = xyes],
      AM_CONDITIONAL([HAVE_STATS], [false])
      AM_CONDITIONAL([HAVE_TUNING], [false])
      AM_CONDITIONAL([HAVE_IB], [false])
-     AM_CONDITIONAL([HAVE_MLX5_DV], [false])
+     AM_CONDITIONAL([HAVE_EFA], [false])
      AM_CONDITIONAL([HAVE_MLX5_HW_UD], [false])
+     AM_CONDITIONAL([HAVE_MLX5_DV], [false])
+     AM_CONDITIONAL([HAVE_MLX5_MMO], [false])
      AM_CONDITIONAL([HAVE_DEVX], [false])
      AM_CONDITIONAL([HAVE_TL_RC], [false])
      AM_CONDITIONAL([HAVE_TL_DC], [false])
@@ -195,6 +197,7 @@ AS_IF([test "x$with_docs_only" = xyes],
      AM_CONDITIONAL([HAVE_CRAY_UGNI], [false])
      AM_CONDITIONAL([HAVE_CUDA], [false])
      AM_CONDITIONAL([HAVE_CUDA_STATIC], [false])
+     AM_CONDITIONAL([HAVE_NVCC], [false])
      AM_CONDITIONAL([HAVE_GDR_COPY], [false])
      AM_CONDITIONAL([HAVE_ROCM], [false])
      AM_CONDITIONAL([HAVE_HIP], [false])
@@ -404,9 +407,11 @@ AC_MSG_NOTICE([Building documents only])
 AC_MSG_NOTICE([UCX build configuration:])
 AC_MSG_NOTICE([        Build prefix:   ${prefix}])
 AC_MSG_NOTICE([   Configuration dir:   ${ucx_config_dir}])
-AC_MSG_NOTICE([  Preprocessor flags:   ${BASE_CPPFLAGS}])
-AC_MSG_NOTICE([          C compiler:   ${CC} ${BASE_CFLAGS}])
-AC_MSG_NOTICE([        C++ compiler:   ${CXX} ${BASE_CXXFLAGS}])
+AC_MSG_NOTICE([                  CC:   ${CC}])
+AC_MSG_NOTICE([                 CXX:   ${CXX}])
+AC_MSG_NOTICE([            CPPFLAGS:   ${BASE_CPPFLAGS} ${CPPFLAGS}])
+AC_MSG_NOTICE([              CFLAGS:   ${BASE_CFLAGS} ${CFLAGS}])
+AC_MSG_NOTICE([            CXXFLAGS:   ${BASE_CXXFLAGS} ${CXXFLAGS}])
 AC_MSG_NOTICE([          ASAN check:   ${enable_asan}])
 AC_MSG_NOTICE([        Multi-thread:   ${mt_enable}])
 AC_MSG_NOTICE([           MPI tests:   ${mpi_enable}])

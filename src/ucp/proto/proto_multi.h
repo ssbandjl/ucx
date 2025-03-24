@@ -111,6 +111,10 @@ typedef struct {
     /* Maximal number of lanes to select */
     ucp_lane_index_t               max_lanes;
 
+    /* Minimal chunk size. It defines the minimal size of the fragment to split into
+     * several parts. The goal is to not split below this limit */
+    size_t                         min_chunk;
+
     /* MDs on which the buffer is expected to be already registered, so no need
        to account for the overhead of registering on them */
     ucp_md_map_t                   initial_reg_md_map;
@@ -159,7 +163,8 @@ typedef ucs_status_t (*ucp_proto_multi_lane_send_func_t)(ucp_request_t *req,
 
 
 ucs_status_t ucp_proto_multi_init(const ucp_proto_multi_init_params_t *params,
-                                  ucp_proto_caps_t *caps,
+                                  const char *perf_name,
+                                  ucp_proto_perf_t **perf_p,
                                   ucp_proto_multi_priv_t *mpriv);
 
 

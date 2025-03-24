@@ -619,7 +619,13 @@ unsigned ucp_test::mt_num_threads()
 #if _OPENMP && ENABLE_MT
     /* Assume each thread can create two workers (sender and receiver entity),
        and each worker can open up to 64 files */
-    return std::min(omp_get_max_threads(), ucs_sys_max_open_files() / (64 * 2));
+    unsigned num = std::min(omp_get_max_threads(),
+                            ucs_sys_max_open_files() / (64 * 2));
+    if (ucs::is_aws()) {
+        num = std::min(num, 64u);
+    }
+
+    return num;
 #else
     return 1;
 #endif
@@ -1184,8 +1190,11 @@ bool ucp_test_base::entity::has_lane_with_caps(uint64_t caps) const
 
 bool ucp_test_base::entity::is_rndv_put_ppln_supported() const
 {
-    const auto config          = ucp_ep_config(ep());
-    ucs_memory_type_t mem_type = ucph()->config.ext.rndv_frag_mem_type;
+    const auto config = ucp_ep_config(ep());
+    ucs_memory_type_t mem_type;
+
+    mem_type = (ucs_memory_type_t)ucs_ffs64(
+                                        ucph()->config.ext.rndv_frag_mem_types);
 
     for (auto i = 0; i < config->key.num_lanes; ++i) {
         const auto lane = config->key.rma_bw_lanes[i];
@@ -1203,6 +1212,12 @@ bool ucp_test_base::entity::is_rndv_put_ppln_supported() const
     }
 
     return false;
+}
+
+bool ucp_test_base::entity::is_rndv_supported() const
+{
+    const auto config = ucp_ep_config(ep());
+    return config->key.rma_bw_lanes[0] != UCP_NULL_LANE;
 }
 
 bool ucp_test_base::entity::is_conn_reqs_queue_empty() const

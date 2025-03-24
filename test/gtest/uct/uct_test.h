@@ -116,6 +116,8 @@ public:
     uct_test();
     virtual ~uct_test();
 
+    virtual bool has_transport(const std::string& tl_name) const;
+
     enum atomic_mode {
         OP32,
         OP64,
@@ -138,7 +140,8 @@ protected:
 
         void mem_alloc(size_t length, unsigned mem_flags,
                        uct_allocated_memory_t *mem,
-                       ucs_memory_type_t mem_type = UCS_MEMORY_TYPE_HOST) const;
+                       ucs_memory_type_t mem_type = UCS_MEMORY_TYPE_HOST,
+                       unsigned num_retries = 0) const;
 
         void mem_free(const uct_allocated_memory_t *mem) const;
 
@@ -243,12 +246,15 @@ protected:
     public:
         mapped_buffer(size_t size, const entity &entity, size_t offset = 0,
                       ucs_memory_type_t mem_type = UCS_MEMORY_TYPE_HOST,
-                      unsigned mem_flags = UCT_MD_MEM_ACCESS_ALL);
+                      unsigned mem_flags = UCT_MD_MEM_ACCESS_ALL,
+                      unsigned num_retries = 0);
 
         mapped_buffer(size_t size, uint64_t seed, const entity &entity,
                       size_t offset = 0,
                       ucs_memory_type_t mem_type = UCS_MEMORY_TYPE_HOST,
-                      unsigned mem_flags = UCT_MD_MEM_ACCESS_ALL);
+                      unsigned mem_flags = UCT_MD_MEM_ACCESS_ALL,
+                      unsigned num_retries = 0);
+
         virtual ~mapped_buffer();
 
         mapped_buffer(mapped_buffer &&other);
@@ -376,7 +382,6 @@ protected:
                                modify_config_mode_t mode = FAIL_IF_NOT_EXIST);
     bool get_config(const std::string& name, std::string& value) const;
 
-    virtual bool has_transport(const std::string& tl_name) const;
     virtual bool has_ud() const;
     virtual bool has_rc() const;
     virtual bool has_rc_or_dc() const;
@@ -468,7 +473,11 @@ protected:
     rc_verbs,           \
     dc_mlx5,            \
     ud_verbs,           \
-    ud_mlx5,            \
+    ud_mlx5
+
+
+#define UCT_TEST_IB_AND_GGA_TLS \
+    UCT_TEST_IB_TLS,            \
     gga_mlx5
 
 
@@ -479,7 +488,7 @@ protected:
 
 
 #define UCT_TEST_NO_SELF_TLS \
-    UCT_TEST_IB_TLS,         \
+    UCT_TEST_IB_AND_GGA_TLS, \
     ugni_rdma,               \
     ugni_udt,                \
     ugni_smsg,               \
@@ -523,6 +532,16 @@ protected:
  */
 #define UCT_INSTANTIATE_IB_TEST_CASE(_test_case) \
     UCS_PP_FOREACH(_UCT_INSTANTIATE_TEST_CASE, _test_case, UCT_TEST_IB_TLS)
+
+
+/**
+ * Instantiate the parametrized test case for all IB and GGA transports.
+ *
+ * @param _test_case  Test case class, derived from uct_test.
+ */
+#define UCT_INSTANTIATE_IB_AND_GGA_TEST_CASE(_test_case) \
+    UCS_PP_FOREACH(_UCT_INSTANTIATE_TEST_CASE, _test_case, \
+                   UCT_TEST_IB_AND_GGA_TLS)
 
 
 /**
@@ -585,9 +604,15 @@ protected:
     _UCT_INSTANTIATE_TEST_CASE(_test_case, rc_verbs) \
     _UCT_INSTANTIATE_TEST_CASE(_test_case, rc_mlx5)
 
+
 #define UCT_INSTANTIATE_RC_DC_TEST_CASE(_test_case) \
     UCT_INSTANTIATE_RC_TEST_CASE(_test_case) \
     _UCT_INSTANTIATE_TEST_CASE(_test_case, dc_mlx5)
+
+
+#define UCT_INSTANTIATE_RC_DC_GGA_TEST_CASE(_test_case) \
+    UCT_INSTANTIATE_RC_DC_TEST_CASE(_test_case) \
+    _UCT_INSTANTIATE_TEST_CASE(_test_case, gga_mlx5)
 
 
 /**
@@ -598,6 +623,16 @@ protected:
  */
 #define UCT_INSTANTIATE_CUDA_IPC_TEST_CASE(_test_case) \
     _UCT_INSTANTIATE_TEST_CASE(_test_case, cuda_ipc)
+
+
+/**
+ * Instantiate the parametrized test case for the SRD transports
+ *
+ * @param _test_case  Test case class, derived from uct_test.
+ */
+#define UCT_INSTANTIATE_SRD_TEST_CASE(_test_case) \
+    _UCT_INSTANTIATE_TEST_CASE(_test_case, srd)
+
 
 std::ostream& operator<<(std::ostream& os, const uct_tl_resource_desc_t& resource);
 

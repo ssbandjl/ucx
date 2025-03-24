@@ -14,6 +14,7 @@
 #include <ucs/profile/profile.h>
 #include <ucs/sys/ptr_arith.h>
 #include <ucs/time/time.h>
+#include <ucs/type/serialize.h>
 
 /* max log value to store in uint8_t */
 #define UCT_IB_MLX5_MD_MAX_DCI_CHANNELS 8
@@ -25,6 +26,24 @@
 static uint32_t uct_ib_mlx5_flush_rkey_make()
 {
     return ((getpid() & 0xff) << 8) | UCT_IB_MD_INVALID_FLUSH_RKEY;
+}
+
+/* Should be called after DDP is initialized */
+static int
+uct_ib_mlx5_md_check_odp_common(uct_ib_mlx5_md_t *md, const char **reason_ptr)
+{
+    if (!uct_ib_md_check_odp_common(&md->super, reason_ptr)) {
+        return 0;
+    }
+
+    /* Issue 4238670 */
+    if ((md->dp_ordering_cap.rc == UCT_IB_MLX5_DP_ORDERING_OOO_ALL) ||
+        (md->dp_ordering_cap.dc == UCT_IB_MLX5_DP_ORDERING_OOO_ALL)) {
+        *reason_ptr = "ODP does not work with DDP";
+        return 0;
+    }
+
+    return 1;
 }
 
 #if HAVE_DEVX
@@ -136,7 +155,8 @@ static void uct_ib_mlx5_devx_ksm_list_log(uct_ib_mlx5_md_t *md, void *address,
 }
 
 static void uct_ib_mlx5_devx_klm_entry_set(void **klm_p, size_t klm_idx,
-                                           void *address, struct ibv_mr *mr)
+                                           void *address, size_t byte_count,
+                                           struct ibv_mr *mr)
 {
     void *klm = *klm_p;
 
@@ -144,6 +164,8 @@ static void uct_ib_mlx5_devx_klm_entry_set(void **klm_p, size_t klm_idx,
               mr->addr, mr->length, mr->lkey);
     UCT_IB_MLX5DV_SET64(klm, klm, address, (uintptr_t)address);
     UCT_IB_MLX5DV_SET(klm, klm, mkey, mr->lkey);
+    UCT_IB_MLX5DV_SET(klm, klm, byte_count, byte_count);
+
     *klm_p = UCS_PTR_BYTE_OFFSET(klm, UCT_IB_MLX5DV_ST_SZ_BYTES(klm));
 }
 
@@ -178,13 +200,13 @@ uct_ib_mlx5_devx_reg_ksm_data_mt(uct_ib_mlx5_md_t *md, void *address,
     klm = UCT_IB_MLX5DV_ADDR_OF(create_mkey_in, in, klm_pas_mtt);
     ucs_carray_for_each(mr, ksm_data->mrs, ksm_data->mr_num) {
         uct_ib_mlx5_devx_klm_entry_set(&klm, mr - ksm_data->mrs, mr_address,
-                                       *mr);
+                                       chunk_size, *mr);
         mr_address = UCS_PTR_BYTE_OFFSET(mr_address, chunk_size);
     }
 
     if ((void*)iova != address) {
         /* Add offset to workaround CREATE_MKEY range check issue */
-        uct_ib_mlx5_devx_klm_entry_set(&klm, list_size, mr_address,
+        uct_ib_mlx5_devx_klm_entry_set(&klm, list_size, mr_address, chunk_size,
                                        ksm_data->mrs[ksm_data->mr_num - 1]);
         ++list_size;
     }
@@ -223,7 +245,8 @@ static ucs_status_t uct_ib_mlx5_devx_reg_ksm_data_addr(
     for (i = 0; i < list_size; i++) {
         uct_ib_mlx5_devx_klm_entry_set(
                 &klm, i,
-                UCS_PTR_BYTE_OFFSET(address, i * UCT_IB_MD_MAX_MR_SIZE), mr);
+                UCS_PTR_BYTE_OFFSET(address, i * UCT_IB_MD_MAX_MR_SIZE),
+                UCT_IB_MD_MAX_MR_SIZE, mr);
     }
     ucs_log_indent(-1);
 
@@ -698,9 +721,10 @@ uct_ib_mlx5_devx_reg_mr(uct_ib_mlx5_md_t *md, uct_ib_mlx5_devx_mem_t *memh,
                         uct_ib_mr_type_t mr_type, uint64_t access_mask,
                         uint32_t *lkey_p, uint32_t *rkey_p)
 {
-    uint64_t access_flags = uct_ib_memh_access_flags(&memh->super,
-                                                     md->super.relaxed_order) &
-                            access_mask;
+    uint64_t access_flags =
+            uct_ib_memh_access_flags(&memh->super, md->super.relaxed_order,
+                                     md->super.dev.mr_access_flags) &
+            access_mask;
     unsigned flags        = UCT_MD_MEM_REG_FIELD_VALUE(params, flags,
                                                        FIELD_FLAGS, 0);
     ucs_status_t status;
@@ -775,7 +799,7 @@ uct_ib_mlx5_devx_memh_alloc(uct_ib_mlx5_md_t *md, size_t length,
 static int
 uct_ib_mlx5_devx_memh_has_ro(uct_ib_mlx5_md_t *md, uct_ib_mlx5_devx_mem_t *memh)
 {
-    if (memh->mrs[UCT_IB_MR_DEFAULT].super.ib->length == SIZE_MAX) {
+    if (memh->super.flags & UCT_IB_MEM_FLAG_GVA) {
         return md->flags & UCT_IB_MLX5_MD_FLAG_GVA_RO;
     }
 
@@ -783,7 +807,7 @@ uct_ib_mlx5_devx_memh_has_ro(uct_ib_mlx5_md_t *md, uct_ib_mlx5_devx_mem_t *memh)
 }
 
 static ucs_status_t
-uct_ib_mlx5_devx_mem_reg_gva(uct_md_h uct_md, uct_mem_h *memh_p)
+uct_ib_mlx5_devx_mem_reg_gva(uct_md_h uct_md, unsigned flags, uct_mem_h *memh_p)
 {
     uct_ib_mlx5_md_t *md           = ucs_derived_of(uct_md, uct_ib_mlx5_md_t);
     uct_md_mem_reg_params_t params = {};
@@ -792,14 +816,16 @@ uct_ib_mlx5_devx_mem_reg_gva(uct_md_h uct_md, uct_mem_h *memh_p)
     ucs_status_t status;
     int relaxed_order;
 
-    status = uct_ib_mlx5_devx_memh_alloc(md, SIZE_MAX, UCT_MD_MEM_FLAG_NONBLOCK,
+    status = uct_ib_mlx5_devx_memh_alloc(md, SIZE_MAX,
+                                         UCT_MD_MEM_FLAG_NONBLOCK | flags,
                                          sizeof(memh->mrs[0]), &memh);
     if (status != UCS_OK) {
         goto err;
     }
 
     relaxed_order = md->flags & UCT_IB_MLX5_MD_FLAG_GVA_RO;
-    access_flags  = uct_ib_memh_access_flags(&memh->super, relaxed_order);
+    access_flags  = uct_ib_memh_access_flags(&memh->super, relaxed_order,
+                                             md->super.dev.mr_access_flags);
     status = uct_ib_reg_mr(&md->super, NULL, SIZE_MAX, &params, access_flags,
                            NULL, &memh->mrs[UCT_IB_MR_DEFAULT].super.ib);
     if (status != UCS_OK) {
@@ -841,7 +867,7 @@ uct_ib_mlx5_devx_mem_reg(uct_md_h uct_md, void *address, size_t length,
     uint32_t dummy_mkey;
 
     if (flags & UCT_MD_MEM_GVA) {
-        return uct_ib_mlx5_devx_mem_reg_gva(uct_md, memh_p);
+        return uct_ib_mlx5_devx_mem_reg_gva(uct_md, flags, memh_p);
     }
 
     status = uct_ib_mlx5_devx_memh_alloc(md, length, flags,
@@ -865,7 +891,7 @@ uct_ib_mlx5_devx_mem_reg(uct_md_h uct_md, void *address, size_t length,
         status = uct_ib_mlx5_devx_reg_mr(md, memh, address, length, params,
                                          UCT_IB_MR_STRICT_ORDER,
                                          ~IBV_ACCESS_RELAXED_ORDERING,
-                                         &dummy_mkey, &dummy_mkey);
+                                         &dummy_mkey, &memh->atomic_rkey);
         if (status != UCS_OK) {
             goto err_dereg_default;
         }
@@ -890,20 +916,21 @@ err:
 static ucs_status_t
 uct_ib_devx_dereg_invalidate_rkey_check(uct_ib_mlx5_md_t *md,
                                         uct_ib_mlx5_devx_mem_t *memh,
-                                        uint32_t rkey, unsigned flags_mask,
-                                        uint64_t cap_mask, const char *name)
+                                        struct mlx5dv_devx_obj *dvmr,
+                                        unsigned flags_mask, uint64_t cap_mask,
+                                        const char *name)
 {
     if (!(memh->super.flags & flags_mask)) {
         return UCS_OK;
     }
 
     if (!(md->super.cap_flags & cap_mask)) {
-        ucs_debug("%s: invalidate %s is not supported (rkey=0x%x)",
-                  uct_ib_device_name(&md->super.dev), name, rkey);
+        ucs_debug("%s: invalidate %s is not supported (dvmr=%p)",
+                  uct_ib_device_name(&md->super.dev), name, dvmr);
         return UCS_ERR_UNSUPPORTED;
     }
 
-    if (rkey == UCT_IB_INVALID_MKEY) {
+    if (dvmr == NULL) {
         return UCS_ERR_INVALID_PARAM;
     }
 
@@ -924,14 +951,14 @@ static ucs_status_t uct_ib_devx_dereg_invalidate_params_check(
 
     memh   = UCT_MD_MEM_DEREG_FIELD_VALUE(params, memh, FIELD_MEMH, NULL);
     status = uct_ib_devx_dereg_invalidate_rkey_check(
-            md, memh, memh->indirect_rkey, UCT_IB_MEM_ACCESS_REMOTE_RMA,
+            md, memh, memh->indirect_dvmr, UCT_IB_MEM_ACCESS_REMOTE_RMA,
             UCT_MD_FLAG_INVALIDATE_RMA, "RMA");
     if (status != UCS_OK) {
         return status;
     }
 
     return uct_ib_devx_dereg_invalidate_rkey_check(
-            md, memh, memh->atomic_rkey, UCT_IB_MEM_ACCESS_REMOTE_ATOMIC,
+            md, memh, memh->atomic_dvmr, UCT_IB_MEM_ACCESS_REMOTE_ATOMIC,
             UCT_MD_FLAG_INVALIDATE_AMO, "AMO");
 }
 
@@ -1207,10 +1234,8 @@ uct_ib_mlx5_devx_umr_mkey_create(uct_ib_mlx5_md_t *md)
     umr_mkey->mkey->lkey |= UCT_IB_MLX5_MKEY_TAG_UMR;
     umr_mkey->mkey->rkey |= UCT_IB_MLX5_MKEY_TAG_UMR;
 
-    status = uct_ib_mlx5_devx_allow_xgvmi_access(md, umr_mkey->mkey->lkey, 1);
+    status = uct_ib_mlx5_devx_allow_xgvmi_access(md, umr_mkey->mkey->lkey, 0);
     if (status != UCS_OK) {
-        /* Reset XGVMI capability flag */
-        md->flags &= ~UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI;
         uct_ib_mlx5_devx_umr_mkey_destroy(md, umr_mkey);
         return NULL;
     }
@@ -1429,9 +1454,21 @@ uct_ib_mlx5_devx_umr_mkey_hash_find(uct_ib_mlx5_md_t *md,
     }
 
     *umr_alias = kh_val(md->umr.mkey_hash, khiter);
-    ucs_trace("%s: found " UCT_IB_MLX5_UMR_ALIAS_FMT " for index 0x%x in hash",
-              uct_ib_mlx5_dev_name(md), UCT_IB_MLX5_UMR_ALIAS_ARG(umr_alias),
-              uct_ib_mlx5_mkey_index(packed_mkey->lkey));
+
+    /* Check if alias is from the same MD as packed_mkey */
+    if (packed_mkey->md_uuid != umr_alias->md_uuid) {
+        ucs_debug("%s: found " UCT_IB_MLX5_UMR_ALIAS_FMT " in hash, but uuid %"
+                  PRIu64 " doesn't match, removing stale alias",
+                  uct_ib_mlx5_dev_name(md), UCT_IB_MLX5_UMR_ALIAS_ARG(umr_alias),
+                  packed_mkey->md_uuid);
+        /* Remove stale entry from hash, and destroy */
+        kh_del(umr_mkey_map, md->umr.mkey_hash, khiter);
+        uct_ib_mlx5_devx_umr_mkey_alias_destroy(md, umr_alias);
+        return UCS_ERR_UNREACHABLE;
+    }
+
+    ucs_trace("%s: found " UCT_IB_MLX5_UMR_ALIAS_FMT " in hash",
+              uct_ib_mlx5_dev_name(md), UCT_IB_MLX5_UMR_ALIAS_ARG(umr_alias));
     return UCS_OK;
 }
 
@@ -1461,9 +1498,8 @@ uct_ib_mlx5_devx_umr_mkey_hash_put(uct_ib_mlx5_md_t *md,
     }
 
     kh_val(md->umr.mkey_hash, khiter) = *umr_alias;
-    ucs_trace("%s: added " UCT_IB_MLX5_UMR_ALIAS_FMT " for index 0x%x to hash",
-              uct_ib_mlx5_dev_name(md), UCT_IB_MLX5_UMR_ALIAS_ARG(umr_alias),
-              uct_ib_mlx5_mkey_index(packed_mkey->lkey));
+    ucs_trace("%s: added " UCT_IB_MLX5_UMR_ALIAS_FMT " to hash",
+              uct_ib_mlx5_dev_name(md), UCT_IB_MLX5_UMR_ALIAS_ARG(umr_alias));
     return UCS_OK;
 }
 
@@ -1474,7 +1510,6 @@ uct_ib_mlx5_devx_mem_dereg(uct_md_h uct_md,
     uct_ib_mlx5_md_t *md = ucs_derived_of(uct_md, uct_ib_mlx5_md_t);
     uct_ib_mlx5_devx_mem_t *memh;
     ucs_status_t status;
-    int ret;
 
     UCT_MD_MEM_DEREG_CHECK_PARAMS(params, 1);
     if (ENABLE_PARAMS_CHECK) {
@@ -1516,14 +1551,6 @@ uct_ib_mlx5_devx_mem_dereg(uct_md_h uct_md,
                                                       memh->exported_umr_mkey);
         if (status != UCS_OK) {
             return status;
-        }
-    }
-
-    if (memh->umem != NULL) {
-        ret = mlx5dv_devx_umem_dereg(memh->umem);
-        if (ret < 0) {
-            ucs_error("mlx5dv_devx_umem_dereg(crossmr) failed: %m");
-            return UCS_ERR_IO_ERROR;
         }
     }
 
@@ -1609,13 +1636,7 @@ static void uct_ib_mlx5_devx_check_odp(uct_ib_mlx5_md_t *md,
     struct ibv_mr *mr;
     uint8_t version;
 
-    if (IBV_ACCESS_ON_DEMAND == 0) {
-        reason = "IBV_ACCESS_ON_DEMAND is not supported";
-        goto no_odp;
-    }
-
-    if (!IBV_DEVICE_HAS_ODP(&md->super.dev)) {
-        reason = "device does not support ODP";
+    if (!uct_ib_mlx5_md_check_odp_common(md, &reason)) {
         goto no_odp;
     }
 
@@ -1647,7 +1668,8 @@ static void uct_ib_mlx5_devx_check_odp(uct_ib_mlx5_md_t *md,
                 capability.odp_cap.memory_page_fault_scheme_cap);
         version = 2;
     } else {
-        if (md_config->devx_objs & UCS_BIT(UCT_IB_DEVX_OBJ_RCQP)) {
+        if (md_config->devx_objs &
+            (UCS_BIT(UCT_IB_DEVX_OBJ_RCQP) | UCS_BIT(UCT_IB_DEVX_OBJ_DCI))) {
             reason = "version 1 is not supported for DevX QP";
             goto no_odp;
         }
@@ -1754,15 +1776,13 @@ uct_ib_mlx5_devx_query_lag(uct_ib_mlx5_md_t *md, uint8_t *state)
     return UCS_OK;
 }
 
-static struct ibv_context *
-uct_ib_mlx5_devx_open_device(struct ibv_device *ibv_device)
+struct ibv_context* uct_ib_mlx5_devx_open_device(struct ibv_device *ibv_device)
 {
-    struct mlx5dv_context_attr dv_attr = {};
-    struct mlx5dv_devx_event_channel *event_channel;
+    struct mlx5dv_context_attr dv_attr = {
+        .flags = MLX5DV_CONTEXT_FLAGS_DEVX
+    };
     struct ibv_context *ctx;
-    struct ibv_cq *cq;
 
-    dv_attr.flags |= MLX5DV_CONTEXT_FLAGS_DEVX;
     ctx = mlx5dv_open_device(ibv_device, &dv_attr);
     if (ctx == NULL) {
         ucs_debug("mlx5dv_open_device(%s) failed: %m",
@@ -1770,11 +1790,20 @@ uct_ib_mlx5_devx_open_device(struct ibv_device *ibv_device)
         return NULL;
     }
 
+    return ctx;
+}
+
+static ucs_status_t
+uct_ib_mlx5_devx_check_event_channel(struct ibv_context *ctx)
+{
+    struct mlx5dv_devx_event_channel *event_channel;
+    struct ibv_cq *cq;
+
     cq = ibv_create_cq(ctx, 1, NULL, NULL, 0);
     if (cq == NULL) {
         uct_ib_check_memlock_limit_msg(ctx, UCS_LOG_LEVEL_DEBUG,
                                        "ibv_create_cq()");
-        goto close_ctx;
+        return UCS_ERR_UNSUPPORTED;
     }
 
     ibv_destroy_cq(cq);
@@ -1783,17 +1812,12 @@ uct_ib_mlx5_devx_open_device(struct ibv_device *ibv_device)
             ctx, MLX5_IB_UAPI_DEVX_CR_EV_CH_FLAGS_OMIT_DATA);
     if (event_channel == NULL) {
         ucs_diag("mlx5dv_devx_create_event_channel(%s) failed: %m",
-                 ibv_get_device_name(ibv_device));
-        goto close_ctx;
+                 ibv_get_device_name(ctx->device));
+        return UCS_ERR_UNSUPPORTED;
     }
 
     mlx5dv_devx_destroy_event_channel(event_channel);
-
-    return ctx;
-
-close_ctx:
-    ibv_close_device(ctx);
-    return NULL;
+    return UCS_OK;
 }
 
 static uct_ib_md_ops_t uct_ib_mlx5_devx_md_ops;
@@ -1840,8 +1864,21 @@ err:
     md->super.flush_rkey = uct_ib_mlx5_flush_rkey_make();
 }
 
-static ucs_status_t
-uct_ib_mlx5_devx_query_cap_2(struct ibv_context *ctx, void *out, size_t size)
+ucs_status_t uct_ib_mlx5_devx_query_cap(struct ibv_context *ctx, uint32_t opmod,
+                                        void *out, size_t size, char *msg_arg,
+                                        int silent)
+{
+    char in[UCT_IB_MLX5DV_ST_SZ_BYTES(query_hca_cap_in)] = {};
+
+    UCT_IB_MLX5DV_SET(query_hca_cap_in, in, opcode,
+                      UCT_IB_MLX5_CMD_OP_QUERY_HCA_CAP);
+    UCT_IB_MLX5DV_SET(query_hca_cap_in, in, op_mod, opmod);
+    return uct_ib_mlx5_devx_general_cmd(ctx, in, ucs_static_array_size(in),
+                                        out, size, msg_arg, silent);
+}
+
+ucs_status_t uct_ib_mlx5_devx_query_cap_2(struct ibv_context *ctx,
+                                          void *out, size_t size)
 {
     char in[UCT_IB_MLX5DV_ST_SZ_BYTES(query_hca_cap_in)] = {};
 
@@ -1855,8 +1892,7 @@ uct_ib_mlx5_devx_query_cap_2(struct ibv_context *ctx, void *out, size_t size)
                                         "QUERY_HCA_CAP, CAP2", 1);
 }
 
-static void uct_ib_mlx5_devx_check_xgvmi(uct_ib_mlx5_md_t *md, void *cap_2,
-                                         uct_ib_device_t *dev)
+int uct_ib_mlx5_devx_check_xgvmi(void *cap_2)
 {
     uint64_t object_for_other_vhca;
     uint32_t object_to_object;
@@ -1866,30 +1902,30 @@ static void uct_ib_mlx5_devx_check_xgvmi(uct_ib_mlx5_md_t *md, void *cap_2,
     object_for_other_vhca = UCT_IB_MLX5DV_GET64(
             cmd_hca_cap_2, cap_2, allowed_object_for_other_vhca_access);
 
-    if ((object_to_object &
-         UCT_IB_MLX5_HCA_CAPS_2_CROSS_VHCA_OBJ_TO_OBJ_LOCAL_MKEY_TO_REMOTE_MKEY) &&
-        (object_for_other_vhca &
-         UCT_IB_MLX5_HCA_CAPS_2_ALLOWED_OBJ_FOR_OTHER_VHCA_ACCESS_MKEY)) {
-        md->flags           |= UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI;
-        md->super.cap_flags |= UCT_MD_FLAG_EXPORTED_MKEY;
-        ucs_debug("%s: cross gvmi alias mkey is supported",
-                  uct_ib_device_name(dev));
-    } else {
-        ucs_debug("%s: crossing_vhca_mkey is not supported",
-                  uct_ib_device_name(dev));
-    }
+    return ((object_to_object &
+             UCT_IB_MLX5_HCA_CAPS_2_CROSS_VHCA_OBJ_TO_OBJ_LOCAL_MKEY_TO_REMOTE_MKEY) &&
+            (object_for_other_vhca &
+             UCT_IB_MLX5_HCA_CAPS_2_ALLOWED_OBJ_FOR_OTHER_VHCA_ACCESS_MKEY));
 }
 
 static void uct_ib_mlx5_devx_check_dp_ordering(uct_ib_mlx5_md_t *md, void *cap,
                                                void *cap_2,
                                                uct_ib_device_t *dev)
 {
-    if (UCT_IB_MLX5DV_GET(cmd_hca_cap, cap, dp_ordering_ooo_rw_rc)) {
-        md->flags |= UCT_IB_MLX5_MD_FLAG_DP_ORDERING_OOO_RW_RC;
+    if (UCT_IB_MLX5DV_GET(cmd_hca_cap, cap, dp_ordering_ooo_all_rc)) {
+        md->dp_ordering_cap.rc = UCT_IB_MLX5_DP_ORDERING_OOO_ALL;
+    } else if (UCT_IB_MLX5DV_GET(cmd_hca_cap, cap, dp_ordering_ooo_rw_rc)) {
+        md->dp_ordering_cap.rc = UCT_IB_MLX5_DP_ORDERING_OOO_RW;
+    } else {
+        md->dp_ordering_cap.rc = UCT_IB_MLX5_DP_ORDERING_IBTA;
     }
 
-    if (UCT_IB_MLX5DV_GET(cmd_hca_cap, cap, dp_ordering_ooo_rw_dc)) {
-        md->flags |= UCT_IB_MLX5_MD_FLAG_DP_ORDERING_OOO_RW_DC;
+    if (UCT_IB_MLX5DV_GET(cmd_hca_cap, cap, dp_ordering_ooo_all_dc)) {
+        md->dp_ordering_cap.dc = UCT_IB_MLX5_DP_ORDERING_OOO_ALL;
+    } else if (UCT_IB_MLX5DV_GET(cmd_hca_cap, cap, dp_ordering_ooo_rw_dc)) {
+        md->dp_ordering_cap.dc = UCT_IB_MLX5_DP_ORDERING_OOO_RW;
+    } else {
+        md->dp_ordering_cap.dc = UCT_IB_MLX5_DP_ORDERING_IBTA;
     }
 
     if ((cap_2 != NULL) &&
@@ -1900,8 +1936,7 @@ static void uct_ib_mlx5_devx_check_dp_ordering(uct_ib_mlx5_md_t *md, void *cap,
     ucs_debug("%s: dp_ordering support: force=%d ooo_rw_rc=%d ooo_rw_dc=%d",
               uct_ib_device_name(dev),
               !!(md->flags & UCT_IB_MLX5_MD_FLAG_DP_ORDERING_FORCE),
-              !!(md->flags & UCT_IB_MLX5_MD_FLAG_DP_ORDERING_OOO_RW_RC),
-              !!(md->flags & UCT_IB_MLX5_MD_FLAG_DP_ORDERING_OOO_RW_DC));
+              md->dp_ordering_cap.rc, md->dp_ordering_cap.dc);
 }
 
 static void uct_ib_mlx5_devx_check_mkey_by_name(uct_ib_mlx5_md_t *md,
@@ -1953,8 +1988,8 @@ static void uct_ib_mlx5_md_port_counter_set_id_init(uct_ib_mlx5_md_t *md)
 ucs_status_t
 uct_ib_mlx5_devx_device_mem_alloc(uct_md_h uct_md, size_t *length_p,
                                   void **address_p, ucs_memory_type_t mem_type,
-                                  unsigned flags, const char *alloc_name,
-                                  uct_mem_h *memh_p)
+                                  ucs_sys_device_t sys_dev, unsigned flags,
+                                  const char *alloc_name, uct_mem_h *memh_p)
 {
 #if HAVE_IBV_DM
     uct_ib_md_t *md           = ucs_derived_of(uct_md, uct_ib_md_t);
@@ -2110,7 +2145,8 @@ static void uct_ib_mlx5dv_check_dm_ksm_reg(uct_ib_mlx5_md_t *md)
     }
 
     status = uct_ib_mlx5_devx_device_mem_alloc(uct_md, &length, &address,
-                                               UCS_MEMORY_TYPE_RDMA, 0,
+                                               UCS_MEMORY_TYPE_RDMA,
+                                               UCS_SYS_DEVICE_ID_UNKNOWN, 0,
                                                "check dm ksm registration",
                                                &memh);
     if (status != UCS_OK) {
@@ -2135,46 +2171,58 @@ static void uct_ib_mlx5dv_check_dm_ksm_reg(uct_ib_mlx5_md_t *md)
 #endif
 }
 
-ucs_status_t uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
-                                      const uct_ib_md_config_t *md_config,
-                                      uct_ib_md_t **p_md)
+ucs_status_t uct_ib_mlx5_devx_md_open_common(const char *name, size_t size,
+                                             struct ibv_device *ibv_device,
+                                             const uct_ib_md_config_t *md_config,
+                                             uct_ib_md_t **p_md)
 {
-    char out[UCT_IB_MLX5DV_ST_SZ_BYTES(query_hca_cap_out)] = {};
-    char in[UCT_IB_MLX5DV_ST_SZ_BYTES(query_hca_cap_in)]   = {};
-    char cap_2_out[UCT_IB_MLX5DV_ST_SZ_BYTES(query_hca_cap_out)] = {};
-    ucs_status_t status                                    = UCS_OK;
-    uint8_t lag_state                                      = 0;
-    void *cap_2;
+    uint8_t lag_state = 0;
+    size_t out_len    = UCT_IB_MLX5DV_ST_SZ_BYTES(query_hca_cap_out);
+    size_t total_len  = 2 * out_len;
+    char *buf, *out, *cap_2_out;
+    void *cap, *cap_2;
+    ucs_status_t status;
     uint8_t log_max_qp;
     uint16_t vhca_id;
     struct ibv_context *ctx;
     uct_ib_device_t *dev;
     uct_ib_mlx5_md_t *md;
     unsigned max_rd_atomic_dc;
-    void *cap;
-    int ret;
-    ucs_log_level_t log_level;
     ucs_mpool_params_t mp_params;
     int ksm_atomic;
 
+    buf = ucs_calloc(1, total_len, "mlx5_devx_buffers");
+    if (buf == NULL) {
+        ucs_error("failed to allocate memory for HCA capability buffers");
+        status = UCS_ERR_NO_MEMORY;
+        goto err;
+    }
+
+    out       = buf;
+    cap_2_out = UCS_PTR_BYTE_OFFSET(out, out_len);
+
     if (!mlx5dv_is_supported(ibv_device)) {
         status = UCS_ERR_UNSUPPORTED;
-        goto err;
+        goto err_free_buffer;
     }
 
     if (md_config->devx == UCS_NO) {
         status = UCS_ERR_UNSUPPORTED;
-        goto err;
+        goto err_free_buffer;
     }
 
     ctx = uct_ib_mlx5_devx_open_device(ibv_device);
     if (ctx == NULL) {
         status = UCS_ERR_UNSUPPORTED;
-        goto err;
+        goto err_free_buffer;
     }
 
-    md = ucs_derived_of(uct_ib_md_alloc(sizeof(*md), "ib_mlx5_devx_md", ctx),
-                        uct_ib_mlx5_md_t);
+    status = uct_ib_mlx5_devx_check_event_channel(ctx);
+    if (status != UCS_OK) {
+        goto err_free_context;
+    }
+
+    md = ucs_derived_of(uct_ib_md_alloc(size, name, ctx), uct_ib_mlx5_md_t);
     if (md == NULL) {
         status = UCS_ERR_NO_MEMORY;
         goto err_free_context;
@@ -2194,24 +2242,17 @@ ucs_status_t uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
         goto err_lru_cleanup;
     }
 
-    cap = UCT_IB_MLX5DV_ADDR_OF(query_hca_cap_out, out, capability);
-    UCT_IB_MLX5DV_SET(query_hca_cap_in, in, opcode, UCT_IB_MLX5_CMD_OP_QUERY_HCA_CAP);
-    UCT_IB_MLX5DV_SET(query_hca_cap_in, in, op_mod, UCT_IB_MLX5_HCA_CAP_OPMOD_GET_CUR |
-                                                   (UCT_IB_MLX5_CAP_GENERAL << 1));
-    ret = mlx5dv_devx_general_cmd(ctx, in, sizeof(in), out, sizeof(out));
-    if (ret != 0) {
-        if ((errno == EPERM) || (errno == EPROTONOSUPPORT) ||
-            (errno == EOPNOTSUPP)) {
-            status    = UCS_ERR_UNSUPPORTED;
-            log_level = UCS_LOG_LEVEL_DEBUG;
-        } else {
-            status    = UCS_ERR_IO_ERROR;
-            log_level = UCS_LOG_LEVEL_ERROR;
-        }
-        ucs_log(log_level,
-                "mlx5dv_devx_general_cmd(QUERY_HCA_CAP) failed,"
-                " syndrome 0x%x: %m",
-                UCT_IB_MLX5DV_GET(query_hca_cap_out, out, syndrome));
+    dev->mr_access_flags       = UCT_IB_MEM_ACCESS_FLAGS;
+    dev->max_inline_data       = 4 * UCS_KBYTE;
+    dev->ordered_send_comp     = 1;
+    dev->req_notify_cq_support = 1;
+
+    cap    = UCT_IB_MLX5DV_ADDR_OF(query_hca_cap_out, out, capability);
+    status = uct_ib_mlx5_devx_query_cap(ctx,
+                                        UCT_IB_MLX5_HCA_CAP_OPMOD_GET_CUR |
+                                        (UCT_IB_MLX5_CAP_GENERAL << 1),
+                                        out, out_len, "QUERY_HCA_CAP", 0);
+    if (status != UCS_OK) {
         goto err_lru_cleanup;
     }
 
@@ -2317,11 +2358,9 @@ ucs_status_t uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
 
     vhca_id = UCT_IB_MLX5DV_GET(cmd_hca_cap, cap, vhca_id);
 
-    status = uct_ib_mlx5_devx_query_cap_2(ctx, cap_2_out, sizeof(cap_2_out));
+    status = uct_ib_mlx5_devx_query_cap_2(ctx, cap_2_out, out_len);
     if (status == UCS_OK) {
         cap_2 = UCT_IB_MLX5DV_ADDR_OF(query_hca_cap_out, cap_2_out, capability);
-
-        uct_ib_mlx5_devx_check_xgvmi(md, cap_2, dev);
         uct_ib_mlx5_devx_check_mkey_by_name(md, cap_2, dev);
     } else {
         cap_2 = NULL;
@@ -2337,11 +2376,11 @@ ucs_status_t uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
         uint8_t arg_size;
         int cap_ops, mode8b;
 
-        UCT_IB_MLX5DV_SET(query_hca_cap_in, in, op_mod, UCT_IB_MLX5_HCA_CAP_OPMOD_GET_CUR |
-                                                       (UCT_IB_MLX5_CAP_ATOMIC << 1));
-        status = uct_ib_mlx5_devx_general_cmd(ctx, in, sizeof(in), out,
-                                              sizeof(out),
-                                              "QUERY_HCA_CAP, ATOMIC", 0);
+        status = uct_ib_mlx5_devx_query_cap(ctx,
+                                            UCT_IB_MLX5_HCA_CAP_OPMOD_GET_CUR |
+                                            (UCT_IB_MLX5_CAP_ATOMIC << 1),
+                                            out, out_len,
+                                            "QUERY_HCA_CAP, ATOMIC", 0);
         if (status != UCS_OK) {
             goto err_lru_cleanup;
         }
@@ -2410,11 +2449,7 @@ ucs_status_t uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
     md->flags           |= UCT_IB_MLX5_MD_FLAGS_DEVX_OBJS(md_config->devx_objs);
     md->super.name       = UCT_IB_MD_NAME(mlx5);
     md->super.vhca_id    = vhca_id;
-
-    if ((md->flags & UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI) &&
-        (md_config->xgvmi_umr_enable == UCS_YES)) {
-        md->flags |= UCT_IB_MLX5_MD_FLAG_XGVMI_UMR;
-    }
+    md->super.uuid       = ucs_generate_uuid((uintptr_t)md);
 
     /* Zero init UMR related fields, will lazy init on first use */
     md->umr.cq        = NULL;
@@ -2441,7 +2476,29 @@ ucs_status_t uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
 
     uct_ib_mlx5_devx_init_flush_mr(md);
 
+    /*
+     * Device capabilities do not allow reliable check whether XGVMI for
+     * indirect mkeys is actually supported. Therefore we do this check by
+     * allowing XGVMI on indirect KSM flush_rkey.
+     */
+    if ((cap_2 != NULL) && (md->flush_mr != NULL) &&
+        uct_ib_mlx5_devx_check_xgvmi(cap_2)) {
+        ucs_assert(md->super.flush_rkey != UCT_IB_MD_INVALID_FLUSH_RKEY);
+        status = uct_ib_mlx5_devx_allow_xgvmi_access(md, md->super.flush_rkey, 1);
+        if (status == UCS_OK) {
+            md->super.cap_flags |= UCT_MD_FLAG_EXPORTED_MKEY;
+
+            if (md_config->xgvmi_umr_enable == UCS_YES) {
+                md->flags |= UCT_IB_MLX5_MD_FLAG_XGVMI_UMR;
+            }
+        }
+    }
+
+    ucs_debug("%s: XGVMI is %ssupported", uct_ib_device_name(dev),
+              (md->super.cap_flags & UCT_MD_FLAG_EXPORTED_MKEY) ? "" : "not ");
+
     *p_md = &md->super;
+    ucs_free(buf);
     return UCS_OK;
 
 err_dbrec_mpool_cleanup:
@@ -2455,6 +2512,8 @@ err_free_md:
     uct_ib_md_free(&md->super);
 err_free_context:
     uct_ib_md_device_context_close(ctx);
+err_free_buffer:
+    ucs_free(buf);
 err:
     if ((status == UCS_ERR_UNSUPPORTED) && (md_config->devx == UCS_YES)) {
         ucs_error("DEVX requested but not supported by %s",
@@ -2631,97 +2690,6 @@ uct_ib_mlx5_devx_allow_xgvmi_access(uct_ib_mlx5_md_t *md,
                                         "ALLOW_OTHER_VHCA_ACCESS", silent);
 }
 
-static ucs_status_t uct_ib_mlx5_devx_xgvmi_umem_mr(uct_ib_mlx5_md_t *md,
-                                                   uct_ib_mlx5_devx_mem_t *memh)
-{
-#if HAVE_DECL_MLX5DV_DEVX_UMEM_REG_EX
-    char in[UCT_IB_MLX5DV_ST_SZ_BYTES(create_mkey_in)]   = {0};
-    char out[UCT_IB_MLX5DV_ST_SZ_BYTES(create_mkey_out)] = {0};
-    struct mlx5dv_devx_umem_in umem_in;
-    struct mlx5dv_devx_obj *cross_mr;
-    struct mlx5dv_devx_umem *umem;
-    uint32_t exported_lkey;
-    ucs_status_t status;
-    void *aligned_address;
-    size_t length;
-    void *mkc;
-
-    if (uct_ib_mlx5_devx_has_dm(memh)) {
-        return UCS_ERR_UNSUPPORTED;
-    }
-
-    length  = memh->mrs[UCT_IB_MR_DEFAULT].super.ib->length;
-
-    /* register umem */
-    umem_in.addr        = memh->address;
-    umem_in.size        = length;
-    umem_in.access      = UCT_IB_MLX5_MD_UMEM_ACCESS;
-    aligned_address     = ucs_align_down_pow2_ptr(memh->address,
-                                                  ucs_get_page_size());
-    umem_in.pgsz_bitmap = UCS_MASK(ucs_ffs64((uint64_t)aligned_address) + 1);
-    umem_in.comp_mask   = 0;
-
-    umem = mlx5dv_devx_umem_reg_ex(md->super.dev.ibv_context, &umem_in);
-    if (umem == NULL) {
-        uct_ib_md_log_mem_reg_error(&md->super, 0,
-                                    "mlx5dv_devx_umem_reg_ex() failed: %m");
-        status = UCS_ERR_NO_MEMORY;
-        goto err_out;
-    }
-
-    /* create mkey */
-    mkc = UCT_IB_MLX5DV_ADDR_OF(create_mkey_in, in, memory_key_mkey_entry);
-    UCT_IB_MLX5DV_SET(create_mkey_in, in, opcode,
-                      UCT_IB_MLX5_CMD_OP_CREATE_MKEY);
-    UCT_IB_MLX5DV_SET(create_mkey_in, in, translations_octword_actual_size, 1);
-    UCT_IB_MLX5DV_SET(create_mkey_in, in, mkey_umem_id, umem->umem_id);
-    UCT_IB_MLX5DV_SET64(create_mkey_in, in, mkey_umem_offset, 0);
-    UCT_IB_MLX5DV_SET(mkc, mkc, access_mode_1_0,
-                      UCT_IB_MLX5_MKC_ACCESS_MODE_MTT);
-    UCT_IB_MLX5DV_SET(mkc, mkc, a, 1);
-    UCT_IB_MLX5DV_SET(mkc, mkc, rw, 1);
-    UCT_IB_MLX5DV_SET(mkc, mkc, rr, 1);
-    UCT_IB_MLX5DV_SET(mkc, mkc, lw, 1);
-    UCT_IB_MLX5DV_SET(mkc, mkc, lr, 1);
-    UCT_IB_MLX5DV_SET(mkc, mkc, crossing_target_mkey, 1);
-    UCT_IB_MLX5DV_SET(mkc, mkc, qpn, 0xffffff);
-    UCT_IB_MLX5DV_SET(mkc, mkc, pd, uct_ib_mlx5_devx_md_get_pdn(md));
-    UCT_IB_MLX5DV_SET(mkc, mkc, mkey_7_0, md->mkey_tag);
-    UCT_IB_MLX5DV_SET64(mkc, mkc, start_addr, (uintptr_t)memh->address);
-    UCT_IB_MLX5DV_SET64(mkc, mkc, len, length);
-
-    cross_mr = uct_ib_mlx5_devx_obj_create(md->super.dev.ibv_context, in,
-                                           sizeof(in), out, sizeof(out), "MKEY",
-                                           uct_md_reg_log_lvl(0));
-    if (cross_mr == NULL) {
-        status = UCS_ERR_IO_ERROR;
-        goto err_umem_dereg;
-    }
-
-    exported_lkey = (UCT_IB_MLX5DV_GET(create_mkey_out, out, mkey_index) << 8) |
-                    md->mkey_tag;
-
-    status = uct_ib_mlx5_devx_allow_xgvmi_access(md, exported_lkey, 0);
-    if (status != UCS_OK) {
-        goto err_cross_mr_destroy;
-    }
-
-    memh->umem          = umem;
-    memh->cross_mr      = cross_mr;
-    memh->exported_lkey = exported_lkey;
-    return UCS_OK;
-
-err_cross_mr_destroy:
-    mlx5dv_devx_obj_destroy(cross_mr);
-err_umem_dereg:
-    mlx5dv_devx_umem_dereg(umem);
-err_out:
-    return status;
-#else
-    return UCS_ERR_UNSUPPORTED;
-#endif
-}
-
 static ucs_status_t
 uct_ib_mlx5_devx_reg_xgvmi_ksm_mr(uct_ib_mlx5_md_t *md,
                                   uct_ib_mlx5_devx_mem_t *memh)
@@ -2737,10 +2705,8 @@ uct_ib_mlx5_devx_reg_xgvmi_ksm_mr(uct_ib_mlx5_md_t *md,
         return status;
     }
 
-    status = uct_ib_mlx5_devx_allow_xgvmi_access(md, exported_lkey, 1);
+    status = uct_ib_mlx5_devx_allow_xgvmi_access(md, exported_lkey, 0);
     if (status != UCS_OK) {
-        /* Reset XGVMI capability flag */
-        md->flags &= ~UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI;
         mlx5dv_devx_obj_destroy(cross_mr);
         return status;
     }
@@ -2770,9 +2736,9 @@ UCS_PROFILE_FUNC_ALWAYS(ucs_status_t, uct_ib_mlx5_devx_reg_exported_key,
                         uct_ib_mlx5_devx_mem_t *memh)
 {
     size_t length = memh->mrs[UCT_IB_MR_DEFAULT].super.ib->length;
-    ucs_status_t status;
 
-    if (uct_ib_mlx5_devx_has_dm(memh)) {
+    if (uct_ib_mlx5_devx_has_dm(memh) ||
+        !(md->super.cap_flags & UCT_MD_FLAG_EXPORTED_MKEY)) {
         return UCS_ERR_UNSUPPORTED;
     }
 
@@ -2781,31 +2747,17 @@ UCS_PROFILE_FUNC_ALWAYS(ucs_status_t, uct_ib_mlx5_devx_reg_exported_key,
                 memh, memh->exported_umr_mkey, memh->cross_mr,
                 memh->exported_lkey);
 
-    if (md->flags & UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI) {
-        /* UMR bind impl (IBV_WR_BIND_MW) attaches a single KLM segment, so:
-        * - IBV_WR_BIND_MW supports the maximum region length of 2GB
-        * - IBV_WR_BIND_MW does not support multi-segment (multi-threaded) MRs
-        * For these use cases we fallback to KSM */
-        if (!(md->flags & UCT_IB_MLX5_MD_FLAG_XGVMI_UMR) ||
-            (length > UCT_IB_MD_MAX_MR_SIZE) ||
-            (memh->super.flags & UCT_IB_MEM_MULTITHREADED)) {
-            status = uct_ib_mlx5_devx_reg_xgvmi_ksm_mr(md, memh);
-        } else {
-            status = uct_ib_mlx5_devx_reg_xgvmi_umr_mr(md, memh);
-        }
-
-        /* If KSM or UMR implementation fail to enable XGVMI, this capability
-         * flag is removed by impl, and then we fallback to UMEM impl */
-        if (md->flags & UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI) {
-            /* No XGVMI error, return impl status as is */
-            return status;
-        }
-
-        ucs_debug("%s: indirect xgvmi not supported, fallback to DEVX UMEM",
-                  uct_ib_mlx5_dev_name(md));
+    /* UMR bind impl (IBV_WR_BIND_MW) attaches a single KLM segment, so:
+    * - IBV_WR_BIND_MW supports the maximum region length of 2GB
+    * - IBV_WR_BIND_MW does not support multi-segment (multi-threaded) MRs
+    * For these use cases we fallback to KSM */
+    if (!(md->flags & UCT_IB_MLX5_MD_FLAG_XGVMI_UMR) ||
+        (length > UCT_IB_MD_MAX_MR_SIZE) ||
+        (memh->super.flags & UCT_IB_MEM_MULTITHREADED)) {
+        return uct_ib_mlx5_devx_reg_xgvmi_ksm_mr(md, memh);
+    } else {
+        return uct_ib_mlx5_devx_reg_xgvmi_umr_mr(md, memh);
     }
-
-    return uct_ib_mlx5_devx_xgvmi_umem_mr(md, memh);
 }
 
 static UCS_F_ALWAYS_INLINE int
@@ -2874,6 +2826,7 @@ uct_ib_mlx5_devx_mkey_pack(uct_md_h uct_md, uct_mem_h uct_memh,
         ((memh->super.flags & UCT_IB_MEM_ACCESS_REMOTE_ATOMIC) ||
          uct_ib_mlx5_devx_memh_has_ro(md, memh)) &&
         !(memh->super.flags & UCT_IB_MEM_IMPORTED) &&
+        md->super.config.enable_indirect_atomic &&
         ucs_test_all_flags(md->flags,
                            UCT_IB_MLX5_MD_FLAG_KSM |
                            UCT_IB_MLX5_MD_FLAG_INDIRECT_ATOMICS)) {
@@ -2894,8 +2847,7 @@ uct_ib_mlx5_devx_mkey_pack(uct_md_h uct_md, uct_mem_h uct_memh,
         return UCS_ERR_INVALID_PARAM;
     }
 
-    if ((flags & UCT_MD_MKEY_PACK_FLAG_INVALIDATE_RMA) ||
-        uct_ib_mlx5_devx_has_dm(memh)) {
+    if (flags & UCT_MD_MKEY_PACK_FLAG_INVALIDATE_RMA) {
         if (ucs_unlikely(memh->indirect_dvmr == NULL)) {
             status = uct_ib_mlx5_devx_reg_indirect_key(md, memh);
             if (status != UCS_OK) {
@@ -2912,6 +2864,25 @@ uct_ib_mlx5_devx_mkey_pack(uct_md_h uct_md, uct_mem_h uct_memh,
     return UCS_OK;
 }
 
+static UCS_F_ALWAYS_INLINE uct_ib_md_packed_mkey_t
+uct_ib_mlx5_devx_get_packed_mkey(const void *mkey_buffer, size_t mkey_size)
+{
+    const void *p = mkey_buffer;
+    uct_ib_md_packed_mkey_t packed_mkey;
+
+    packed_mkey.lkey    = *ucs_serialize_next(&p, uint32_t);
+    packed_mkey.vhca_id = *ucs_serialize_next(&p, uint16_t);
+    packed_mkey.md_uuid = 0;
+
+    /* Backward compatibility: extract MD UUID from mkey buffer only if it's
+     * present there */
+    if (mkey_size > ucs_offsetof(uct_ib_md_packed_mkey_t, md_uuid)) {
+        packed_mkey.md_uuid = *ucs_serialize_next(&p, uint64_t);
+    }
+
+    return packed_mkey;
+}
+
 ucs_status_t uct_ib_mlx5_devx_mem_attach(uct_md_h uct_md,
                                          const void *mkey_buffer,
                                          uct_md_mem_attach_params_t *params,
@@ -2922,7 +2893,9 @@ ucs_status_t uct_ib_mlx5_devx_mem_attach(uct_md_h uct_md,
     uct_ib_mlx5_md_t *md = ucs_derived_of(uct_md, uct_ib_mlx5_md_t);
     const uint64_t flags = UCT_MD_MEM_ATTACH_FIELD_VALUE(params, flags,
                                                          FIELD_FLAGS, 0);
-    const uct_ib_md_packed_mkey_t *packed_mkey = mkey_buffer;
+    size_t mkey_size     = UCT_MD_MEM_ATTACH_FIELD_VALUE(params, mkey_size,
+                                                         FIELD_MKEY_SIZE, 0);
+    uct_ib_md_packed_mkey_t packed_mkey;
     uct_ib_mlx5_devx_umr_alias_t umr_alias     = {};
     uct_ib_mlx5_devx_mem_t *memh;
     void *hdr, *alias_ctx;
@@ -2935,11 +2908,12 @@ ucs_status_t uct_ib_mlx5_devx_mem_attach(uct_md_h uct_md,
         goto err;
     }
 
-    hdr       = UCT_IB_MLX5DV_ADDR_OF(create_alias_obj_in, in, hdr);
-    alias_ctx = UCT_IB_MLX5DV_ADDR_OF(create_alias_obj_in, in, alias_ctx);
+    hdr         = UCT_IB_MLX5DV_ADDR_OF(create_alias_obj_in, in, hdr);
+    alias_ctx   = UCT_IB_MLX5DV_ADDR_OF(create_alias_obj_in, in, alias_ctx);
+    packed_mkey = uct_ib_mlx5_devx_get_packed_mkey(mkey_buffer, mkey_size);
 
     /* Try to find alias in the UMR hash map */
-    status = uct_ib_mlx5_devx_umr_mkey_hash_find(md, packed_mkey, &umr_alias);
+    status = uct_ib_mlx5_devx_umr_mkey_hash_find(md, &packed_mkey, &umr_alias);
     if (UCS_OK == status) {
         memh->super.lkey = umr_alias.lkey;
         goto out;
@@ -2953,15 +2927,16 @@ ucs_status_t uct_ib_mlx5_devx_mem_attach(uct_md_h uct_md,
     UCT_IB_MLX5DV_SET(general_obj_in_cmd_hdr, hdr, alias_object, 1);
 
     UCT_IB_MLX5DV_SET(alias_context, alias_ctx, vhca_id_to_be_accessed,
-                      packed_mkey->vhca_id);
+                      packed_mkey.vhca_id);
     UCT_IB_MLX5DV_SET(alias_context, alias_ctx, object_id_to_be_accessed,
-                      uct_ib_mlx5_mkey_index(packed_mkey->lkey));
+                      uct_ib_mlx5_mkey_index(packed_mkey.lkey));
     UCT_IB_MLX5DV_SET(alias_context, alias_ctx, metadata_1,
                       uct_ib_mlx5_devx_md_get_pdn(md));
     access_key = UCT_IB_MLX5DV_ADDR_OF(alias_context, alias_ctx, access_key);
     ucs_strncpy_zero(access_key, uct_ib_mkey_token,
                      UCT_IB_MLX5DV_FLD_SZ_BYTES(alias_context, access_key));
 
+    umr_alias.md_uuid  = packed_mkey.md_uuid;
     umr_alias.cross_mr = uct_ib_mlx5_devx_obj_create(md->super.dev.ibv_context,
                                                      in, sizeof(in), out,
                                                      sizeof(out), "MKEY_ALIAS",
@@ -2984,10 +2959,10 @@ ucs_status_t uct_ib_mlx5_devx_mem_attach(uct_md_h uct_md,
                        md->mkey_tag;
 
     /* If received mkey is UMR key, store alias in the UMR hash map */
-    if (uct_ib_mlx5_devx_mkey_is_umr(packed_mkey->lkey)) {
+    if (uct_ib_mlx5_devx_mkey_is_umr(packed_mkey.lkey)) {
         umr_alias.lkey = memh->super.lkey;
 
-        status = uct_ib_mlx5_devx_umr_mkey_hash_put(md, packed_mkey, &umr_alias);
+        status = uct_ib_mlx5_devx_umr_mkey_hash_put(md, &packed_mkey, &umr_alias);
         if (UCS_OK != status) {
             goto err_cross_mr_destroy;
         }
@@ -3031,18 +3006,29 @@ uct_ib_mlx5_devx_md_query(uct_md_h uct_md, uct_md_attr_v2_t *md_attr)
     return UCS_OK;
 }
 
+static ucs_status_t
+uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
+                         const uct_ib_md_config_t *md_config,
+                         uct_ib_md_t **p_md)
+{
+    return uct_ib_mlx5_devx_md_open_common("ib_mlx5_devx_md",
+                                           sizeof(uct_ib_mlx5_md_t),
+                                           ibv_device, md_config, p_md);
+}
+
 static uct_ib_md_ops_t uct_ib_mlx5_devx_md_ops = {
     .super = {
         .close              = uct_ib_mlx5_devx_md_close,
         .query              = uct_ib_mlx5_devx_md_query,
         .mem_alloc          = uct_ib_mlx5_devx_device_mem_alloc,
         .mem_free           = uct_ib_mlx5_devx_device_mem_free,
+        .mem_advise         = uct_ib_mem_advise,
         .mem_reg            = uct_ib_mlx5_devx_mem_reg,
         .mem_dereg          = uct_ib_mlx5_devx_mem_dereg,
-        .mem_attach         = uct_ib_mlx5_devx_mem_attach,
-        .mem_advise         = uct_ib_mem_advise,
+        .mem_query          = (uct_md_mem_query_func_t)ucs_empty_function_return_unsupported,
         .mkey_pack          = uct_ib_mlx5_devx_mkey_pack,
-        .detect_memory_type = ucs_empty_function_return_unsupported,
+        .mem_attach         = uct_ib_mlx5_devx_mem_attach,
+        .detect_memory_type = (uct_md_detect_memory_type_func_t)ucs_empty_function_return_unsupported,
     },
     .open = uct_ib_mlx5_devx_md_open,
 };
@@ -3140,6 +3126,50 @@ out:
 
 static uct_ib_md_ops_t uct_ib_mlx5_md_ops;
 
+static ucs_status_t
+uct_ib_mlx5dv_check_ddp(struct ibv_context *ctx, uct_ib_mlx5_md_t *md)
+{
+#ifdef HAVE_OOO_RECV_WRS
+    struct mlx5dv_context ctx_dv = {
+        .comp_mask = MLX5DV_CONTEXT_MASK_OOO_RECV_WRS
+    };
+    int ret;
+
+    ret = mlx5dv_query_device(ctx, &ctx_dv);
+    if (ret != 0) {
+        ucs_error("mlx5dv_query_device: Failed to query device capabilities, ret=%d\n", ret);
+        return UCS_ERR_NO_RESOURCE;
+    }
+
+    if (ctx_dv.ooo_recv_wrs_caps.max_rc > 0) {
+        md->dp_ordering_cap.rc = UCT_IB_MLX5_DP_ORDERING_OOO_ALL;
+    }
+
+    if (ctx_dv.ooo_recv_wrs_caps.max_dct > 0) {
+        md->dp_ordering_cap.dc = UCT_IB_MLX5_DP_ORDERING_OOO_ALL;
+    }
+#else
+    md->dp_ordering_cap.rc = UCT_IB_MLX5_DP_ORDERING_IBTA;
+    md->dp_ordering_cap.dc = UCT_IB_MLX5_DP_ORDERING_IBTA;
+#endif
+    return UCS_OK;
+}
+
+static void uct_ib_mlx5dv_md_check_odp(uct_ib_mlx5_md_t *md,
+                                       const uct_ib_md_config_t *md_config)
+{
+    const char *device_name = uct_ib_device_name(&md->super.dev);
+    const char *reason;
+
+    if (!uct_ib_mlx5_md_check_odp_common(md, &reason)) {
+        ucs_debug("%s: ODP is disabled because %s", device_name, reason);
+        return;
+    }
+
+    md->super.reg_nonblock_mem_types = md_config->ext.odp.mem_types;
+    ucs_debug("%s: ODP is supported", device_name);
+}
+
 static ucs_status_t uct_ib_mlx5dv_md_open(struct ibv_device *ibv_device,
                                           const uct_ib_md_config_t *md_config,
                                           uct_ib_md_t **p_md)
@@ -3168,9 +3198,18 @@ static ucs_status_t uct_ib_mlx5dv_md_open(struct ibv_device *ibv_device,
         goto err_free_context;
     }
 
-    dev = &md->super.dev;
+    dev                        = &md->super.dev;
+    dev->mr_access_flags       = UCT_IB_MEM_ACCESS_FLAGS;
+    dev->max_inline_data       = 4 * UCS_KBYTE;
+    dev->ordered_send_comp     = 1;
+    dev->req_notify_cq_support = 1;
 
     status = uct_ib_device_query(dev, ibv_device);
+    if (status != UCS_OK) {
+        goto err_md_free;
+    }
+
+    status = uct_ib_mlx5dv_check_ddp(ctx, md);
     if (status != UCS_OK) {
         goto err_md_free;
     }
@@ -3199,6 +3238,7 @@ static ucs_status_t uct_ib_mlx5dv_md_open(struct ibv_device *ibv_device,
 
     uct_ib_md_parse_relaxed_order(&md->super, md_config, 0);
     uct_ib_md_ece_check(&md->super);
+    uct_ib_mlx5dv_md_check_odp(md, md_config);
 
     md->super.flush_rkey = uct_ib_mlx5_flush_rkey_make();
 
@@ -3218,12 +3258,15 @@ static uct_ib_md_ops_t uct_ib_mlx5_md_ops = {
     .super = {
         .close              = uct_ib_md_close,
         .query              = uct_ib_md_query,
+        .mem_alloc          = (uct_md_mem_alloc_func_t)ucs_empty_function_return_unsupported,
+        .mem_free           = (uct_md_mem_free_func_t)ucs_empty_function_return_unsupported,
+        .mem_advise         = uct_ib_mem_advise,
         .mem_reg            = uct_ib_verbs_mem_reg,
         .mem_dereg          = uct_ib_verbs_mem_dereg,
-        .mem_attach         = ucs_empty_function_return_unsupported,
-        .mem_advise         = uct_ib_mem_advise,
+        .mem_query          = (uct_md_mem_query_func_t)ucs_empty_function_return_unsupported,
         .mkey_pack          = uct_ib_verbs_mkey_pack,
-        .detect_memory_type = ucs_empty_function_return_unsupported,
+        .mem_attach         = (uct_md_mem_attach_func_t)ucs_empty_function_return_unsupported,
+        .detect_memory_type = (uct_md_detect_memory_type_func_t)ucs_empty_function_return_unsupported,
     },
     .open = uct_ib_mlx5dv_md_open,
 };

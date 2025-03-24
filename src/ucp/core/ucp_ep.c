@@ -226,6 +226,8 @@ static ucp_ep_h ucp_ep_allocate(ucp_worker_h worker, const char *peer_name)
     ep->ext->ka_last_round                = 0;
 #endif
     ep->ext->peer_mem                     = NULL;
+    ep->ext->unflushed_lanes              = 0;
+    ep->ext->fence_seq                    = 0;
     ep->ext->uct_eps                      = NULL;
 
     UCS_STATIC_ASSERT(sizeof(ep->ext->ep_match) >=
@@ -586,7 +588,7 @@ ucs_status_t
 ucp_ep_config_err_mode_check_mismatch(ucp_ep_h ep,
                                       ucp_err_handling_mode_t err_mode)
 {
-    if (ucp_ep_config(ep)->key.err_mode != err_mode) {
+    if (!ucp_ep_config_err_mode_eq(ep, err_mode)) {
         ucs_error("ep %p: asymmetric endpoint configuration is not supported,"
                   " error handling level mismatch (expected: %d, got: %d)",
                   ep, ucp_ep_config(ep)->key.err_mode, err_mode);
@@ -685,8 +687,7 @@ ucs_status_t ucp_worker_mem_type_eps_create(ucp_worker_h worker)
     unsigned addr_indices[UCP_MAX_LANES];
 
     ucs_memory_type_for_each(mem_type) {
-        UCP_CONTEXT_MEM_CAP_TLS(context, mem_type, access_mem_types,
-                                mem_access_tls);
+        ucp_context_memaccess_tl_bitmap(context, mem_type, 0, &mem_access_tls);
         if (UCP_MEM_IS_HOST(mem_type) ||
             UCS_STATIC_BITMAP_IS_ZERO(mem_access_tls)) {
             continue;
@@ -826,6 +827,7 @@ ucp_ep_create_to_worker_addr(ucp_worker_h worker,
     ucp_tl_bitmap_t ep_tl_bitmap;
     ucs_status_t status;
     ucp_ep_h ep;
+    int am_need_flush;
 
     /* allocate endpoint */
     status = ucp_ep_create_base(worker, ep_init_flags, remote_address->name,
@@ -836,7 +838,8 @@ ucp_ep_create_to_worker_addr(ucp_worker_h worker,
 
     /* initialize transport endpoints */
     status = ucp_wireup_init_lanes(ep, ep_init_flags, local_tl_bitmap,
-                                   remote_address, addr_indices);
+                                   remote_address, addr_indices,
+                                   &am_need_flush);
     if (status != UCS_OK) {
         goto err_delete;
     }
@@ -1172,8 +1175,6 @@ static void ucp_ep_params_check_err_handling(ucp_ep_h ep,
         return;
     }
 
-    ucs_assert(!ep->worker->context->config.ext.gva_enable);
-
     if (ucp_worker_keepalive_is_enabled(ep->worker) &&
         ucp_ep_use_indirect_id(ep)) {
         return;
@@ -1189,14 +1190,6 @@ ucs_status_t ucp_ep_create(ucp_worker_h worker, const ucp_ep_params_t *params,
     ucp_ep_h ep    = NULL;
     unsigned flags = UCP_PARAM_VALUE(EP, params, flags, FLAGS, 0);
     ucs_status_t status;
-
-    if ((UCP_PARAM_VALUE(EP, params, err_mode, ERR_HANDLING_MODE,
-                         UCP_ERR_HANDLING_MODE_NONE) !=
-         UCP_ERR_HANDLING_MODE_NONE) &&
-        worker->context->config.ext.gva_enable) {
-        ucs_error("GVA and error handling not supported");
-        return UCS_ERR_INVALID_PARAM;
-    }
 
     UCS_ASYNC_BLOCK(&worker->async);
 
@@ -1775,7 +1768,8 @@ ucs_status_ptr_t ucp_ep_close_nbx(ucp_ep_h ep, const ucp_request_param_t *param)
         ucp_ep_disconnected(ep, 1);
     } else {
         request = ucp_ep_flush_internal(ep, 0, param, NULL,
-                                        ucp_ep_close_flushed_callback, "close");
+                                        ucp_ep_close_flushed_callback, "close",
+                                        UCT_FLUSH_FLAG_LOCAL);
         if (!UCS_PTR_IS_PTR(request)) {
             if (ucp_ep_is_cm_local_connected(ep)) {
                 /* lanes already flushed, start disconnect on CM lane */
@@ -1869,40 +1863,39 @@ int ucp_ep_config_lane_is_peer_match(const ucp_ep_config_key_t *key1,
                                           config_lane2->dst_md_index);
 }
 
-static ucp_lane_index_t
-ucp_ep_config_find_match_lane(const ucp_ep_config_key_t *key1,
-                              ucp_lane_index_t lane1,
-                              const ucp_ep_config_key_t *key2)
+ucp_lane_index_t
+ucp_ep_config_find_match_lane(const ucp_ep_config_key_t *old_key,
+                              ucp_lane_index_t old_lane,
+                              const ucp_ep_config_key_t *new_key)
 {
-    ucp_lane_index_t lane_idx;
+    ucp_lane_index_t new_lane;
 
-    for (lane_idx = 0; lane_idx < key2->num_lanes; ++lane_idx) {
-        if (ucp_ep_config_lane_is_peer_match(key1, lane1, key2, lane_idx)) {
-            return lane_idx;
+    for (new_lane = 0; new_lane < new_key->num_lanes; ++new_lane) {
+        if (ucp_ep_config_lane_is_peer_match(old_key, old_lane, new_key,
+                                             new_lane)) {
+            return new_lane;
         }
     }
 
     return UCP_NULL_LANE;
 }
 
-static ucp_lane_index_t
-ucp_ep_config_find_reusable_lane(const ucp_ep_config_key_t *key1,
-                                 const ucp_ep_config_key_t *key2, ucp_ep_h ep,
-                                 const ucp_unpacked_address_t *remote_address,
-                                 const unsigned *addr_indices,
-                                 ucp_lane_index_t old_lane)
+static ucp_lane_index_t ucp_ep_config_find_reusable_lane(
+        const ucp_ep_config_key_t *old_key, const ucp_ep_config_key_t *new_key,
+        ucp_ep_h ep, const ucp_unpacked_address_t *remote_address,
+        const unsigned *addr_indices, ucp_lane_index_t old_lane)
 {
     ucp_context_h context     = ep->worker->context;
-    ucp_rsc_index_t rsc_index = key1->lanes[old_lane].rsc_index;
+    ucp_rsc_index_t rsc_index = old_key->lanes[old_lane].rsc_index;
     ucp_lane_index_t new_lane;
     unsigned addr_index;
     const ucp_address_entry_t *ae;
 
-    if (old_lane == key1->cm_lane) {
-        return key2->cm_lane;
+    if (old_lane == old_key->cm_lane) {
+        return new_key->cm_lane;
     }
 
-    new_lane = ucp_ep_config_find_match_lane(key1, old_lane, key2);
+    new_lane = ucp_ep_config_find_match_lane(old_key, old_lane, new_key);
     if (new_lane == UCP_NULL_LANE) {
         /* No matching lane was found */
         return UCP_NULL_LANE;
@@ -1929,26 +1922,24 @@ ucp_ep_config_find_reusable_lane(const ucp_ep_config_key_t *key1,
 
 /* Go through the first configuration and check if the lanes selected
  * for this configuration could be used for the second configuration */
-void ucp_ep_config_lanes_intersect(const ucp_ep_config_key_t *key1,
-                                   const ucp_ep_config_key_t *key2,
+void ucp_ep_config_lanes_intersect(const ucp_ep_config_key_t *old_key,
+                                   const ucp_ep_config_key_t *new_key,
                                    const ucp_ep_h ep,
                                    const ucp_unpacked_address_t *remote_address,
                                    const unsigned *addr_indices,
                                    ucp_lane_index_t *lane_map)
 {
-    ucp_lane_index_t lane1_idx;
+    ucp_lane_index_t old_lane;
 
-    for (lane1_idx = 0; lane1_idx < key1->num_lanes; ++lane1_idx) {
-        lane_map[lane1_idx] = ucp_ep_config_find_reusable_lane(key1, key2, ep,
-                                                               remote_address,
-                                                               addr_indices,
-                                                               lane1_idx);
+    for (old_lane = 0; old_lane < old_key->num_lanes; ++old_lane) {
+        lane_map[old_lane] = ucp_ep_config_find_reusable_lane(
+                old_key, new_key, ep, remote_address, addr_indices, old_lane);
     }
 }
 
-static int ucp_ep_config_lane_is_equal(const ucp_ep_config_key_t *key1,
-                                       const ucp_ep_config_key_t *key2,
-                                       ucp_lane_index_t lane)
+int ucp_ep_config_lane_is_equal(const ucp_ep_config_key_t *key1,
+                                const ucp_ep_config_key_t *key2,
+                                ucp_lane_index_t lane)
 {
     const ucp_ep_config_key_lane_t *config_lane1 = &key1->lanes[lane];
     const ucp_ep_config_key_lane_t *config_lane2 = &key2->lanes[lane];
@@ -2450,7 +2441,7 @@ ucp_ep_config_max_short(ucp_context_t *context, uct_iface_attr_t *iface_attr,
     ssize_t cfg_max_short;
 
     if (!(iface_attr->cap.flags & short_flag) ||
-        context->config.progress_wrapper_enabled) {
+        ucp_context_usage_tracker_enabled(context)) {
         return -1;
     }
 
@@ -2882,9 +2873,11 @@ ucs_status_t ucp_ep_config_init(ucp_worker_h worker, ucp_ep_config_t *config,
                     iface_attr->cap.am.max_short, sizeof(ucp_am_hdr_t),
                     config->am.zcopy_thresh[0], &config->rndv.am_thresh);
 
-            ucp_ep_config_set_memtype_thresh(&config->am_u.max_eager_short,
-                                             am_max_eager_short,
-                                             context->num_mem_type_detect_mds);
+            if (iface_attr->cap.am.max_iov >= UCP_AM_SEND_SHORT_MIN_IOV) {
+                ucp_ep_config_set_memtype_thresh(
+                        &config->am_u.max_eager_short, am_max_eager_short,
+                        context->num_mem_type_detect_mds);
+            }
 
             /* All keys must fit in RNDV packet.
              * TODO remove some MDs if they don't
@@ -2917,9 +2910,11 @@ ucs_status_t ucp_ep_config_init(ucp_worker_h worker, ucp_ep_config_t *config,
                     sizeof(ucp_am_hdr_t) + sizeof(ucp_am_reply_ftr_t),
                     config->am.zcopy_thresh[0], &config->rndv.am_thresh);
 
-            ucp_ep_config_set_memtype_thresh(&config->am_u.max_reply_eager_short,
-                                             am_max_eager_short,
-                                             context->num_mem_type_detect_mds);
+            if (iface_attr->cap.am.max_iov >= UCP_AM_SEND_SHORT_MIN_IOV) {
+                ucp_ep_config_set_memtype_thresh(
+                        &config->am_u.max_reply_eager_short, am_max_eager_short,
+                        context->num_mem_type_detect_mds);
+            }
         } else {
             /* Stub endpoint */
             config->am.max_bcopy        = UCP_MIN_BCOPY;
@@ -3899,7 +3894,6 @@ static void ucp_ep_config_proto_init(ucp_worker_h worker,
 {
     ucp_ep_config_t *ep_config = ucp_worker_ep_config(worker, cfg_index);
     ucp_ep_config_key_t *key   = &ep_config->key;
-
     ucp_memtype_thresh_t *tag_max_short;
     ucp_lane_index_t tag_exp_lane;
     unsigned tag_proto_flags;

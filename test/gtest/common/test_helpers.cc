@@ -456,12 +456,13 @@ bool is_inet_addr(const struct sockaddr* ifa_addr) {
 
 static bool netif_has_sysfs_file(const char *ifa_name, const char *file_name)
 {
-    char path[PATH_MAX];
-    ucs_snprintf_safe(path, sizeof(path), "/sys/class/net/%s/%s", ifa_name,
+    std::string path(PATH_MAX, '\0');
+
+    ucs_snprintf_safe(&path[0], path.size(), "/sys/class/net/%s/%s", ifa_name,
                       file_name);
 
     struct stat st;
-    return stat(path, &st) >= 0;
+    return stat(path.c_str(), &st) >= 0;
 }
 
 bool is_interface_usable(struct ifaddrs *ifa)
@@ -529,6 +530,10 @@ static std::map<std::string, std::string> get_all_rdmacm_net_devices()
     ssize_t nread;
     int port_num;
 
+    if (ucs::is_aws()) {
+        return devices;
+    }
+
     std::vector<std::string> ndevs = read_dir(sysfs_net_dir);
 
     /* Enumerate IPoIB and RoCE devices which have direct mapping to an RDMA
@@ -541,6 +546,11 @@ static std::map<std::string, std::string> get_all_rdmacm_net_devices()
 
         if (!ib_devices.empty()) {
             std::string ib_device = ib_devices.front();
+            if (ib_device.rfind("smi", 0) == 0) {
+                /* Skip SMI device */
+                continue;
+            }
+
             std::string ports_dir = infiniband_dir + "/" + ib_device +
                                     "/ports";
             std::string ib_port   = read_dir(ports_dir).front();
@@ -601,6 +611,19 @@ bool is_rdmacm_netdev(const char *ifa_name)
     return !get_rdmacm_netdev(ifa_name).empty();
 }
 
+bool is_aws()
+{
+    static bool result, initialized = false;
+
+    if (!initialized) {
+        const char *str = getenv("CLOUD_TYPE");
+        result          = (str != NULL) && !strcmp(str, "aws");
+        initialized     = true;
+    }
+
+    return result;
+}
+
 uint16_t get_port() {
     int sock_fd, ret;
     ucs_status_t status;
@@ -608,7 +631,7 @@ uint16_t get_port() {
     socklen_t len = sizeof(ret_addr);
     uint16_t port;
 
-    status = ucs_socket_create(AF_INET, SOCK_STREAM, &sock_fd);
+    status = ucs_socket_create(AF_INET, SOCK_STREAM, 0, &sock_fd);
     EXPECT_EQ(status, UCS_OK);
 
     memset(&addr_in, 0, sizeof(struct sockaddr_in));

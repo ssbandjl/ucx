@@ -54,10 +54,11 @@ enum {
     UCP_REQUEST_FLAG_RKEY_INUSE            = UCS_BIT(18),
     UCP_REQUEST_FLAG_USER_HEADER_COPIED    = UCS_BIT(19),
     UCP_REQUEST_FLAG_USAGE_TRACKED         = UCS_BIT(20),
+    UCP_REQUEST_FLAG_FENCE_REQUIRED        = UCS_BIT(21),
 #if UCS_ENABLE_ASSERT
-    UCP_REQUEST_FLAG_STREAM_RECV           = UCS_BIT(21),
-    UCP_REQUEST_DEBUG_FLAG_EXTERNAL        = UCS_BIT(22),
-    UCP_REQUEST_FLAG_SUPER_VALID           = UCS_BIT(23),
+    UCP_REQUEST_FLAG_STREAM_RECV           = UCS_BIT(22),
+    UCP_REQUEST_DEBUG_FLAG_EXTERNAL        = UCS_BIT(23),
+    UCP_REQUEST_FLAG_SUPER_VALID           = UCS_BIT(24),
 #else
     UCP_REQUEST_FLAG_STREAM_RECV           = 0,
     UCP_REQUEST_DEBUG_FLAG_EXTERNAL        = 0,
@@ -205,7 +206,11 @@ struct ucp_request {
                             } header UCS_S_PACKED; /* packed to avoid 32-bit
                                                       padding */
                             uint16_t       am_id;
+                            /* API flags from @ref ucp_send_am_flags enum */
                             uint16_t       flags;
+                            /* Internal implementation flags from @ref
+                             * ucp_request_am_internal_flags enum */
+                            uint8_t        internal_flags;
                         } am;
                     };
                 } msg_proto;

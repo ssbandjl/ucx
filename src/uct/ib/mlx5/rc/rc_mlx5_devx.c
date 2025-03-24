@@ -408,6 +408,9 @@ ucs_status_t uct_rc_mlx5_iface_common_devx_connect_qp(
     UCT_IB_MLX5DV_SET(qpc, qpc, mtu, path_mtu);
     UCT_IB_MLX5DV_SET(qpc, qpc, log_msg_max, UCT_IB_MLX5_LOG_MAX_MSG_SIZE);
     UCT_IB_MLX5DV_SET(qpc, qpc, remote_qpn, dest_qp_num);
+
+    uct_ib_mlx5_devx_set_qpc_dp_ordering(md, qpc, iface);
+
     if (uct_ib_iface_is_roce(&iface->super.super)) {
         status = uct_ib_iface_create_ah(&iface->super.super, ah_attr,
                                         "RC DEVX QP connect", &ah);
@@ -417,9 +420,9 @@ ucs_status_t uct_rc_mlx5_iface_common_devx_connect_qp(
 
         uct_ib_mlx5_get_av(ah, &mlx5_av);
         memcpy(UCT_IB_MLX5DV_ADDR_OF(qpc, qpc, primary_address_path.rmac_47_32),
-               &mlx5_av.rmac, sizeof(mlx5_av.rmac));
+               mlx5_av.rmac, sizeof(mlx5_av.rmac));
         memcpy(UCT_IB_MLX5DV_ADDR_OF(qpc, qpc, primary_address_path.rgid_rip),
-               &mlx5_av.rgid, sizeof(mlx5_av.rgid));
+               mlx5_av.rgid, sizeof(mlx5_av.rgid));
         UCT_IB_MLX5DV_SET(qpc, qpc, primary_address_path.hop_limit,
                           mlx5_av.hop_limit);
         UCT_IB_MLX5DV_SET(qpc, qpc, primary_address_path.src_addr_index,
@@ -434,8 +437,6 @@ ucs_status_t uct_rc_mlx5_iface_common_devx_connect_qp(
                               uct_ib_iface_roce_dscp(&iface->super.super));
         }
 
-        uct_ib_mlx5_devx_set_qpc_dp_ordering(
-                qpc, iface->super.super.config.dp_ordering_ooo);
         uct_ib_mlx5_devx_set_qpc_port_affinity(md, path_index, qpc,
                                                &opt_param_mask);
     } else {

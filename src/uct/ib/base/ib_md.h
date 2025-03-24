@@ -36,6 +36,15 @@
 
 
 /**
+ * Callback function to check and filter out not applicable devices.
+ *
+ * @param [in]      device      IB device.
+ * @return 1 for acceptable device, otherwise 0.
+ */
+typedef int (*uct_ib_check_device_cb_t)(struct ibv_device *device);
+
+
+/**
  * IB MD statistics counters
  */
 enum {
@@ -57,11 +66,13 @@ enum {
     UCT_IB_MEM_IMPORTED              = UCS_BIT(3), /**< The memory handle was
                                                         created by mem_attach */
 #if ENABLE_PARAMS_CHECK
-    UCT_IB_MEM_ACCESS_REMOTE_RMA     = UCS_BIT(4) /**< RMA access was requested
+    UCT_IB_MEM_ACCESS_REMOTE_RMA     = UCS_BIT(4), /**< RMA access was requested
                                                         for the memory region */
 #else
-    UCT_IB_MEM_ACCESS_REMOTE_RMA     = 0
+    UCT_IB_MEM_ACCESS_REMOTE_RMA     = 0,
 #endif
+    UCT_IB_MEM_FLAG_GVA              = UCS_BIT(5), /**< The memory handle is a
+                                                        GVA region */
 };
 
 enum {
@@ -154,6 +165,7 @@ typedef struct uct_ib_md {
      * be initiated.  */
     uint32_t                 flush_rkey;
     uint16_t                 vhca_id;
+    uint64_t                 uuid;
     struct {
         uint32_t             base;
         uint32_t             size;
@@ -161,9 +173,10 @@ typedef struct uct_ib_md {
 } uct_ib_md_t;
 
 
-typedef struct uct_ib_md_packed_mkey {
+typedef struct {
     uint32_t lkey;
     uint16_t vhca_id;
+    uint64_t md_uuid;
 } UCS_S_PACKED uct_ib_md_packed_mkey_t;
 
 
@@ -271,6 +284,7 @@ uct_ib_md_pack_exported_mkey(uct_ib_md_t *md, uint32_t lkey, void *buffer)
 
     mkey->lkey    = lkey;
     mkey->vhca_id = md->vhca_id;
+    mkey->md_uuid = md->uuid;
 
     ucs_trace("packed exported mkey on %s: lkey 0x%x",
               uct_ib_device_name(&md->dev), lkey);
@@ -372,13 +386,17 @@ ucs_status_t uct_ib_mem_prefetch(uct_ib_md_t *md, uct_ib_mem_t *ib_memh,
  */
 void uct_ib_md_ece_check(uct_ib_md_t *md);
 
+/* Check if IB MD supports nonblocking registration */
+int uct_ib_md_check_odp_common(uct_ib_md_t *md, const char **reason_ptr);
+
 ucs_status_t
 uct_ib_md_handle_mr_list_mt(uct_ib_md_t *md, void *address, size_t length,
                             const uct_md_mem_reg_params_t *params,
                             uint64_t access_flags, size_t mr_num,
                             struct ibv_mr **mrs);
 
-uint64_t uct_ib_memh_access_flags(uct_ib_mem_t *memh, int relaxed_order);
+uint64_t uct_ib_memh_access_flags(uct_ib_mem_t *memh, int relaxed_order,
+                                  uint64_t access_flags);
 
 ucs_status_t uct_ib_verbs_mem_reg(uct_md_h uct_md, void *address, size_t length,
                                   const uct_md_mem_reg_params_t *params,
@@ -396,9 +414,10 @@ ucs_status_t uct_ib_rkey_unpack(uct_component_t *component,
                                 const void *rkey_buffer, uct_rkey_t *rkey_p,
                                 void **handle_p);
 
-ucs_status_t uct_ib_query_md_resources(uct_component_t *component,
-                                       uct_md_resource_desc_t **resources_p,
-                                       unsigned *num_resources_p);
+ucs_status_t
+uct_ib_base_query_md_resources(uct_md_resource_desc_t **resources_p,
+                               unsigned *num_resources_p,
+                               uct_ib_check_device_cb_t check_device_cb);
 
 ucs_status_t uct_ib_get_device_by_name(struct ibv_device **ib_device_list,
                                        int num_devices, const char *md_name,

@@ -21,7 +21,8 @@
 
 
 ucs_status_t ucp_proto_multi_init(const ucp_proto_multi_init_params_t *params,
-                                  ucp_proto_caps_t *caps,
+                                  const char *perf_name,
+                                  ucp_proto_perf_t **perf_p,
                                   ucp_proto_multi_priv_t *mpriv)
 {
     ucp_context_h context         = params->super.super.worker->context;
@@ -34,13 +35,12 @@ ucs_status_t ucp_proto_multi_init(const ucp_proto_multi_init_params_t *params,
     ucp_lane_index_t i, lane, num_lanes;
     ucp_proto_multi_lane_priv_t *lpriv;
     ucp_proto_perf_node_t *perf_node;
-    size_t max_frag, min_length, min_end_offset;
+    size_t max_frag, min_length, min_end_offset, min_chunk;
     ucp_lane_map_t lane_map;
     ucp_md_map_t reg_md_map;
     uint32_t weight_sum;
     ucs_status_t status;
 
-    ucs_assert(params->max_lanes >= 1);
     ucs_assert(params->max_lanes <= UCP_PROTO_MAX_LANES);
 
     if ((ucp_proto_select_op_flags(params->super.super.select_param) &
@@ -49,7 +49,12 @@ ucs_status_t ucp_proto_multi_init(const ucp_proto_multi_init_params_t *params,
         return UCS_ERR_UNSUPPORTED;
     }
 
-    if (!ucp_proto_common_init_check_err_handling(&params->super)) {
+    if (!ucp_proto_common_init_check_err_handling(&params->super) ||
+        (params->max_lanes == 0)) {
+        return UCS_ERR_UNSUPPORTED;
+    }
+
+    if (!ucp_proto_common_check_memtype_copy(&params->super)) {
         return UCS_ERR_UNSUPPORTED;
     }
 
@@ -166,6 +171,10 @@ ucs_status_t ucp_proto_multi_init(const ucp_proto_multi_init_params_t *params,
         /* Make sure fragment is not zero */
         ucs_assert(max_frag > 0);
 
+        /* Min chunk is scaled, but must be within HW limits */
+        min_chunk       = ucs_min(lane_perf->bandwidth * params->min_chunk /
+                                  min_bandwidth, lane_perf->max_frag);
+        max_frag        = ucs_max(max_frag, min_chunk);
         lpriv->max_frag = max_frag;
         perf.max_frag  += max_frag;
 
@@ -214,9 +223,7 @@ ucs_status_t ucp_proto_multi_init(const ucp_proto_multi_init_params_t *params,
         perf.min_length = ucs_max(perf.min_length, min_length);
 
         weight_sum           += lpriv->weight;
-        min_end_offset       += lane_perf->bandwidth *
-                                context->config.ext.min_rndv_chunk_size /
-                                min_bandwidth;
+        min_end_offset       += min_chunk;
         mpriv->min_frag       = ucs_max(mpriv->min_frag, lane_perf->min_length);
         mpriv->max_frag_sum  += lpriv->max_frag;
         lpriv->weight_sum     = weight_sum;
@@ -240,8 +247,9 @@ ucs_status_t ucp_proto_multi_init(const ucp_proto_multi_init_params_t *params,
         }
     }
 
-    status = ucp_proto_common_init_caps(&params->super, &perf, perf_node,
-                                        reg_md_map, caps);
+    status = ucp_proto_init_perf(&params->super, &perf, perf_node, reg_md_map,
+                                 perf_name, perf_p);
+
     /* Deref unused nodes */
     for (i = 0; i < num_lanes; ++i) {
         ucp_proto_perf_node_deref(&lanes_perf_nodes[lanes[i]]);
@@ -260,16 +268,19 @@ size_t ucp_proto_multi_priv_size(const ucp_proto_multi_priv_t *mpriv)
 
 void ucp_proto_multi_probe(const ucp_proto_multi_init_params_t *params)
 {
+    const char *proto_name = ucp_proto_id_field(params->super.super.proto_id,
+                                                name);
     ucp_proto_multi_priv_t mpriv;
-    ucp_proto_caps_t caps;
+    ucp_proto_perf_t *perf;
     ucs_status_t status;
 
-    status = ucp_proto_multi_init(params, &caps, &mpriv);
+    status = ucp_proto_multi_init(params, proto_name, &perf, &mpriv);
     if (status != UCS_OK) {
         return;
     }
 
-    ucp_proto_common_add_proto(&params->super, &caps, &mpriv,
+    ucp_proto_select_add_proto(&params->super.super, params->super.cfg_thresh,
+                               params->super.cfg_priority, perf, &mpriv,
                                ucp_proto_multi_priv_size(&mpriv));
 }
 

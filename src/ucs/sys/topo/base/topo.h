@@ -73,6 +73,12 @@ extern ucs_list_link_t ucs_sys_topo_providers_list;
 
 
 /**
+ * Reset the internal singleton system topology provider.
+ */
+void ucs_sys_topo_reset_provider(void);
+
+
+/**
  * Find system device by pci bus id.
  *
  * @param [in]  bus_id  pointer to bus id of the device of interest.
@@ -234,12 +240,36 @@ const char *ucs_topo_sys_device_get_name(ucs_sys_device_t sys_dev);
  */
 ucs_numa_node_t ucs_topo_sys_device_get_numa_node(ucs_sys_device_t sys_dev);
 
+
+/**
+ * Set a user-defined value for a given system device.
+ *
+ * @param [in] sys_dev System device index.
+ * @param [in] value   User-defined value to set.
+ *
+ * @return UCS_OK on success, error otherwise.
+ */
+ucs_status_t
+ucs_topo_sys_device_set_user_value(ucs_sys_device_t sys_dev, uintptr_t value);
+
+
+/**
+ * Retrieve the user-defined value of a system device.
+ *
+ * @param [in] sys_dev System device index.
+ *
+ * @return User-defined value, or UINTPTR_MAX if no value is set or the device
+ *         does not exist.
+ */
+uintptr_t ucs_topo_sys_device_get_user_value(ucs_sys_device_t sys_dev);
+
+
 /**
  * Get the number of registered system devices.
  *
  * @return Number of system devices.
  */
-unsigned ucs_topo_num_devices();
+unsigned ucs_topo_num_devices(void);
 
 
 /**
@@ -252,13 +282,13 @@ void ucs_topo_print_info(FILE *stream);
 /**
  * Initialize UCS topology subsystem.
  */
-void ucs_topo_init();
+void ucs_topo_init(void);
 
 
 /**
  * Cleanup UCS topology subsystem.
  */
-void ucs_topo_cleanup();
+void ucs_topo_cleanup(void);
 
 END_C_DECLS
 

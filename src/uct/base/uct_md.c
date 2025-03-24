@@ -254,7 +254,7 @@ ucs_status_t uct_iface_open(uct_md_h md, uct_worker_h worker,
 
     ucs_vfs_obj_add_dir(worker, *iface_p, "iface/%p", *iface_p);
     ucs_vfs_obj_add_sym_link(*iface_p, md, "memory_domain");
-    ucs_vfs_obj_set_dirty(*iface_p, uct_iface_vfs_refresh);
+    uct_iface_vfs_set_dirty(*iface_p);
 
     return UCS_OK;
 }
@@ -490,6 +490,7 @@ ucs_status_t uct_md_query_v2(uct_md_h md, uct_md_attr_v2_t *md_attr)
 
 void uct_md_base_md_query(uct_md_attr_v2_t *md_attr)
 {
+    md_attr->flags                     = 0;
     md_attr->reg_mem_types             = 0;
     md_attr->reg_nonblock_mem_types    = 0;
     md_attr->cache_mem_types           = 0;
@@ -538,10 +539,11 @@ ucs_status_t uct_mem_alloc_check_params(size_t length,
 }
 
 ucs_status_t uct_md_mem_alloc(uct_md_h md, size_t *length_p, void **address_p,
-                              ucs_memory_type_t mem_type, unsigned flags,
+                              ucs_memory_type_t mem_type,
+                              ucs_sys_device_t sys_dev, unsigned flags,
                               const char *alloc_name, uct_mem_h *memh_p)
 {
-    return md->ops->mem_alloc(md, length_p, address_p, mem_type, flags,
+    return md->ops->mem_alloc(md, length_p, address_p, mem_type, sys_dev, flags,
                               alloc_name, memh_p);
 }
 

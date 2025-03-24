@@ -72,10 +72,10 @@ ucp_am_eager_short_proto_progress_common(uct_pending_req_t *self, int is_reply)
     status = uct_ep_am_short_iov(ucp_ep_get_fast_lane(req->send.ep,
                                                       spriv->super.lane),
                                  am_id, iov, iov_cnt);
-    status = ucp_proto_am_handle_user_header_send_status(req, status);
     if (ucs_unlikely(status == UCS_ERR_NO_RESOURCE)) {
         req->send.lane = spriv->super.lane; /* for pending add */
-        return status;
+        return ucp_am_handle_user_header_send_status_or_abort(
+                req, UCS_ERR_NO_RESOURCE);
     }
 
     ucp_am_release_user_header(req);
@@ -100,10 +100,10 @@ ucp_am_eager_short_probe_common(const ucp_proto_init_params_t *init_params,
         .super.cfg_priority  = 0,
         .super.min_length    = 0,
         .super.max_length    = SIZE_MAX,
-        .super.min_iov       = 0,
+        .super.min_iov       = 3,
         .super.min_frag_offs = UCP_PROTO_COMMON_OFFSET_INVALID,
         .super.max_frag_offs = ucs_offsetof(uct_iface_attr_t, cap.am.max_short),
-        .super.max_iov_offs  = UCP_PROTO_COMMON_OFFSET_INVALID,
+        .super.max_iov_offs  = ucs_offsetof(uct_iface_attr_t, cap.am.max_iov),
         .super.hdr_size      = ucp_am_eager_single_hdr_size(op_id),
         .super.send_op       = UCT_EP_OP_AM_SHORT,
         .super.memtype_op    = UCT_EP_OP_LAST,
@@ -111,6 +111,7 @@ ucp_am_eager_short_probe_common(const ucp_proto_init_params_t *init_params,
                                UCP_PROTO_COMMON_INIT_FLAG_CAP_SEG_SIZE |
                                UCP_PROTO_COMMON_INIT_FLAG_ERR_HANDLING,
         .super.exclude_map   = 0,
+        .super.reg_mem_info  = ucp_mem_info_unknown,
         .lane_type           = UCP_LANE_TYPE_AM,
         .tl_cap_flags        = UCT_IFACE_FLAG_AM_SHORT
     };
@@ -214,7 +215,7 @@ ucp_am_eager_single_bcopy_proto_progress(uct_pending_req_t *self)
             req, UCP_AM_ID_AM_SINGLE, spriv->super.lane,
             ucp_am_eager_single_bcopy_pack, req, SIZE_MAX,
             ucp_proto_request_am_bcopy_complete_success, 1);
-    return ucp_proto_am_handle_user_header_send_status(req, status);
+    return ucp_am_handle_user_header_send_status_or_abort(req, status);
 }
 
 static void ucp_am_eager_single_bcopy_probe_common(
@@ -240,6 +241,7 @@ static void ucp_am_eager_single_bcopy_probe_common(
                                UCP_PROTO_COMMON_INIT_FLAG_CAP_SEG_SIZE |
                                UCP_PROTO_COMMON_INIT_FLAG_ERR_HANDLING,
         .super.exclude_map   = 0,
+        .super.reg_mem_info  = ucp_mem_info_unknown,
         .lane_type           = UCP_LANE_TYPE_AM,
         .tl_cap_flags        = UCT_IFACE_FLAG_AM_BCOPY
     };
@@ -292,7 +294,7 @@ ucp_am_eager_single_bcopy_reply_proto_progress(uct_pending_req_t *self)
             req, UCP_AM_ID_AM_SINGLE_REPLY, spriv->super.lane,
             ucp_am_eager_single_bcopy_reply_pack, req, SIZE_MAX,
             ucp_proto_request_am_bcopy_complete_success, 1);
-    return ucp_proto_am_handle_user_header_send_status(req, status);
+    return ucp_am_handle_user_header_send_status_or_abort(req, status);
 }
 
 ucp_proto_t ucp_am_eager_single_bcopy_reply_proto = {
@@ -330,6 +332,8 @@ static void ucp_am_eager_single_zcopy_probe_common(
                                UCP_PROTO_COMMON_INIT_FLAG_CAP_SEG_SIZE |
                                UCP_PROTO_COMMON_INIT_FLAG_ERR_HANDLING,
         .super.exclude_map   = 0,
+        .super.reg_mem_info  = ucp_proto_common_select_param_mem_info(
+                                                     init_params->select_param),
         .lane_type           = UCP_LANE_TYPE_AM,
         .tl_cap_flags        = UCT_IFACE_FLAG_AM_ZCOPY
     };

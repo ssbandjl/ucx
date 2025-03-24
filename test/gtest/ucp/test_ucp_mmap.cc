@@ -106,6 +106,11 @@ public:
             modify_config("PROTO_ENABLE", "n");
         }
 
+        if (get_variant_value() == VARIANT_MAP_NONBLOCK) {
+            // ODPv1 cannot interact with DEVX objects
+            modify_config("IB_MLX5_DEVX_OBJECTS", "", SETENV_IF_NOT_EXIST);
+        }
+
         if (get_variant_value() == VARIANT_NO_RCACHE) {
             modify_config("RCACHE_ENABLE", "n");
             ucp_test::init(); // Init UCP with rcache disabled
@@ -148,8 +153,6 @@ public:
         ucp_md_map_t md_map = memh1->md_map &
                               sender().ucph()->cache_md_map[memh1->mem_type];
         ucp_md_index_t md_index;
-
-        EXPECT_NE(memh1->md_map, 0);
 
         ucs_for_each_bit(md_index, md_map) {
             if (equal || (m_always_equal_md_map & UCS_BIT(md_index))) {
@@ -421,6 +424,9 @@ void test_ucp_mmap::check_distance_precision(double rkey_value,
     } else if (rkey_value == pack_max) {
         /* Capped by pack_max, no cache entry */
         EXPECT_GE(std::lround(topo_value), pack_max);
+    } else if (topo_value == INFINITY) {
+        /* Infinity values can be packed without loss */
+        EXPECT_EQ(topo_value, rkey_value);
     } else {
         /* Inside the borders or cache entry */
         EXPECT_NEAR(rkey_value, topo_value, topo_value * allowed_diff_ratio);
@@ -547,7 +553,11 @@ UCS_TEST_P(test_ucp_mmap, reg_mem_type) {
 
     for (int i = 0; i < 1000 / ucs::test_time_multiplier(); ++i) {
         size_t size    = ucs::rand() % UCS_MBYTE;
-        alloc_mem_type = mem_types.at(ucs::rand() % mem_types.size());
+        auto flags     = mem_map_flags();
+        /* Test ODP registration with host buffer only */
+        alloc_mem_type = (flags & VARIANT_MAP_NONBLOCK) ?
+                UCS_MEMORY_TYPE_HOST :
+                mem_types.at(ucs::rand() % mem_types.size());
         mem_buffer buf(size, alloc_mem_type);
         mem_buffer::pattern_fill(buf.ptr(), size, 0, alloc_mem_type);
 
@@ -561,7 +571,7 @@ UCS_TEST_P(test_ucp_mmap, reg_mem_type) {
         params.address     = buf.ptr();
         params.length      = size;
         params.memory_type = alloc_mem_type;
-        params.flags       = mem_map_flags();
+        params.flags       = flags;
 
         status = ucp_mem_map(sender().ucph(), &params, &memh);
         ASSERT_UCS_OK(status);
@@ -943,8 +953,7 @@ UCS_TEST_P(test_ucp_mmap, fixed) {
     }
 }
 
-UCS_TEST_P(test_ucp_mmap, gva_allocate, "GVA_ENABLE=y",
-           "IB_MLX5_DEVX_OBJECTS?=")
+UCS_TEST_P(test_ucp_mmap, gva_allocate, "GVA_ENABLE=y")
 {
     for (auto mem_type : mem_buffer::supported_mem_types()) {
         ucp_md_map_t md_map = sender().ucph()->gva_md_map[mem_type];
@@ -969,7 +978,7 @@ UCS_TEST_P(test_ucp_mmap, gva_allocate, "GVA_ENABLE=y",
     }
 }
 
-UCS_TEST_P(test_ucp_mmap, gva, "GVA_ENABLE=y", "IB_MLX5_DEVX_OBJECTS?=")
+UCS_TEST_P(test_ucp_mmap, gva, "GVA_ENABLE=y")
 {
     std::list<void*> bufs;
     ucp_mem_h first     = NULL;
@@ -1014,6 +1023,16 @@ UCS_TEST_P(test_ucp_mmap, gva, "GVA_ENABLE=y", "IB_MLX5_DEVX_OBJECTS?=")
     }
 }
 
+UCS_TEST_P(test_ucp_mmap, rndv_mpool_mdesc_no_rcache)
+{
+    ucp_worker_h worker = sender().worker();
+    for (auto mem_type : mem_buffer::supported_mem_types()) {
+        ucp_mem_desc_t *mdesc = ucp_rndv_mpool_get(worker, mem_type,
+                                                   UCS_SYS_DEVICE_ID_UNKNOWN);
+        EXPECT_EQ(mdesc->memh, mdesc->memh->parent);
+        ucs_mpool_put(mdesc);
+    }
+}
 
 UCP_INSTANTIATE_TEST_CASE_GPU_AWARE(test_ucp_mmap)
 

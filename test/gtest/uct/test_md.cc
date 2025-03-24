@@ -947,6 +947,16 @@ UCS_TEST_SKIP_COND_P(test_md, dereg_bad_arg,
                  UCT_MD_MKEY_PACK_FLAG_INVALIDATE_RMA);
 }
 
+UCS_TEST_SKIP_COND_P(test_md, dereg_bad_arg_with_ro,
+                     !check_reg_mem_type(UCS_MEMORY_TYPE_HOST) ||
+                     !ENABLE_PARAMS_CHECK,
+                     "IB_PCI_RELAXED_ORDERING?=try")
+{
+    test_reg_mem(md_flags_remote_rma, UCT_MD_MKEY_PACK_FLAG_INVALIDATE_RMA);
+    test_reg_mem(UCT_MD_MEM_ACCESS_REMOTE_ATOMIC,
+                 UCT_MD_MKEY_PACK_FLAG_INVALIDATE_RMA);
+}
+
 UCS_TEST_SKIP_COND_P(test_md, exported_mkey,
                      !check_caps(UCT_MD_FLAG_EXPORTED_MKEY))
 {
@@ -981,7 +991,8 @@ UCS_TEST_SKIP_COND_P(test_md, exported_mkey,
     ASSERT_UCS_OK(status);
 }
 
-UCS_TEST_P(test_md, rkey_compare_params_check)
+UCS_TEST_SKIP_COND_P(test_md, rkey_compare_params_check,
+                     !check_caps(UCT_MD_FLAG_NEED_RKEY))
 {
     uct_rkey_compare_params_t params = {};
     ucs_status_t status;
@@ -1138,44 +1149,16 @@ UCS_TEST_P(test_md_memlock_limit, md_open)
 
 UCT_MD_INSTANTIATE_TEST_CASE(test_md_memlock_limit)
 
-class test_md_non_blocking : public test_md
-{
-protected:
-    void init() override {
-        /* ODPv1 IB feature can work only for certain DEVX configuration */
-        modify_config("IB_MLX5_DEVX_OBJECTS", "dct,dcsrq", IGNORE_IF_NOT_EXIST);
-        test_md::init();
-    }
-};
-
 UCS_TEST_SKIP_COND_P(test_md_non_blocking, reg_advise,
                      !check_caps(UCT_MD_FLAG_REG | UCT_MD_FLAG_ADVISE))
 {
-    test_reg_advise(UCS_KBYTE, UCS_KBYTE, 0, true);
-    test_reg_advise(UCS_KBYTE, UCS_KBYTE / 2, 0, true);
-    test_reg_advise(UCS_KBYTE, UCS_KBYTE / 2, UCS_KBYTE / 4, true);
-
-    /*
-     * TODO: These tests should be enabled
-     * when https://redmine.mellanox.com/issues/336376 fixed
-
-     * test_reg_advise(UCS_MBYTE, UCS_MBYTE, 0, true);
-     * test_reg_advise(UCS_MBYTE, UCS_MBYTE / 2, 0, true);
-     * test_reg_advise(UCS_MBYTE, UCS_MBYTE / 2, UCS_MBYTE / 4, true);
-     */
+    test_nb_reg_advise();
 }
 
 UCS_TEST_SKIP_COND_P(test_md_non_blocking, reg,
                      !check_caps(UCT_MD_FLAG_REG))
 {
-    test_reg_advise(UCS_KBYTE, 0, 0, true);
-
-    /*
-     * TODO: This test should be enabled
-     * when https://redmine.mellanox.com/issues/336376 fixed
-
-     * test_reg_advise(UCS_MBYTE, 0, 0, true);
-     */
+    test_nb_reg();
 }
 
 UCT_MD_INSTANTIATE_TEST_CASE(test_md_non_blocking)

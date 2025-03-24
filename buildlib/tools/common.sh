@@ -4,8 +4,8 @@ WORKSPACE=${WORKSPACE:=$PWD}
 # build in local directory which goes away when docker exits
 ucx_build_dir=$HOME/${BUILD_ID}/build
 ucx_inst=$ucx_build_dir/install
-CUDA_MODULE="dev/cuda12.2.2"
-GDRCOPY_MODULE="dev/gdrcopy2.3.1-1_cuda12.2.2"
+CUDA_MODULE="dev/cuda12.8"
+GDRCOPY_MODULE="dev/gdrcopy2.4.4_cuda12.8.0"
 JDK_MODULE="dev/jdk"
 MVN_MODULE="dev/mvn"
 XPMEM_MODULE="dev/xpmem-90a95a4"
@@ -145,6 +145,7 @@ get_ib_devices() {
 	set +x
 	for ibdev in $device_list
 	do
+		[[ "$device" =~ ^smi[0-9]*:.$ ]] && continue
 		num_ports=$(ibv_devinfo -d $ibdev| awk '/phys_port_cnt:/ {print $2}')
 		for port in $(seq 1 $num_ports)
 		do
@@ -168,6 +169,7 @@ get_ifaddr() {
 }
 
 get_rdma_device_ip_addr() {
+	device=$1
 	if [ ! -r /dev/infiniband/rdma_cm  ]
 	then
 		return
@@ -185,6 +187,11 @@ get_rdma_device_ip_addr() {
 		port=$(echo "${line}" | awk '{print $3}')
 		netif=$(echo "${line}" | awk '{print $5}')
 		node_guid=`cat /sys/class/infiniband/${ibdev}/node_guid`
+
+		if [ -n "${device}" ] && [ "${device}" != "${ibdev}:${port}" ]
+		then
+			continue
+		fi
 
 		# skip devices that do not have proper gid (representors)
 		if [ -e "/sys/class/infiniband/${ibdev}/ports/${port}/gids/0" ] && \
@@ -223,6 +230,22 @@ get_non_rdma_ip_addr() {
 #
 get_active_ib_devices() {
 	get_ib_devices PORT_ACTIVE
+}
+
+#
+# Filter in BlueField IB devices from the device list
+#
+get_ib_bf_devices() {
+	ib_devices=$@
+	for ibdev_port in $ib_devices
+	do
+		ibdev=${ibdev_port%:*}
+		port=${ibdev_port#*:}
+		if ibv_devinfo -d $ibdev -i $port | grep -q 'vendor_part_id:\s*41692'
+		then
+			echo "$ibdev_port"
+		fi
+	done
 }
 
 #

@@ -29,6 +29,7 @@ void test_uct_ib::create_connected_entities() {
 void test_uct_ib::init() {
     uct_test::init();
     create_connected_entities();
+    check_skip_test();
     test_uct_ib::m_ib_am_handler_counter = 0;
 }
 
@@ -160,7 +161,8 @@ public:
         struct ibv_ah_attr ah_attr;
 
         ASSERT_EQ(iface->config.force_global_addr,
-                  config_is_global || uct_ib_iface_is_roce(iface));
+                  config_is_global || uct_ib_iface_is_roce(iface) ||
+                          ucs::is_aws());
 
         gid.global.subnet_prefix = subnet_prefix ?: iface->gid_info.gid.global.subnet_prefix;
         gid.global.interface_id  = 0xdeadbeef;
@@ -177,7 +179,7 @@ public:
             EXPECT_TRUE(ah_attr.is_global);
         } else if (iface->gid_info.gid.global.subnet_prefix == gid.global.subnet_prefix) {
             /* in case of subnets are same - ah_attr depend from forced/nonforced GRH */
-            EXPECT_FALSE(ah_attr.is_global);
+            EXPECT_EQ(ucs::is_aws(), ah_attr.is_global);
         } else if (iface->gid_info.gid.global.subnet_prefix != gid.global.subnet_prefix) {
             /* in case of subnets are different - ah_attr should use GRH */
             EXPECT_TRUE(ah_attr.is_global);
@@ -303,7 +305,8 @@ void test_uct_ib_with_specific_port::cleanup() {
 class test_uct_ib_roce : public test_uct_ib {
 };
 
-UCS_TEST_P(test_uct_ib_roce, local_subnet_only, "IB_ROCE_LOCAL_SUBNET=y")
+UCS_TEST_P(test_uct_ib_roce, local_subnet_only,
+           "IB_ROCE_REACHABILITY_MODE=local_subnet")
 {
     send_recv_short();
 }
@@ -439,27 +442,79 @@ public:
         }
     }
 
+    bool transport_has_ddp() const
+    {
+        ucs::handle<uct_md_h> uct_md;
+
+        if (!has_transport("rc_mlx5") && !has_transport("dc_mlx5")) {
+            return false;
+        }
+
+        UCS_TEST_CREATE_HANDLE(uct_md_h, uct_md, uct_md_close, uct_md_open,
+                               &uct_ib_component,
+                               ibv_get_device_name(m_ibctx->device),
+                               m_md_config);
+
+        uct_ib_mlx5_md_t *ib_md = ucs_derived_of(uct_md, uct_ib_mlx5_md_t);
+        int rc_has_ddp          = has_transport("rc_mlx5") &&
+                                  (ib_md->dp_ordering_cap.rc ==
+                                   UCT_IB_MLX5_DP_ORDERING_OOO_ALL);
+        int dc_has_ddp          = has_transport("dc_mlx5") &&
+                                  (ib_md->dp_ordering_cap.dc ==
+                                   UCT_IB_MLX5_DP_ORDERING_OOO_ALL);
+        return rc_has_ddp || dc_has_ddp;
+    }
+    
+    void test_check_ib_sl_config() {
+        const char *max_avail_sl_str = getenv("GTEST_MAX_IB_SL");
+        uint8_t sl, max_avail_sl;
+
+        if (max_avail_sl_str == NULL) {
+            max_avail_sl = UCT_IB_SL_NUM;
+        } else {
+            max_avail_sl = std::min(strtoul(max_avail_sl_str, NULL, 0),
+                                    static_cast<unsigned long>(UCT_IB_SL_NUM));
+        }
+
+        // go over all SLs, check UCTs could be initialized on a specific SL
+        // and able to send/recv traffic
+        for (sl = 0; sl < max_avail_sl; ++sl) {
+            bool sl_supports_ar = UCS_BIT_GET(m_ooo_sl_mask, sl);
+            if (!has_transport("rc_verbs") && !has_transport("ud_verbs")) {
+                // if AR is configured on the given SL, set AR_ENABLE to "y",
+                // otherwise - to "n" in order to test that AR_ENABLE parameter
+                // works as expected w/o errors and warnings
+                modify_config("IB_AR_ENABLE", sl_supports_ar ? "y" : "n");
+            }
+
+            modify_config("IB_SL", ucs::to_string(static_cast<uint16_t>(sl)));
+
+            test_uct_ib::init();
+            send_recv_short();
+            test_uct_ib::cleanup();
+        }
+    }
+
 protected:
     uint16_t m_ooo_sl_mask;
 };
 
-UCS_TEST_P(test_uct_ib_sl, check_ib_sl_config) {
-    // go over all SLs, check UCTs could be initialized on a specific SL
-    // and able to send/recv traffic
-    for (uint8_t sl = 0; sl < UCT_IB_SL_NUM; ++sl)  {
-        if (!has_transport("rc_verbs") && !has_transport("ud_verbs")) {
-            // if AR is configured on the given SL, set AR_ENABLE to "y",
-            // otherwise - to "n" in order to test that AR_ENABLE parameter
-            // works as expected w/o errors and warnings
-            modify_config("IB_AR_ENABLE",
-                          (m_ooo_sl_mask & UCS_BIT(sl)) ? "y" : "n");
-        }
-        modify_config("IB_SL", ucs::to_string(static_cast<uint16_t>(sl)));
 
-        test_uct_ib::init();
-        send_recv_short();
-        test_uct_ib::cleanup();
+UCS_TEST_P(test_uct_ib_sl, check_ib_sl_config_without_ddp,
+           "RC_MLX5_DDP_ENABLE?=n", "DC_MLX5_DDP_ENABLE?=n")
+{
+    test_check_ib_sl_config();
+}
+
+UCS_TEST_P(test_uct_ib_sl, check_ib_sl_config_with_ddp,
+           "RC_MLX5_DDP_ENABLE?=try", "DC_MLX5_DDP_ENABLE?=try")
+
+{
+    if (!transport_has_ddp()) {
+        UCS_TEST_SKIP_R("DDP is not supported by the transport");
     }
+
+    test_check_ib_sl_config();
 }
 
 UCT_INSTANTIATE_IB_TEST_CASE(test_uct_ib_sl);

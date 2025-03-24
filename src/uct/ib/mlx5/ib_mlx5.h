@@ -1,6 +1,7 @@
 /**
 * Copyright (c) NVIDIA CORPORATION & AFFILIATES, 2001-2014. ALL RIGHTS RESERVED.
 * Copyright (C) ARM Ltd. 2016.  ALL RIGHTS RESERVED.
+* Copyright (c) Google, LLC, 2024. ALL RIGHTS RESERVED.
 *
 * See file LICENSE for terms.
 */
@@ -57,6 +58,7 @@
 #define UCT_IB_MLX5_CQE_VENDOR_SYND_ODP  0x93
 #define UCT_IB_MLX5_CQE_VENDOR_SYND_PSN  0x99
 #define UCT_IB_MLX5_CQE_OP_OWN_ERR_MASK  0x80
+#define UCT_IB_MLX5_WQE_ALIGNMENT        (1 * MLX5_SEND_WQE_BB)
 #define UCT_IB_MLX5_MAX_SEND_WQE_SIZE    (UCT_IB_MLX5_MAX_BB * MLX5_SEND_WQE_BB)
 #define UCT_IB_MLX5_CQ_SET_CI            0
 #define UCT_IB_MLX5_CQ_ARM_DB            1
@@ -65,6 +67,9 @@
 #define UCT_IB_MLX5_ATOMIC_MODE_EXT      3
 #define UCT_IB_MLX5_CQE_FLAG_L3_IN_DATA  UCS_BIT(28) /* GRH/IP in the receive buffer */
 #define UCT_IB_MLX5_CQE_FLAG_L3_IN_CQE   UCS_BIT(29) /* GRH/IP in the CQE */
+/* Bits 24-26 of flags_rqpn indicate the packet type */
+#define UCT_IB_MLX5_RQPN_ROCE_FLAG_IPV6  UCS_BIT(24)
+#define UCT_IB_MLX5_RQPN_ROCE_FLAG_IPV4  UCS_BIT(25)
 #define UCT_IB_MLX5_CQE_FORMAT_MASK      0xc
 #define UCT_IB_MLX5_MINICQE_ARR_MAX_SIZE 7
 #define UCT_IB_MLX5_MP_RQ_BYTE_CNT_MASK  0x0000FFFF  /* Byte count mask for multi-packet RQs */
@@ -86,6 +91,8 @@
 
 #define UCT_IB_MLX5_OPMOD_EXT_ATOMIC(_log_arg_size) \
     ((8) | ((_log_arg_size) - 2))
+
+#define UCT_IB_MLX5_OPMOD_MMO_DMA   0x1
 
 #ifdef HAVE_STRUCT_MLX5_WQE_AV_BASE
 
@@ -188,28 +195,21 @@ enum {
     UCT_IB_MLX5_MD_FLAG_CQE128_ZIP           = UCS_BIT(11),
     /* Device performance is optimized when RDMA_WRITE is not used */
     UCT_IB_MLX5_MD_FLAG_NO_RDMA_WR_OPTIMIZED = UCS_BIT(12),
-    /* Device supports indirect xgvmi MR. This flag is removed if xgvmi access
-     * command fails */
-    UCT_IB_MLX5_MD_FLAG_INDIRECT_XGVMI       = UCS_BIT(13),
     /* Device supports symmetric key creation */
-    UCT_IB_MLX5_MD_FLAG_MKEY_BY_NAME_RESERVE = UCS_BIT(14),
+    UCT_IB_MLX5_MD_FLAG_MKEY_BY_NAME_RESERVE = UCS_BIT(13),
     /* Device supports DMA MMO */
-    UCT_IB_MLX5_MD_FLAG_MMO_DMA              = UCS_BIT(15),
+    UCT_IB_MLX5_MD_FLAG_MMO_DMA              = UCS_BIT(14),
     /* Device supports XGVMI UMR workflow */
-    UCT_IB_MLX5_MD_FLAG_XGVMI_UMR            = UCS_BIT(16),
+    UCT_IB_MLX5_MD_FLAG_XGVMI_UMR            = UCS_BIT(15),
     /* Device supports UAR WC allocation type */
-    UCT_IB_MLX5_MD_FLAG_UAR_USE_WC           = UCS_BIT(17),
+    UCT_IB_MLX5_MD_FLAG_UAR_USE_WC           = UCS_BIT(16),
     /* Device supports implicit ODP with PCI relaxed order */
-    UCT_IB_MLX5_MD_FLAG_GVA_RO               = UCS_BIT(18),
-    /* RoCE supports out-of-order RDMA for RC */
-    UCT_IB_MLX5_MD_FLAG_DP_ORDERING_OOO_RW_RC = UCS_BIT(19),
-    /* RoCE supports out-of-order RDMA for DC */
-    UCT_IB_MLX5_MD_FLAG_DP_ORDERING_OOO_RW_DC = UCS_BIT(20),
-    /* RoCE supports forcing ordering configuration */
-    UCT_IB_MLX5_MD_FLAG_DP_ORDERING_FORCE     = UCS_BIT(21),
+    UCT_IB_MLX5_MD_FLAG_GVA_RO               = UCS_BIT(17),
+    /* Device supports forcing ordering configuration */
+    UCT_IB_MLX5_MD_FLAG_DP_ORDERING_FORCE    = UCS_BIT(18),
 
     /* Object to be created by DevX */
-    UCT_IB_MLX5_MD_FLAG_DEVX_OBJS_SHIFT  = 22,
+    UCT_IB_MLX5_MD_FLAG_DEVX_OBJS_SHIFT  = 20,
     UCT_IB_MLX5_MD_FLAG_DEVX_RC_QP       = UCT_IB_MLX5_MD_FLAG_DEVX_OBJS(RCQP),
     UCT_IB_MLX5_MD_FLAG_DEVX_RC_SRQ      = UCT_IB_MLX5_MD_FLAG_DEVX_OBJS(RCSRQ),
     UCT_IB_MLX5_MD_FLAG_DEVX_DCT         = UCT_IB_MLX5_MD_FLAG_DEVX_OBJS(DCT),
@@ -245,6 +245,28 @@ enum {
 };
 
 
+typedef struct uct_ib_mlx5_dma_opaque_mr {
+    uint64_t be_vaddr;
+    uint32_t be_lkey;
+} uct_ib_mlx5_dma_opaque_mr_t;
+
+
+#if HAVE_MLX5_MMO
+/**
+ * full WQE format:
+ * struct mlx5_wqe_ctrl_seg;
+ * struct uct_ib_mlx5_dma_qwe_seg;
+ * struct mlx5_wqe_data_seg gather;
+ * struct mlx5_wqe_data_seg scatter;
+ */
+typedef struct uct_ib_mlx5_dma_seg {
+    uint32_t padding;   /* unused for dma */
+    uint32_t be_opaque_lkey;
+    uint64_t be_opaque_vaddr;
+} UCS_S_PACKED uct_ib_mlx5_dma_seg_t;
+#endif
+
+
 #if HAVE_DEVX
 typedef struct {
     struct mlx5dv_devx_obj *dvmr;
@@ -276,13 +298,14 @@ typedef struct {
 typedef struct {
     struct mlx5dv_devx_obj *cross_mr;
     uint32_t               lkey;
+    uint64_t               md_uuid;
 } uct_ib_mlx5_devx_umr_alias_t;
 
 
-#define UCT_IB_MLX5_UMR_ALIAS_FMT "UMR mkey alias %p index 0x%x"
+#define UCT_IB_MLX5_UMR_ALIAS_FMT "UMR mkey alias %p index 0x%x uuid %" PRIu64
 #define UCT_IB_MLX5_UMR_ALIAS_ARG(_umr_alias) \
-    (_umr_alias)->cross_mr, uct_ib_mlx5_mkey_index((_umr_alias)->lkey)
-
+    (_umr_alias)->cross_mr, uct_ib_mlx5_mkey_index((_umr_alias)->lkey), \
+    (_umr_alias)->md_uuid
 
 /* Hash map of indirect mkey (from the host) to mkey alias (on the DPU) */
 /* Note the hash key here is: gvmi_id << 32 | mkey (both uint32_t) */
@@ -294,7 +317,6 @@ typedef struct {
     void                        *address;
     struct mlx5dv_devx_obj      *atomic_dvmr;
     struct mlx5dv_devx_obj      *indirect_dvmr;
-    struct mlx5dv_devx_umem     *umem;
     struct mlx5dv_devx_obj      *cross_mr;
     uct_ib_mlx5_devx_umr_mkey_t *exported_umr_mkey;
     struct mlx5dv_devx_obj      *smkey_mr;
@@ -361,6 +383,16 @@ KHASH_MAP_INIT_INT(rkeys, uct_ib_mlx5_mem_lru_entry_t*);
 #endif
 
 
+typedef enum {
+    /* IBTA-compliant ordering semantics */
+    UCT_IB_MLX5_DP_ORDERING_IBTA    = 0x0,
+    /* Out-of-order RDMA reads and writes */
+    UCT_IB_MLX5_DP_ORDERING_OOO_RW  = 0x1,
+    /* Out-of-order RDMA read/write/send/recv (DDP) */
+    UCT_IB_MLX5_DP_ORDERING_OOO_ALL = 0x2,
+} uct_ib_mlx5_dp_ordering_t;
+
+
 /**
  * MLX5 IB memory domain.
  */
@@ -406,6 +438,12 @@ typedef struct uct_ib_mlx5_md {
     uint8_t                  max_rd_atomic_dc;
     uint8_t                  log_max_dci_stream_channels;
     uint32_t                 smkey_index;
+    struct {
+        /* Max dp ordering level per transport, 
+           as listed in uct_ib_mlx5_dp_ordering_t */
+        uint8_t              rc;
+        uint8_t              dc;
+    } dp_ordering_cap;
 } uct_ib_mlx5_md_t;
 
 
@@ -940,17 +978,27 @@ uct_ib_mlx5_devx_general_cmd(struct ibv_context *context,
                              void *out, size_t outlen,
                              char *msg_arg, int silent)
 {
-    ucs_log_level_t level = silent ? UCS_LOG_LEVEL_DEBUG : UCS_LOG_LEVEL_ERROR;
+    ucs_log_level_t level;
+    ucs_status_t status;
     int ret;
     unsigned syndrome;
 
+    memset(out, 0, outlen);
     ret = mlx5dv_devx_general_cmd(context, in, inlen, out, outlen);
     if (ret != 0) {
+        if ((errno == EPERM) || (errno == EPROTONOSUPPORT) ||
+            (errno == EOPNOTSUPP)) {
+            status = UCS_ERR_UNSUPPORTED;
+        } else {
+            status = UCS_ERR_IO_ERROR;
+        }
+
         syndrome = UCT_IB_MLX5DV_GET(general_obj_out_cmd_hdr, out, syndrome);
+        level    = silent ? UCS_LOG_LEVEL_DEBUG : UCS_LOG_LEVEL_ERROR;
         ucs_log(level,
                 "mlx5dv_devx_general_cmd(%s) failed on %s, syndrome 0x%x: %m",
                 msg_arg, ibv_get_device_name(context->device), syndrome);
-        return UCS_ERR_IO_ERROR;
+        return status;
     }
 
     return UCS_OK;
@@ -960,9 +1008,6 @@ uct_ib_mlx5_devx_general_cmd(struct ibv_context *context,
 ucs_status_t uct_ib_mlx5_devx_query_ooo_sl_mask(uct_ib_mlx5_md_t *md,
                                                 uint8_t port_num,
                                                 uint16_t *ooo_sl_mask_p);
-
-void uct_ib_mlx5_devx_set_qpc_dp_ordering(
-        void *qpc, ucs_ternary_auto_value_t dp_ordering_ooo);
 
 void uct_ib_mlx5_devx_set_qpc_port_affinity(uct_ib_mlx5_md_t *md,
                                             uint8_t path_index, void *qpc,
@@ -1109,9 +1154,9 @@ uct_ib_mlx5_devx_md_query(uct_md_h uct_md, uct_md_attr_v2_t *md_attr);
 
 ucs_status_t
 uct_ib_mlx5_devx_device_mem_alloc(uct_md_h uct_md, size_t *length_p,
-         void **address_p, ucs_memory_type_t mem_type,
-                                  unsigned flags, const char *alloc_name,
-                                  uct_mem_h *memh_p);
+                                  void **address_p, ucs_memory_type_t mem_type,
+                                  ucs_sys_device_t sys_dev, unsigned flags,
+                                  const char *alloc_name, uct_mem_h *memh_p);
 
 ucs_status_t
 uct_ib_mlx5_devx_device_mem_free(uct_md_h uct_md, uct_mem_h tl_memh);
@@ -1121,9 +1166,25 @@ uct_ib_mlx5_devx_mem_reg(uct_md_h uct_md, void *address, size_t length,
                          const uct_md_mem_reg_params_t *params,
                          uct_mem_h *memh_p);
 
+/**
+ * Check if the device capabilities declare XGVMI support.
+ * This function detects whether device supports XGVMI, but there is no way to
+ * detect whether XGVMI works with indirect mkeys. Currently we only support
+ * XGVMI with indirect mkeys.
+ * TODO: FW should expose this capability
+ */
+int uct_ib_mlx5_devx_check_xgvmi(void *cap_2);
+
 ucs_status_t
 uct_ib_mlx5_devx_mem_dereg(uct_md_h uct_md,
                            const uct_md_mem_dereg_params_t *params);
+
+ucs_status_t uct_ib_mlx5_devx_query_cap(struct ibv_context *ctx, uint32_t opmod,
+                                        void *out, size_t size, char *msg_arg,
+                                        int silent);
+
+ucs_status_t uct_ib_mlx5_devx_query_cap_2(struct ibv_context *ctx,
+                                          void *out, size_t size);
 
 ucs_status_t
 uct_ib_mlx5_devx_mem_attach(uct_md_h uct_md, const void *mkey_buffer,
@@ -1136,9 +1197,12 @@ uct_ib_mlx5_devx_mkey_pack(uct_md_h uct_md, uct_mem_h uct_memh,
                            const uct_md_mkey_pack_params_t *params,
                            void *mkey_buffer);
 
-ucs_status_t uct_ib_mlx5_devx_md_open(struct ibv_device *ibv_device,
-                                      const uct_ib_md_config_t *md_config,
-                                      uct_ib_md_t **p_md);
+struct ibv_context* uct_ib_mlx5_devx_open_device(struct ibv_device *ibv_device);
+
+ucs_status_t uct_ib_mlx5_devx_md_open_common(const char* name, size_t size,
+                                             struct ibv_device *ibv_device,
+                                             const uct_ib_md_config_t *md_config,
+                                             uct_ib_md_t **p_md);
 
 ucs_status_t uct_ib_mlx5_devx_reg_exported_key(uct_ib_mlx5_md_t *md,
                                                uct_ib_mlx5_devx_mem_t *memh);

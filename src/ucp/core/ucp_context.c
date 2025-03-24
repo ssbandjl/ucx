@@ -68,6 +68,8 @@
 #define UCP_TL_AUX_SUFFIX    "aux"
 #define UCP_TL_AUX(_tl_name) _tl_name ":" UCP_TL_AUX_SUFFIX
 
+/* Factor to multiply with in order to get infinite latency */
+#define UCP_CONTEXT_INFINITE_LAT_FACTOR 100
 
 typedef enum ucp_transports_list_search_result {
     UCP_TRANSPORTS_LIST_SEARCH_RESULT_PRIMARY      = UCS_BIT(0),
@@ -91,10 +93,11 @@ static const char *ucp_atomic_modes[] = {
 };
 
 static const char *ucp_fence_modes[] = {
-    [UCP_FENCE_MODE_WEAK]   = "weak",
-    [UCP_FENCE_MODE_STRONG] = "strong",
-    [UCP_FENCE_MODE_AUTO]   = "auto",
-    [UCP_FENCE_MODE_LAST]   = NULL
+    [UCP_FENCE_MODE_WEAK]     = "weak",
+    [UCP_FENCE_MODE_STRONG]   = "strong",
+    [UCP_FENCE_MODE_AUTO]     = "auto",
+    [UCP_FENCE_MODE_EP_BASED] = "ep_based",
+    [UCP_FENCE_MODE_LAST]     = NULL
 };
 
 static const char *ucp_rndv_modes[] = {
@@ -140,6 +143,13 @@ const char *ucp_object_versions[] = {
     [UCP_OBJECT_VERSION_LAST] = NULL
 };
 
+const char *ucp_extra_op_attr_flags_names[] = {
+    [UCP_OP_ATTR_INDEX(UCP_OP_ATTR_FLAG_NO_IMM_CMPL)]    = "no_imm_cmpl",
+    [UCP_OP_ATTR_INDEX(UCP_OP_ATTR_FLAG_FAST_CMPL)]      = "fast_cmpl",
+    [UCP_OP_ATTR_INDEX(UCP_OP_ATTR_FLAG_FORCE_IMM_CMPL)] = "force_imm_cmpl",
+    [UCP_OP_ATTR_INDEX(UCP_OP_ATTR_FLAG_MULTI_SEND)]     = "multi_send",
+    NULL
+};
 
 static UCS_CONFIG_DEFINE_ARRAY(memunit_sizes, sizeof(size_t),
                                UCS_CONFIG_TYPE_MEMUNITS);
@@ -340,11 +350,19 @@ static ucs_config_field_t ucp_context_config_table[] = {
    "and the resulting performance.",
    ucs_offsetof(ucp_context_config_t, estimated_num_ppn), UCS_CONFIG_TYPE_ULUNITS},
 
-  {"RNDV_FRAG_MEM_TYPE", "host",
-   "Memory type of fragments used for RNDV pipeline protocol.\n"
-   "Allowed memory types is one of: host, cuda, rocm, ze-host, ze-device",
-   ucs_offsetof(ucp_context_config_t, rndv_frag_mem_type),
-   UCS_CONFIG_TYPE_ENUM(ucs_memory_type_names)},
+  {"RNDV_FRAG_MEM_TYPE", NULL, "",
+   ucs_offsetof(ucp_context_config_t, rndv_frag_mem_types),
+   UCS_CONFIG_TYPE_BITMAP(ucs_memory_type_names)},
+
+  {"RNDV_FRAG_MEM_TYPES", "host,cuda",
+   "Memory types of fragments used for RNDV pipeline protocol.\n"
+   "Allowed memory types are: host, cuda, rocm, ze-host, ze-device",
+   ucs_offsetof(ucp_context_config_t, rndv_frag_mem_types),
+   UCS_CONFIG_TYPE_BITMAP(ucs_memory_type_names)},
+
+  {"MEMTYPE_COPY_ENABLE", "y",
+   "Allows memory type copies. This option influences protocol selection.\n",
+   ucs_offsetof(ucp_context_config_t, memtype_copy_enable), UCS_CONFIG_TYPE_BOOL},
 
   {"RNDV_PIPELINE_SEND_THRESH", "inf",
    "RNDV size threshold to enable sender side pipeline for mem type",
@@ -354,6 +372,11 @@ static ucs_config_field_t ucp_context_config_table[] = {
    "Use two stage pipeline rendezvous protocol for intra-node GPU to GPU transfers",
    ucs_offsetof(ucp_context_config_t, rndv_shm_ppln_enable), UCS_CONFIG_TYPE_BOOL},
 
+  {"RNDV_PIPELINE_ERROR_HANDLING", "n",
+   "Allow using error handling protocol in the rendezvous pipeline protocol\n"
+   "even if invalidation workflow isn't supported",
+   ucs_offsetof(ucp_context_config_t, rndv_errh_ppln_enable), UCS_CONFIG_TYPE_BOOL},
+
   {"FLUSH_WORKER_EPS", "y",
    "Enable flushing the worker by flushing its endpoints. Allows completing\n"
    "the flush operation in a bounded time even if there are new requests on\n"
@@ -362,9 +385,10 @@ static ucs_config_field_t ucp_context_config_table[] = {
 
   {"FENCE_MODE", "auto",
    "Fence mode used in ucp_worker_fence routine.\n"
-   " weak   - use weak fence mode.\n"
-   " strong - use strong fence mode.\n"
-   " auto   - automatically detect required fence mode.",
+   " weak     - use weak fence mode.\n"
+   " strong   - use strong fence mode.\n"
+   " auto     - automatically detect fence mode.\n"
+   " ep_based - use endpoint-based fence mode.",
    ucs_offsetof(ucp_context_config_t, fence_mode),
    UCS_CONFIG_TYPE_ENUM(ucp_fence_modes)},
 
@@ -510,9 +534,10 @@ static ucs_config_field_t ucp_context_config_table[] = {
         {NULL}
   )},
 
-  {"GVA_ENABLE", "n",
-   "Enable Global VA infrastructure",
-   ucs_offsetof(ucp_context_config_t, gva_enable), UCS_CONFIG_TYPE_BOOL},
+  {"GVA_ENABLE", "off",
+   "Enable Global VA infrastructure. Setting to 'auto' will try to enable, "
+   "but if error handling enabled will disable",
+   ucs_offsetof(ucp_context_config_t, gva_enable), UCS_CONFIG_TYPE_ON_OFF_AUTO},
 
   {"GVA_MLOCK", "y",
    "Lock memory with mlock() when using global VA MR",
@@ -521,6 +546,24 @@ static ucs_config_field_t ucp_context_config_table[] = {
   {"GVA_PREFETCH", "y",
    "Prefetch memory when using global VA MR",
    ucs_offsetof(ucp_context_config_t, gva_prefetch), UCS_CONFIG_TYPE_BOOL},
+
+  {"EXTRA_OP_ATTR_FLAGS", "",
+   "Additional send/receive operation flags that are added for each request"
+   "in addition to what is set explicitly by the user. \n"
+   "Possible values are: no_imm_cmpl, fast_cmpl, force_imm_cmpl, multi_send.",
+   ucs_offsetof(ucp_context_config_t, extra_op_attr_flags),
+   UCS_CONFIG_TYPE_BITMAP(ucp_extra_op_attr_flags_names)},
+
+  {"MAX_PRIORITY_EPS", "20",
+   "Max number of prioritized endpoints. Does not affect semantics,\n"
+   "but only transport selection criteria and resulting performance.",
+   ucs_offsetof(ucp_context_config_t, max_priority_eps),
+   UCS_CONFIG_TYPE_UINT},
+
+  {"WIREUP_VIA_AM_LANE", "n",
+   "Use AM lane to send wireup messages",
+   ucs_offsetof(ucp_context_config_t, wireup_via_am_lane),
+   UCS_CONFIG_TYPE_BOOL},
 
   {NULL}
 };
@@ -626,6 +669,10 @@ static ucs_config_field_t ucp_config_table[] = {
    ucs_offsetof(ucp_config_t, ctx),
    UCS_CONFIG_TYPE_TABLE(ucp_context_config_table)},
 
+  {"MAX_COMPONENT_MDS", "16",
+   "Maximum number of memory domains per component to use.",
+   ucs_offsetof(ucp_config_t, max_component_mds), UCS_CONFIG_TYPE_ULUNITS},
+
   {NULL}
 };
 UCS_CONFIG_DECLARE_TABLE(ucp_config_table, "UCP context", NULL, ucp_config_t)
@@ -635,7 +682,8 @@ static ucp_tl_alias_t ucp_tl_aliases[] = {
   { "mm",    { "posix", "sysv", "xpmem", NULL } }, /* for backward compatibility */
   { "sm",    { "posix", "sysv", "xpmem", "knem", "cma", NULL } },
   { "shm",   { "posix", "sysv", "xpmem", "knem", "cma", NULL } },
-  { "ib",    { "rc_verbs", "ud_verbs", "rc_mlx5", "ud_mlx5", "dc_mlx5", NULL } },
+  { "ib",    { "rc_verbs", "ud_verbs", "rc_mlx5", "ud_mlx5", "dc_mlx5",
+               "gga_mlx5", NULL } },
   { "ud_v",  { "ud_verbs", NULL } },
   { "ud_x",  { "ud_mlx5", NULL } },
   { "ud",    { "ud_mlx5", "ud_verbs", NULL } },
@@ -649,6 +697,7 @@ static ucp_tl_alias_t ucp_tl_aliases[] = {
   { "cuda",  { "cuda_copy", "cuda_ipc", "gdr_copy", NULL } },
   { "rocm",  { "rocm_copy", "rocm_ipc", "rocm_gdr", NULL } },
   { "ze",    { "ze_copy", "ze_ipc", "ze_gdr", NULL } },
+  { "gga",   { "gga_mlx5", NULL } },
   { NULL }
 };
 
@@ -831,8 +880,8 @@ void ucp_config_print_cached_uct(const ucp_config_t *config, FILE *stream,
 void ucp_config_print(const ucp_config_t *config, FILE *stream,
                       const char *title, ucs_config_print_flags_t print_flags)
 {
-    ucs_config_parser_print_opts(stream, title, config, ucp_config_table,
-                                 NULL, UCS_DEFAULT_ENV_PREFIX, print_flags);
+    ucs_config_parser_print_opts(stream, title, config, ucp_config_table, NULL,
+                                 UCS_DEFAULT_ENV_PREFIX, print_flags, NULL);
     ucp_config_print_cached_uct(config, stream, title, print_flags);
 }
 
@@ -1535,6 +1584,7 @@ ucp_add_component_resources(ucp_context_h context, ucp_rsc_index_t cmpt_index,
                             const ucs_string_set_t *aux_tls)
 {
     const ucp_tl_cmpt_t *tl_cmpt = &context->tl_cmpts[cmpt_index];
+    size_t avail_mds             = config->max_component_mds;
     uct_component_attr_t uct_component_attr;
     unsigned num_tl_resources;
     ucs_status_t status;
@@ -1546,7 +1596,8 @@ ucp_add_component_resources(ucp_context_h context, ucp_rsc_index_t cmpt_index,
     const uct_md_attr_v2_t *md_attr;
 
     /* List memory domain resources */
-    uct_component_attr.field_mask   = UCT_COMPONENT_ATTR_FIELD_MD_RESOURCES;
+    uct_component_attr.field_mask   = UCT_COMPONENT_ATTR_FIELD_MD_RESOURCES |
+                                      UCT_COMPONENT_ATTR_FIELD_NAME;
     uct_component_attr.md_resources =
                     ucs_alloca(tl_cmpt->attr.md_resource_count *
                                sizeof(*uct_component_attr.md_resources));
@@ -1558,6 +1609,14 @@ ucp_add_component_resources(ucp_context_h context, ucp_rsc_index_t cmpt_index,
     /* Open all memory domains */
     mem_type_mask = UCS_BIT(UCS_MEMORY_TYPE_HOST);
     for (i = 0; i < tl_cmpt->attr.md_resource_count; ++i) {
+        if (avail_mds == 0) {
+            ucs_debug("only first %zu domains kept for component %s with %u "
+                      "memory domains resources",
+                      config->max_component_mds, uct_component_attr.name,
+                      tl_cmpt->attr.md_resource_count);
+            break;
+        }
+
         md_index = context->num_mds;
         md_attr  = &context->tl_mds[md_index].attr;
 
@@ -1577,67 +1636,71 @@ ucp_add_component_resources(ucp_context_h context, ucp_rsc_index_t cmpt_index,
             goto out;
         }
 
-        if (num_tl_resources > 0) {
-            /* List of memory type MDs */
-            mem_type_bitmap = md_attr->detect_mem_types;
-            if (~mem_type_mask & mem_type_bitmap) {
-                context->mem_type_detect_mds[context->num_mem_type_detect_mds] = md_index;
-                ++context->num_mem_type_detect_mds;
-                mem_type_mask |= mem_type_bitmap;
-            }
-
-            ucs_memory_type_for_each(mem_type) {
-                if (md_attr->flags & UCT_MD_FLAG_REG) {
-                    if ((context->config.ext.reg_nb_mem_types & UCS_BIT(mem_type)) &&
-                        !(md_attr->reg_nonblock_mem_types & UCS_BIT(mem_type))) {
-                        if (md_attr->reg_mem_types & UCS_BIT(mem_type)) {
-                            /* Keep map of MDs supporting blocking registration
-                             * if non-blocking registration is requested for the
-                             * given memory type. In some cases blocking
-                             * registration maybe required anyway (e.g. internal
-                             * staging buffers for rndv pipeline protocols). */
-                            context->reg_block_md_map[mem_type] |= UCS_BIT(md_index);
-                        }
-                        continue;
-                    }
-
-                    if (md_attr->reg_mem_types & UCS_BIT(mem_type)) {
-                        context->reg_md_map[mem_type] |= UCS_BIT(md_index);
-                    }
-
-                    if (md_attr->cache_mem_types & UCS_BIT(mem_type)) {
-                        context->cache_md_map[mem_type] |= UCS_BIT(md_index);
-                    }
-
-                    if (context->config.ext.gva_enable &&
-                        (md_attr->gva_mem_types & UCS_BIT(mem_type))) {
-                        context->gva_md_map[mem_type] |= UCS_BIT(md_index);
-                    }
-                }
-            }
-
-            if (md_attr->flags & UCT_MD_FLAG_EXPORTED_MKEY) {
-                context->export_md_map |= UCS_BIT(md_index);
-            }
-
-            if (md_attr->flags & UCT_MD_FLAG_REG_DMABUF) {
-                context->dmabuf_reg_md_map |= UCS_BIT(md_index);
-            }
-
-            ucs_for_each_bit(mem_type, md_attr->dmabuf_mem_types) {
-                /* In case of multiple providers, take the first one */
-                if (context->dmabuf_mds[mem_type] == UCP_NULL_RESOURCE) {
-                    context->dmabuf_mds[mem_type] = md_index;
-                }
-            }
-            ++context->num_mds;
-        } else {
+        if (num_tl_resources == 0) {
             /* If the MD does not have transport resources (device or sockaddr),
              * don't use it */
             ucs_debug("closing md %s because it has no selected transport resources",
                       context->tl_mds[md_index].rsc.md_name);
             uct_md_close(context->tl_mds[md_index].md);
+            continue;
         }
+
+        avail_mds--;
+
+        /* List of memory type MDs */
+        mem_type_bitmap = md_attr->detect_mem_types;
+        if (~mem_type_mask & mem_type_bitmap) {
+            context->mem_type_detect_mds[context->num_mem_type_detect_mds] = md_index;
+            ++context->num_mem_type_detect_mds;
+            mem_type_mask |= mem_type_bitmap;
+        }
+
+        ucs_memory_type_for_each(mem_type) {
+            if (md_attr->flags & UCT_MD_FLAG_REG) {
+                if ((context->config.ext.reg_nb_mem_types & UCS_BIT(mem_type)) &&
+                    !(md_attr->reg_nonblock_mem_types & UCS_BIT(mem_type))) {
+                    if (md_attr->reg_mem_types & UCS_BIT(mem_type)) {
+                        /* Keep map of MDs supporting blocking registration
+                         * if non-blocking registration is requested for the
+                         * given memory type. In some cases blocking
+                         * registration maybe required anyway (e.g. internal
+                         * staging buffers for rndv pipeline protocols). */
+                        context->reg_block_md_map[mem_type] |= UCS_BIT(md_index);
+                    }
+                    continue;
+                }
+
+                if (md_attr->reg_mem_types & UCS_BIT(mem_type)) {
+                    context->reg_md_map[mem_type] |= UCS_BIT(md_index);
+                }
+
+                if (md_attr->cache_mem_types & UCS_BIT(mem_type)) {
+                    context->cache_md_map[mem_type] |= UCS_BIT(md_index);
+                }
+
+                if ((context->config.ext.gva_enable != UCS_CONFIG_OFF) &&
+                    (md_attr->gva_mem_types & UCS_BIT(mem_type))) {
+                    context->gva_md_map[mem_type] |= UCS_BIT(md_index);
+                }
+            }
+        }
+
+        if (md_attr->flags & UCT_MD_FLAG_EXPORTED_MKEY) {
+            context->export_md_map |= UCS_BIT(md_index);
+        }
+
+        if (md_attr->flags & UCT_MD_FLAG_REG_DMABUF) {
+            context->dmabuf_reg_md_map |= UCS_BIT(md_index);
+        }
+
+        ucs_for_each_bit(mem_type, md_attr->dmabuf_mem_types) {
+            /* In case of multiple providers, take the first one */
+            if (context->dmabuf_mds[mem_type] == UCP_NULL_RESOURCE) {
+                context->dmabuf_mds[mem_type] = md_index;
+            }
+        }
+
+        ++context->num_mds;
     }
 
     context->mem_type_mask |= mem_type_mask;
@@ -1736,6 +1799,7 @@ static ucs_status_t ucp_fill_resources(ucp_context_h context,
         context->gva_md_map[mem_type]           = 0;
         context->dmabuf_mds[mem_type]           = UCP_NULL_RESOURCE;
         context->alloc_md[mem_type].md_index    = UCP_NULL_RESOURCE;
+        context->alloc_md[mem_type].sys_dev     = UCS_SYS_DEVICE_ID_UNKNOWN;
         context->alloc_md[mem_type].initialized = 0;
     }
 
@@ -2171,11 +2235,21 @@ static ucs_status_t ucp_fill_config(ucp_context_h context,
     memcpy(context->config.am_mpools.sizes, config->mpool_sizes.memunits,
            config->mpool_sizes.count * sizeof(size_t));
 
-    context->config.worker_strong_fence =
-            (context->config.ext.fence_mode == UCP_FENCE_MODE_STRONG) ||
-            ((context->config.ext.fence_mode == UCP_FENCE_MODE_AUTO) &&
-             ((context->config.ext.max_rma_lanes > 1) ||
-              context->config.ext.proto_enable));
+    if ((context->config.ext.fence_mode == UCP_FENCE_MODE_EP_BASED) &&
+        !context->config.ext.proto_enable) {
+        ucs_error("UCX_FENCE_MODE=ep_based requires UCX_PROTO_ENABLE=y");
+        status = UCS_ERR_INVALID_PARAM;
+        goto err_free_key_list;
+    } else if (context->config.ext.fence_mode == UCP_FENCE_MODE_AUTO) {
+        if ((context->config.ext.max_rma_lanes > 1) ||
+            context->config.ext.proto_enable) {
+            context->config.worker_fence_mode = UCP_FENCE_MODE_STRONG;
+        } else {
+            context->config.worker_fence_mode = UCP_FENCE_MODE_WEAK;
+        }
+    } else {
+        context->config.worker_fence_mode = context->config.ext.fence_mode;
+    }
 
     context->config.progress_wrapper_enabled =
             ucs_log_is_enabled(UCS_LOG_LEVEL_TRACE_REQ) ||
@@ -2307,6 +2381,7 @@ ucs_status_t ucp_init_version(unsigned api_major_version, unsigned api_minor_ver
         }
     } else {
         context->rcache = NULL;
+        memset(&context->cache_md_map, 0, sizeof(context->cache_md_map));
     }
 
     if (dfl_config != NULL) {
@@ -2517,6 +2592,31 @@ void ucp_memory_detect_slowpath(ucp_context_h context, const void *address,
     ucs_memory_info_set_host(mem_info);
 }
 
+void ucp_context_memaccess_tl_bitmap(ucp_context_h context,
+                                     ucs_memory_type_t mem_type,
+                                     uint64_t md_reg_flags,
+                                     ucp_tl_bitmap_t *tl_bitmap)
+{
+    const uct_md_attr_v2_t *md_attr;
+    ucp_rsc_index_t rsc_index;
+    ucp_md_index_t md_index;
+    uint64_t mem_types;
+
+    UCS_STATIC_BITMAP_RESET_ALL(tl_bitmap);
+    UCS_STATIC_BITMAP_FOR_EACH_BIT(rsc_index, &context->tl_bitmap) {
+        md_index = context->tl_rscs[rsc_index].md_index;
+        md_attr  = &context->tl_mds[md_index].attr;
+        if (md_attr->flags & md_reg_flags) {
+            mem_types = md_attr->reg_mem_types;
+        } else {
+            mem_types = md_attr->access_mem_types;
+        }
+        if (mem_types & UCS_BIT(mem_type)) {
+            UCS_STATIC_BITMAP_SET(tl_bitmap, rsc_index);
+        }
+    }
+}
+
 void
 ucp_context_dev_tl_bitmap(ucp_context_h context, const char *dev_name,
                           ucp_tl_bitmap_t *tl_bitmap)
@@ -2560,6 +2660,28 @@ const char* ucp_context_cm_name(ucp_context_h context, ucp_rsc_index_t cm_idx)
 {
     ucs_assert(cm_idx != UCP_NULL_RESOURCE);
     return context->tl_cmpts[context->config.cm_cmpt_idxs[cm_idx]].attr.name;
+}
+
+double ucp_tl_iface_latency_with_priority(ucp_context_h context,
+                                          const ucs_linear_func_t *latency,
+                                          int is_prioritized_ep)
+{
+    unsigned num_eps = context->config.est_num_eps;
+
+    if (ucp_context_usage_tracker_enabled(context)) {
+        if (is_prioritized_ep) {
+            /* The number of priority endpoints is limited by
+             * max_priority_eps */
+            num_eps = ucs_min(num_eps, context->config.ext.max_priority_eps);
+        } else if (latency->m > UCP_PROTO_PERF_EPSILON) {
+            /* If the transport is not scalable, assume a high number of
+             * endpoints */
+            num_eps = ucs_max(num_eps, context->config.ext.max_priority_eps *
+                                               UCP_CONTEXT_INFINITE_LAT_FACTOR);
+        }
+    }
+
+    return ucs_linear_func_apply(*latency, num_eps);
 }
 
 UCS_F_CTOR void ucp_global_init(void)
