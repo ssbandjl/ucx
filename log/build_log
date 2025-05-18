@@ -1,0 +1,593 @@
+root@hpc117:~/project/net/ucx# export HAVE_EXAMPLES=true
+root@hpc117:~/project/net/ucx# ./autogen.sh
+autoreconf: Entering directory `.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: aclocal -I config/m4
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy
+libtoolize: putting auxiliary files in '.'.
+libtoolize: copying file './ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'config/m4'.
+libtoolize: copying file 'config/m4/libtool.m4'
+libtoolize: copying file 'config/m4/ltoptions.m4'
+libtoolize: copying file 'config/m4/ltsugar.m4'
+libtoolize: copying file 'config/m4/ltversion.m4'
+libtoolize: copying file 'config/m4/lt~obsolete.m4'
+autoreconf: running: /usr/bin/autoconf
+autoreconf: running: /usr/bin/autoheader
+autoreconf: running: automake --add-missing --copy --no-force
+configure.ac:31: installing './compile'
+configure.ac:83: installing './config.guess'
+configure.ac:83: installing './config.sub'
+configure.ac:51: installing './install-sh'
+configure.ac:51: installing './missing'
+bindings/java/src/main/native/Makefile.am: installing './depcomp'
+autoreconf: Leaving directory `.'
+root@hpc117:~/project/net/ucx# ./contrib/configure-devel --prefix=$PWD/install-debug
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether gcc understands -c and -o together... yes
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking for git... yes
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports the include directive... yes (GNU style)
+checking whether make supports nested variables... yes
+checking whether UID '0' is supported by ustar format... yes
+checking whether GID '0' is supported by ustar format... yes
+checking how to create a ustar tar archive... gnutar
+checking dependency style of gcc... gcc3
+checking whether make supports nested variables... (cached) yes
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for gcc... (cached) gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking for gcc option to accept ISO C89... (cached) none needed
+checking whether gcc understands -c and -o together... (cached) yes
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking dependency style of g++... gcc3
+checking for gcc option to support OpenMP... -fopenmp
+checking dependency style of gcc... gcc3
+checking whether ln -s works... yes
+checking for a sed that does not truncate output... /usr/bin/sed
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking how to print strings... printf
+checking for a sed that does not truncate output... (cached) /usr/bin/sed
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by gcc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/ld option to reload object files... -r
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ar... ar
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... ranlib
+checking command to parse /usr/bin/nm -B output from gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... mt
+checking if mt is a manifest tool... no
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fPIC -DPIC
+checking if gcc PIC flag -fPIC -DPIC works... yes
+checking if gcc static flag -static works... yes
+checking if gcc supports -c -o file.o... yes
+checking if gcc supports -c -o file.o... (cached) yes
+checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking how to run the C++ preprocessor... g++ -E
+checking for ld used by g++... /usr/bin/ld -m elf_x86_64
+checking if the linker (/usr/bin/ld -m elf_x86_64) is GNU ld... yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking for g++ option to produce PIC... -fPIC -DPIC
+checking if g++ PIC flag -fPIC -DPIC works... yes
+checking if g++ static flag -static works... yes
+checking if g++ supports -c -o file.o... yes
+checking if g++ supports -c -o file.o... (cached) yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking for cos in -lm... yes
+checking for C/C++ restrict keyword... __restrict
+checking whether strerror_r is declared... yes
+checking for strerror_r... yes
+checking whether strerror_r returns char *... yes
+checking for pkg-config... /usr/bin/pkg-config
+checking if ln -s supports --relative... yes
+checking for dot... yes
+checking for doxygen... no
+configure: WARNING: doxygen not found - will not generate any doxygen documentation
+/root/project/net/ucx/contrib/../configure: line 14329: doxygen: command not found
+configure: WARNING: doxygen version  is bad. Required version: 1.8.6 and above
+checking for perl... /usr/bin/perl
+checking for size_t... yes
+checking compiler flag -diag-error 10006... no
+checking compiler flag -diag-error 10148... no
+checking whether -diag-disable 1478 overrides deprecated declarations... no
+checking whether -Wno-deprecated-declarations overrides deprecated declarations... yes
+checking compiler flag -diag-disable 269... no
+checking compiler flag -fmax-type-align=16... no
+configure: Detected CPU implementation: 
+configure: Detected CPU architecture: 
+configure: Detected CPU variant: 
+configure: Detected CPU part: 
+checking for __attribute__(optimize)... 1
+checking compiler flag -fno-omit-frame-pointer... yes
+configure: compiling with frame pointer
+checking compiler flag -funwind-tables... yes
+configure: compiling with unwind tables
+checking compiler flag stack_usage_check... yes
+checking if g++ works... yes
+checking c++11 support... yes
+checking gnu++11 support... yes
+checking whether _GLIBCXX_NOTHROW is declared... yes
+checking compiler flag --display_error_number... no
+checking compiler flag --diag_suppress 1... no
+checking compiler flag --diag_suppress 68... no
+checking compiler flag --diag_suppress 111... no
+checking compiler flag --diag_suppress 167... no
+checking compiler flag --diag_suppress 181... no
+checking compiler flag --diag_suppress 188... no
+checking compiler flag --diag_suppress 381... no
+checking compiler flag --diag_suppress 1215... no
+checking compiler flag --diag_suppress 1626... no
+checking compiler flag --diag_suppress 1901... no
+checking compiler flag --diag_suppress 1902... no
+checking compiler flag -pedantic... yes
+checking compiler flag -Wl,-dynamic-list-data... yes
+checking compiler flag -Wno-missing-field-initializers... yes
+checking compiler flag -Wno-unused-parameter... yes
+checking compiler flag -Wno-unused-label... yes
+checking compiler flag -Wno-long-long... yes
+checking compiler flag -Wno-endif-labels... yes
+checking compiler flag -Wno-sign-compare... yes
+checking compiler flag -Wno-multichar... yes
+checking compiler flag -Wno-deprecated-declarations... yes
+checking compiler flag -Winvalid-pch... yes
+checking compiler flag -Wno-pointer-sign... yes
+checking compiler flag -Werror-implicit-function-declaration... yes
+checking compiler flag -Wno-format-zero-length... yes
+checking compiler flag -Wnested-externs... yes
+checking compiler flag -Wshadow... yes
+checking compiler flag -Werror=declaration-after-statement... yes
+checking for working alloca.h... yes
+checking for alloca... yes
+checking for shm_open in -lrt... yes
+checking for timer_create in -lrt... yes
+checking libgen.h usability... yes
+checking libgen.h presence... yes
+checking for libgen.h... yes
+checking whether asprintf is declared... yes
+checking whether basename is declared... yes
+checking whether fmemopen is declared... yes
+checking sys/cpuset.h usability... no
+checking sys/cpuset.h presence... no
+checking for sys/cpuset.h... no
+checking whether CPU_ZERO is declared... yes
+checking whether CPU_ISSET is declared... yes
+checking for cpu_set_t... yes
+checking for cpuset_t... no
+checking for sighandler_t... yes
+checking for __sighandler_t... yes
+checking pthread_np.h usability... no
+checking pthread_np.h presence... no
+checking for pthread_np.h... no
+checking for library containing pthread_create... -lpthread
+checking for library containing pthread_atfork... none required
+checking for clearenv... yes
+checking for malloc_trim... yes
+checking for memalign... yes
+checking for posix_memalign... yes
+checking for mremap... yes
+checking for sched_setaffinity... yes
+checking for sched_getaffinity... yes
+checking for cpuset_setaffinity... no
+checking for cpuset_getaffinity... no
+checking whether F_SETOWN_EX is declared... yes
+checking whether ethtool_cmd_speed is declared... yes
+checking whether SPEED_UNKNOWN is declared... yes
+checking sys/platform/ppc.h usability... no
+checking sys/platform/ppc.h presence... no
+checking for sys/platform/ppc.h... no
+checking whether __ppc_get_timebase_freq is declared... no
+checking whether __ppc_get_timebase is declared... no
+checking for using Google C++ Testing Framework... yes
+checking malloc hooks... yes
+checking sys/capability.h usability... no
+checking sys/capability.h presence... no
+checking for sys/capability.h... no
+checking whether PR_SET_PTRACER is declared... yes
+checking for struct in6_addr.s6_addr32... yes
+checking for struct in6_addr.__u6_addr.__u6_addr32... no
+checking for struct iphdr.daddr.s_addr... no
+checking for struct ip.ip_dst.s_addr... yes
+checking for struct sigevent._sigev_un._tid... yes
+checking for struct sigevent.sigev_notify_thread_id... no
+checking for struct sigaction.sa_restorer... yes
+checking sys/epoll.h usability... yes
+checking sys/epoll.h presence... yes
+checking for sys/epoll.h... yes
+checking sys/eventfd.h usability... yes
+checking sys/eventfd.h presence... yes
+checking for sys/eventfd.h... yes
+checking sys/event.h usability... no
+checking sys/event.h presence... no
+checking for sys/event.h... no
+checking sys/thr.h usability... no
+checking sys/thr.h presence... no
+checking for sys/thr.h... no
+checking malloc.h usability... yes
+checking malloc.h presence... yes
+checking for malloc.h... yes
+checking malloc_np.h usability... no
+checking malloc_np.h presence... no
+checking for malloc_np.h... no
+checking endian.h, usability... no
+checking endian.h, presence... no
+checking for endian.h,... no
+checking sys/endian.h usability... no
+checking sys/endian.h presence... no
+checking for sys/endian.h... no
+checking linux/mman.h usability... yes
+checking linux/mman.h presence... yes
+checking for linux/mman.h... yes
+checking linux/ip.h usability... yes
+checking linux/ip.h presence... yes
+checking for linux/ip.h... yes
+checking linux/futex.h usability... yes
+checking linux/futex.h presence... yes
+checking for linux/futex.h... yes
+checking for net/ethernet.h... yes
+checking for netinet/ip.h... yes
+configure: Memory allocator is ptmalloc-2.8.6 version
+checking for malloc_get_state... no
+checking for malloc_set_state... no
+checking whether MADV_FREE is declared... yes
+checking whether MADV_REMOVE is declared... yes
+checking whether POSIX_MADV_DONTNEED is declared... yes
+checking whether getauxval is declared... yes
+checking whether SYS_mmap is declared... yes
+checking whether SYS_munmap is declared... yes
+checking whether SYS_mremap is declared... yes
+checking whether SYS_brk is declared... yes
+checking whether SYS_madvise is declared... yes
+checking whether SYS_shmat is declared... yes
+checking whether SYS_shmdt is declared... yes
+checking whether SYS_ipc is declared... no
+checking for __curbrk... yes
+checking for tc_malloc in -ltcmalloc... no
+checking whether fuse_open_channel is declared... yes
+checking whether fuse_mount is declared... yes
+checking whether fuse_unmount is declared... yes
+checking for fuse_open_channel... yes
+checking for fuse_mount... yes
+checking for fuse_unmount... yes
+checking for go... no
+configure: WARNING: Disabling GO support - GO compiler version 1.16 or newer not found.
+checking for mvn... yes
+checking for java... yes
+checking for readlink... yes
+configure: Setting JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+checking jni_md.h usability... yes
+checking jni_md.h presence... yes
+checking for jni_md.h... yes
+checking jni.h usability... yes
+checking jni.h presence... yes
+checking for jni.h... yes
+configure: Infiniband MAD Path not specified. Guessing ...
+checking infiniband/mad.h usability... yes
+checking infiniband/mad.h presence... yes
+checking for infiniband/mad.h... yes
+checking infiniband/umad.h usability... yes
+checking infiniband/umad.h presence... yes
+checking for infiniband/umad.h... yes
+checking infiniband/umad_types.h usability... yes
+checking infiniband/umad_types.h presence... yes
+checking for infiniband/umad_types.h... yes
+checking for mad_build_pkt in -libmad... yes
+checking for umad_send in -libumad... yes
+configure: WARNING: LCOV support is not enabled.
+checking cuda.h usability... no
+checking cuda.h presence... no
+checking for cuda.h... no
+checking cuda_runtime.h usability... no
+checking cuda_runtime.h presence... no
+checking for cuda_runtime.h... no
+checking whether nvmlDeviceGetGpuFabricInfo is declared... no
+configure: nvmlDeviceGetGpuFabricInfo function not found in libnvidia-ml. MNNVL support will be disabled.
+checking whether CU_MEM_HANDLE_TYPE_FABRIC is declared... no
+checking for nvcc... no
+configure: WARNING: CUDA not found
+configure: ROCm path was not specified. Guessing ...
+checking hsa.h usability... no
+checking hsa.h presence... no
+checking for hsa.h... no
+configure: WARNING: ROCm not found
+checking for hsa_amd_portable_export_dmabuf... no
+checking for hipFree in -lhip_hcc... no
+checking hip_runtime.h usability... no
+checking hip_runtime.h presence... no
+checking for hip_runtime.h... no
+configure: WARNING: HIP Runtime not found
+checking level_zero/ze_api.h usability... no
+checking level_zero/ze_api.h presence... no
+checking for level_zero/ze_api.h... no
+configure: WARNING: ZE not found
+checking whether inotify_init is declared... yes
+checking whether inotify_add_watch is declared... yes
+checking whether IN_ATTRIB is declared... yes
+configure: enabling profiling
+checking for bfd_openr in -lbfd... no
+checking for bfd_openr in -lbfd... no
+checking for bfd_openr in -lbfd... no
+checking bfd.h usability... no
+checking bfd.h presence... no
+checking for bfd.h... no
+checking for struct dl_phdr_info... yes
+configure: enabling statistics
+checking __attribute__((constructor))... yes
+configure: enabling builtin memcpy
+checking for __clear_cache... yes
+checking for __aarch64_sync_cache_range... no
+checking gdrapi.h usability... no
+checking gdrapi.h presence... no
+checking for gdrapi.h... no
+configure: WARNING: GDR_COPY not found
+configure: Compiling with verbs support from /usr
+checking infiniband/verbs.h usability... yes
+checking infiniband/verbs.h presence... yes
+checking for infiniband/verbs.h... yes
+checking for ibv_get_device_list in -libverbs... yes
+checking whether ibv_wc_status_str is declared... yes
+checking whether ibv_event_type_str is declared... yes
+checking whether ibv_query_gid is declared... yes
+checking whether ibv_get_device_name is declared... yes
+checking whether ibv_create_srq is declared... yes
+checking whether ibv_get_async_event is declared... yes
+checking whether IBV_CREATE_CQ_ATTR_IGNORE_OVERRUN is declared... yes
+configure: Checking for DV bare-metal support
+checking for mlx5dv_query_device in -lmlx5-rdmav2... no
+checking for mlx5dv_query_device in -lmlx5... yes
+checking for infiniband/mlx5dv.h... yes
+checking whether mlx5dv_init_obj is declared... yes
+checking whether mlx5dv_create_qp is declared... yes
+checking whether mlx5dv_is_supported is declared... yes
+checking whether mlx5dv_devx_subscribe_devx_event is declared... yes
+checking whether MLX5DV_CQ_INIT_ATTR_MASK_COMPRESSED_CQE is declared... yes
+checking whether MLX5DV_CQ_INIT_ATTR_MASK_CQE_SIZE is declared... yes
+checking whether MLX5DV_QP_CREATE_ALLOW_SCATTER_TO_CQE is declared... yes
+checking whether MLX5DV_UAR_ALLOC_TYPE_BF is declared... yes
+checking whether MLX5DV_UAR_ALLOC_TYPE_NC_DEDICATED is declared... yes
+checking for struct mlx5dv_cq.cq_uar... yes
+checking whether MLX5DV_OBJ_AH is declared... yes
+checking whether MLX5DV_DCTYPE_DCT is declared... yes
+checking whether ibv_alloc_td is declared... yes
+checking whether MLX5_OPCODE_MMO is declared... yes
+checking whether MLX5DV_CONTEXT_FLAGS_DEVX is declared... yes
+checking whether IBV_LINK_LAYER_INFINIBAND is declared... yes
+checking whether IBV_LINK_LAYER_ETHERNET is declared... yes
+checking whether IBV_EVENT_GID_CHANGE is declared... yes
+checking whether IBV_TRANSPORT_USNIC is declared... yes
+checking whether IBV_TRANSPORT_USNIC_UDP is declared... yes
+checking whether IBV_TRANSPORT_UNSPECIFIED is declared... yes
+checking whether ibv_create_qp_ex is declared... yes
+checking whether ibv_create_cq_ex is declared... yes
+checking whether ibv_create_srq_ex is declared... yes
+checking whether ibv_reg_dmabuf_mr is declared... yes
+checking whether ibv_set_ece is declared... yes
+checking whether ibv_query_device_ex is declared... yes
+checking for struct ibv_device_attr_ex.pci_atomic_caps... yes
+checking for struct ibv_device_attr_ex.odp_caps... yes
+checking whether IBV_ACCESS_RELAXED_ORDERING is declared... yes
+checking whether IBV_ACCESS_ON_DEMAND is declared... yes
+checking whether IBV_QPF_GRH_REQUIRED is declared... yes
+checking whether ibv_advise_mr is declared... yes
+checking for struct mlx5_wqe_av.base... no
+checking for struct mlx5_grh_av.rmac... no
+checking for struct mlx5_cqe64.ib_stride_index... no
+checking for struct ibv_tmh.tag... yes
+checking for struct ibv_tm_caps.flags... yes
+checking whether ibv_alloc_dm is declared... yes
+checking whether MLX5DV_CONTEXT_MASK_OOO_RECV_WRS is declared... yes
+checking whether NETLINK_RDMA is declared... yes
+checking whether RDMA_NL_NLDEV is declared... yes
+checking whether ibv_get_device_index is declared... yes
+checking whether RDMA_NLDEV_ATTR_DEV_TYPE is declared... no
+checking whether RDMA_DEVICE_TYPE_SMI is declared... no
+configure: Checking OFED valgrind libs /usr/lib64/mlnx_ofed/valgrind
+checking /usr/include/rdma/rdma_cma.h usability... yes
+checking /usr/include/rdma/rdma_cma.h presence... yes
+checking for /usr/include/rdma/rdma_cma.h... yes
+checking for rdma_establish in -lrdmacm... yes
+checking infiniband/efadv.h usability... yes
+checking infiniband/efadv.h presence... yes
+checking for infiniband/efadv.h... yes
+checking for efadv_query_device in -lefa... yes
+checking whether EFADV_DEVICE_ATTR_CAPS_RDMA_WRITE is declared... yes
+checking whether EFADV_DEVICE_ATTR_CAPS_RDMA_READ is declared... yes
+checking sys/uio.h usability... yes
+checking sys/uio.h presence... yes
+checking for sys/uio.h... yes
+checking for process_vm_readv... yes
+configure: KNEM path was not found, guessing ...
+Package knem was not found in the pkg-config search path.
+Perhaps you should add the directory containing `knem.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'knem' found
+checking whether KNEM_CMD_GET_INFO is declared... no
+configure: WARNING: KNEM requested but required file (knem_io.h) could not be found
+configure: XPMEM - failed to open the requested location (guess), guessing ...
+checking cray-ugni... no
+checking whether IPPROTO_TCP is declared... yes
+checking whether SOL_SOCKET is declared... yes
+checking whether SO_KEEPALIVE is declared... yes
+checking whether TCP_KEEPCNT is declared... yes
+checking whether TCP_KEEPIDLE is declared... yes
+checking whether TCP_KEEPINTVL is declared... yes
+checking compiler flag -fno-exceptions... yes
+checking compiler flag -fno-rtti... yes
+checking compiler flag --no_exceptions... no
+checking compiler flag -fno-tree-vectorize... yes
+checking compiler flag --diag_suppress 186... no
+checking compiler flag --diag_suppress 236... no
+checking compiler flag -Wno-noexcept-type... yes
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating src/ucm/cuda/Makefile
+config.status: creating src/ucm/rocm/Makefile
+config.status: creating src/ucm/ze/Makefile
+config.status: creating src/ucm/Makefile
+config.status: creating src/ucs/vfs/sock/Makefile
+config.status: creating src/ucs/vfs/fuse/Makefile
+config.status: creating src/ucs/vfs/fuse/ucx-fuse.pc
+config.status: creating src/ucs/Makefile
+config.status: creating src/ucs/signal/Makefile
+config.status: creating src/ucs/ucx-ucs.pc
+config.status: creating src/uct/cuda/gdr_copy/Makefile
+config.status: creating src/uct/cuda/gdr_copy/ucx-gdrcopy.pc
+config.status: creating src/uct/cuda/Makefile
+config.status: creating src/uct/cuda/ucx-cuda.pc
+config.status: creating src/uct/ib/rdmacm/Makefile
+config.status: creating src/uct/ib/rdmacm/ucx-rdmacm.pc
+config.status: creating src/uct/ib/mlx5/Makefile
+config.status: creating src/uct/ib/mlx5/ucx-ib-mlx5.pc
+config.status: creating src/uct/ib/efa/Makefile
+config.status: creating src/uct/ib/efa/ucx-ib-efa.pc
+config.status: creating src/uct/ib/Makefile
+config.status: creating src/uct/ib/ucx-ib.pc
+config.status: creating src/uct/rocm/Makefile
+config.status: creating src/uct/rocm/ucx-rocm.pc
+config.status: creating src/uct/sm/scopy/cma/Makefile
+config.status: creating src/uct/sm/scopy/cma/ucx-cma.pc
+config.status: creating src/uct/sm/scopy/knem/Makefile
+config.status: creating src/uct/sm/scopy/knem/ucx-knem.pc
+config.status: creating src/uct/sm/scopy/Makefile
+config.status: creating src/uct/sm/mm/xpmem/Makefile
+config.status: creating src/uct/sm/mm/xpmem/ucx-xpmem.pc
+config.status: creating src/uct/sm/mm/Makefile
+config.status: creating src/uct/sm/Makefile
+config.status: creating src/uct/ugni/Makefile
+config.status: creating src/uct/ugni/ucx-ugni.pc
+config.status: creating src/uct/ze/Makefile
+config.status: creating src/uct/ze/ucx-ze.pc
+config.status: creating src/uct/Makefile
+config.status: creating src/uct/ucx-uct.pc
+config.status: creating src/tools/perf/lib/Makefile
+config.status: creating src/tools/perf/cuda/Makefile
+config.status: creating src/tools/perf/rocm/Makefile
+config.status: creating src/tools/perf/ze/Makefile
+config.status: creating src/tools/perf/mad/Makefile
+config.status: creating src/tools/perf/Makefile
+config.status: creating test/gtest/common/googletest/Makefile
+config.status: creating test/gtest/ucm/test_dlopen/Makefile
+config.status: creating test/gtest/ucm/test_dlopen/rpath-subdir/Makefile
+config.status: creating test/gtest/ucs/test_module/Makefile
+config.status: creating test/gtest/Makefile
+config.status: creating test/apps/uct_info/Makefile
+config.status: creating Makefile
+config.status: creating docs/doxygen/header.tex
+config.status: creating src/uct/api/version.h
+config.status: creating ucx.spec
+config.status: creating ucx.pc
+config.status: creating contrib/rpmdef.sh
+config.status: creating contrib/ucx
+config.status: creating debian/rules
+config.status: creating debian/control
+config.status: creating debian/changelog
+config.status: creating src/ucp/Makefile
+config.status: creating src/ucp/api/ucp_version.h
+config.status: creating src/ucp/core/ucp_version.c
+config.status: creating src/tools/vfs/Makefile
+config.status: creating src/tools/info/Makefile
+config.status: creating src/tools/profile/Makefile
+config.status: creating test/apps/Makefile
+config.status: creating test/apps/iodemo/Makefile
+config.status: creating test/apps/profiling/Makefile
+config.status: creating test/mpi/Makefile
+config.status: creating bindings/go/Makefile
+config.status: creating bindings/java/Makefile
+config.status: creating bindings/java/pom.xml
+config.status: creating bindings/java/src/main/native/Makefile
+config.status: creating examples/Makefile
+config.status: creating cmake/Makefile
+config.status: creating cmake/ucx-config-version.cmake
+config.status: creating cmake/ucx-config.cmake
+config.status: creating cmake/ucx-targets.cmake
+config.status: creating config/Makefile
+config.status: creating test/mpi/run_mpi.sh
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+configure: =========================================================
+configure: UCX build configuration:
+configure:         Build prefix:   /root/project/net/ucx/install-debug
+configure:    Configuration dir:   ${prefix}/etc/ucx
+configure:                   CC:   gcc
+configure:                  CXX:   g++
+configure:             CPPFLAGS:   -DCPU_FLAGS="" -I${abs_top_srcdir}/src -I${abs_top_builddir} -I${abs_top_builddir}/src 
+configure:               CFLAGS:   -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wframe-larger-than=8192 -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement 
+configure:             CXXFLAGS:   -O3 -g -Wall -Werror -fno-omit-frame-pointer -funwind-tables -Wframe-larger-than=8192 -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch 
+configure:           ASAN check:   no
+configure:         Multi-thread:   enabled
+configure:            MPI tests:   disabled
+configure:          VFS support:   yes
+configure:        Devel headers:   no
+configure: io_demo CUDA support:   no
+configure:             Bindings:   < java >
+configure:          UCS modules:   < fuse >
+configure:          UCT modules:   < ib rdmacm cma xpmem >
+configure:         CUDA modules:   < >
+configure:         ROCM modules:   < >
+configure:           IB modules:   < mlx5 efa >
+configure:          UCM modules:   < >
+configure:         Perf modules:   < mad >
+configure: =========================================================
+root@hpc117:~/project/net/ucx# 
+
