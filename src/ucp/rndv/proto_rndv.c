@@ -645,6 +645,7 @@ ucp_proto_rndv_bulk_init(const ucp_proto_multi_init_params_t *init_params,
     }
 
     rpriv->frag_mem_type = init_params->super.reg_mem_info.type;
+    rpriv->frag_sys_dev  = init_params->super.reg_mem_info.sys_dev;
 
     if (rpriv->super.lane == UCP_NULL_LANE) {
         /* Add perf without ACK in case of pipeline */
@@ -719,6 +720,7 @@ UCS_PROFILE_FUNC(ucs_status_t, ucp_proto_rndv_send_reply,
     ucp_worker_cfg_index_t rkey_cfg_index;
     ucp_proto_select_param_t sel_param;
     ucp_proto_select_t *proto_select;
+    ucs_sys_device_t sys_dev;
     ucs_status_t status;
     ucp_rkey_h rkey;
 
@@ -726,6 +728,11 @@ UCS_PROFILE_FUNC(ucs_status_t, ucp_proto_rndv_send_reply,
                (op_id < UCP_OP_ID_RNDV_LAST));
 
     if (rkey_length > 0) {
+        sys_dev = req->send.state.dt_iter.mem_info.sys_dev;
+        if (sys_dev == UCS_SYS_DEVICE_ID_UNKNOWN) {
+            sys_dev = worker->context->alloc_md[UCS_MEMORY_TYPE_CUDA].sys_dev;
+        }
+
         ucs_assert(rkey_buffer != NULL);
         /* Do not unpack rkeys from MDs with rkey_ptr capability, except
          * rkey_ptr_lane. Examples are: sysv and posix. Such keys, if packed,
@@ -734,7 +741,7 @@ UCS_PROFILE_FUNC(ucs_status_t, ucp_proto_rndv_send_reply,
          */
         status = ucp_ep_rkey_unpack_internal(
                   ep, rkey_buffer, rkey_length, ep_config->key.reachable_md_map,
-                  ep_config->rndv.proto_rndv_rkey_skip_mds, &rkey);
+                  ep_config->rndv.proto_rndv_rkey_skip_mds, sys_dev, &rkey);
         if (status != UCS_OK) {
             goto err;
         }

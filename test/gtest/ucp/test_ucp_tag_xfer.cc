@@ -31,7 +31,8 @@ public:
         VARIANT_RNDV_AM_BCOPY,
         VARIANT_RNDV_AM_ZCOPY,
         VARIANT_SEND_NBR,
-        VARIANT_PROTO_V1
+        VARIANT_PROTO_V1,
+        VARIANT_CONNECT_ALL_TO_ALL
     };
 
     test_ucp_tag_xfer() {
@@ -61,6 +62,8 @@ public:
             modify_config("ZCOPY_THRESH", "0");
         } else if (get_variant_value() == VARIANT_PROTO_V1) {
             modify_config("PROTO_ENABLE", "n");
+        } else if (get_variant_value() == VARIANT_CONNECT_ALL_TO_ALL) {
+            modify_config("CONNECT_ALL_TO_ALL", "y");
         }
 
         /* Init number of lanes according to test requirement
@@ -98,6 +101,8 @@ public:
             add_variant_with_value(variants, get_ctx_params(), VARIANT_PROTO_V1,
                                    "proto_v1");
         }
+        add_variant_with_value(variants, get_ctx_params(),
+                               VARIANT_CONNECT_ALL_TO_ALL, "connect_all_to_all");
     }
 
     virtual ucp_ep_params_t get_ep_params() {
@@ -1094,7 +1099,7 @@ public:
 
     bool has_rma_zcopy() {
         return has_transport("rc_v") || has_transport("rc_x") ||
-               has_transport("dc_x") ||
+               has_transport("dc_x") || has_transport("srd") ||
                (ucp_context_find_tl_md(receiver().ucph(), "cma")  != NULL) ||
                (ucp_context_find_tl_md(receiver().ucph(), "knem") != NULL);
     }

@@ -72,9 +72,10 @@
 #define UCP_CONTEXT_INFINITE_LAT_FACTOR 100
 
 typedef enum ucp_transports_list_search_result {
-    UCP_TRANSPORTS_LIST_SEARCH_RESULT_PRIMARY      = UCS_BIT(0),
-    UCP_TRANSPORTS_LIST_SEARCH_RESULT_AUX_IN_MAIN  = UCS_BIT(1),
-    UCP_TRANSPORTS_LIST_SEARCH_RESULT_AUX_IN_ALIAS = UCS_BIT(2)
+    UCP_TRANSPORTS_LIST_SEARCH_RESULT_PRIMARY             = UCS_BIT(0),
+    UCP_TRANSPORTS_LIST_SEARCH_RESULT_AUX_IN_MAIN         = UCS_BIT(1),
+    UCP_TRANSPORTS_LIST_SEARCH_RESULT_AUX_IN_ALIAS        = UCS_BIT(2),
+    UCP_TRANSPORTS_LIST_SEARCH_RESULT_TL_AND_AUX_IN_ALIAS = UCS_BIT(3)
 } ucp_transports_list_search_result_t;
 
 
@@ -565,6 +566,12 @@ static ucs_config_field_t ucp_context_config_table[] = {
    ucs_offsetof(ucp_context_config_t, wireup_via_am_lane),
    UCS_CONFIG_TYPE_BOOL},
 
+  {"CONNECT_ALL_TO_ALL", "n",
+   "Establish connections between all pairs of local and remote devices that\n"
+   "are reachable through the transport layer.",
+   ucs_offsetof(ucp_context_config_t, connect_all_to_all),
+   UCS_CONFIG_TYPE_BOOL},
+
   {NULL}
 };
 
@@ -595,13 +602,14 @@ static ucs_config_field_t ucp_config_table[] = {
    " - sm/shm  : all shared memory transports (mm, cma, knem).\n"
    " - mm      : shared memory transports - only memory mappers.\n"
    " - ugni    : ugni_smsg and ugni_rdma (uses ugni_udt for bootstrap).\n"
-   " - ib      : all infiniband transports (rc/rc_mlx5, ud/ud_mlx5, dc_mlx5).\n"
+   " - ib      : all infiniband transports (rc/rc_mlx5, ud/ud_mlx5, dc_mlx5, srd).\n"
    " - rc_v    : rc verbs (uses ud for bootstrap).\n"
    " - rc_x    : rc with accelerated verbs (uses ud_mlx5 for bootstrap).\n"
    " - rc      : rc_v and rc_x (preferably if available).\n"
    " - ud_v    : ud verbs.\n"
    " - ud_x    : ud with accelerated verbs.\n"
    " - ud      : ud_v and ud_x (preferably if available).\n"
+   " - srd     : EFA srd reliable transport.\n"
    " - dc/dc_x : dc with accelerated verbs.\n"
    " - tcp     : sockets over TCP/IP.\n"
    " - cuda    : CUDA (NVIDIA GPU) memory support.\n"
@@ -683,7 +691,8 @@ static ucp_tl_alias_t ucp_tl_aliases[] = {
   { "sm",    { "posix", "sysv", "xpmem", "knem", "cma", NULL } },
   { "shm",   { "posix", "sysv", "xpmem", "knem", "cma", NULL } },
   { "ib",    { "rc_verbs", "ud_verbs", "rc_mlx5", "ud_mlx5", "dc_mlx5",
-               "gga_mlx5", NULL } },
+               "gga_mlx5", UCP_TL_AUX("ud_mlx5"), UCP_TL_AUX("ud_verbs"),
+               "srd", NULL } },
   { "ud_v",  { "ud_verbs", NULL } },
   { "ud_x",  { "ud_mlx5", NULL } },
   { "ud",    { "ud_mlx5", "ud_verbs", NULL } },
@@ -1016,6 +1025,7 @@ ucp_transports_list_search(const char *tl_name,
     uint8_t search_result = 0;
     uint64_t tmp_tl_cfg_mask;
     ucp_tl_alias_t *alias;
+    int tl_in_alias, tl_aux_in_alias;
 
     if (ucp_config_is_tl_name_present(tl_array, tl_name, 0, NULL,
                                       tl_cfg_mask)) {
@@ -1033,16 +1043,25 @@ ucp_transports_list_search(const char *tl_name,
         tmp_tl_cfg_mask = 0;
         if (ucp_config_is_tl_name_present(tl_array, alias->alias, 1, NULL,
                                           &tmp_tl_cfg_mask)) {
-            if (ucp_tls_alias_is_present(alias, tl_name, NULL)) {
+            tl_in_alias = ucp_tls_alias_is_present(alias, tl_name, NULL);
+            if (tl_in_alias) {
                 /* alias={tl_name}, UCX_TLS=[^]alias */
                 *tl_cfg_mask  |= tmp_tl_cfg_mask;
                 search_result |= UCP_TRANSPORTS_LIST_SEARCH_RESULT_PRIMARY;
             }
 
-            if (ucp_tls_alias_is_present(alias, tl_name, UCP_TL_AUX_SUFFIX)) {
+            tl_aux_in_alias = ucp_tls_alias_is_present(alias, tl_name,
+                                                       UCP_TL_AUX_SUFFIX);
+            if (tl_aux_in_alias) {
                 /* alias={tl_name:aux}, UCX_TLS=[^]alias */
                 *tl_cfg_mask  |= tmp_tl_cfg_mask;
                 search_result |= UCP_TRANSPORTS_LIST_SEARCH_RESULT_AUX_IN_ALIAS;
+            }
+
+            if (tl_in_alias && tl_aux_in_alias) {
+                /* alias={tl_name, tl_name:aux}, UCX_TLS=[^]alias */
+                search_result |= 
+                          UCP_TRANSPORTS_LIST_SEARCH_RESULT_TL_AND_AUX_IN_ALIAS;
             }
         }
 
@@ -1102,13 +1121,15 @@ ucp_is_resource_in_transports_list(const char *tl_name,
         return !(search_result & UCP_TRANSPORTS_LIST_SEARCH_RESULT_PRIMARY);
     }
 
-    /* Only explicit indication in the deny list can completely disable
-     * transport which can be used as an auxiliary.
-     * E.g: UCX_TLS=^tl_name,tl_name:aux, or alias={tl_name} and
-     * UCX_TLS=^alias,alias:aux. */
+    /* A transport that can be used as an auxiliary is disabled by
+     * including it in the deny list in one of the following ways:
+     *  - UCX_TLS=^tl_name,tl_name:aux
+     *  - UCX_TLS=^alias,alias:aux where alias={tl_name}
+     *  - UCX_TLS=^alias where alias={tl_name,tl_name:aux} */
     if (ucs_test_all_flags(search_result,
                            UCP_TRANSPORTS_LIST_SEARCH_RESULT_PRIMARY |
-                           UCP_TRANSPORTS_LIST_SEARCH_RESULT_AUX_IN_MAIN)) {
+                           UCP_TRANSPORTS_LIST_SEARCH_RESULT_AUX_IN_MAIN) ||
+        search_result & UCP_TRANSPORTS_LIST_SEARCH_RESULT_TL_AND_AUX_IN_ALIAS) {
         return 0;
     }
 
