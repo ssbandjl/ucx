@@ -492,6 +492,8 @@ static inline ucs_status_t uct_ib_poll_cq(struct ibv_cq *cq, unsigned *count, st
         ucs_fatal("failed to poll receive CQ %d", ret);
     }
 
+	if (ret > 0)
+		printf_ffl("Poll success cqe_num:%d\n", ret);
     *count = ret;
     return UCS_OK;
 }

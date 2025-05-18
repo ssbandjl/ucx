@@ -1,0 +1,88 @@
+
+uct_hello_world_server:
+export LD_LIBRARY_PATH=/root/project/rdma/dpu_user_rdma/build/lib
+export HUGE_PAGE_NUM=20
+export XT_CQ_INLINE_CQE=0
+
+export UCX_LOG_LEVEL=debug
+cd examples/.libs
+ibdev2netdev
+./uct_hello_world -d xtrdma_0:1 -t rc_verbs
+root@hpc117:~/project/net/ucx/examples/.libs# export UCX_LOG_LEVEL=debug
+root@hpc117:~/project/net/ucx/examples/.libs# ./uct_hello_world -d xtrdma_0:1 -t rc_verbs
+[1747556857.108774] [hpc117:48643:0]           debug.c:1157 UCX  DEBUG using signal stack 0x7f8eef140000 size 141824
+[1747556857.129881] [hpc117:48643:0]            init.c:120  UCX  DEBUG /root/project/net/ucx/install-debug/lib/libucs.so.0 loaded at 0x7f8eef57a000
+[1747556857.129944] [hpc117:48643:0]            init.c:122  UCX  DEBUG cmd line: ./uct_hello_world -d xtrdma_0:1 -t rc_verbs 
+[1747556857.129977] [hpc117:48643:0]          module.c:72   UCX  DEBUG ucs library path: /root/project/net/ucx/install-debug/lib/libucs.so.0
+[1747556857.129992] [hpc117:48643:0]          module.c:304  UCX  DEBUG loading modules for ucs
+INFO: UCT_HELLO_WORLD AM function = uct_ep_am_short server = (null) port = 13337, parse_cmd uct_hello_world.c:515 
+[1747556857.131074] [hpc117:48643:f]        vfs_fuse.c:424  UCX  DEBUG connecting vfs socket 3 to daemon on '/run/user/0/ucx/vfs.sock'
+[1747556857.131099] [hpc117:48643:0]          module.c:304  UCX  DEBUG loading modules for uct
+[1747556857.131125] [hpc117:48643:f]        vfs_fuse.c:432  UCX  DEBUG failed to connect to vfs socket '/run/user/0/ucx/vfs.sock': No such file or directory
+[1747556857.131177] [hpc117:48643:f]        vfs_fuse.c:313  UCX  DEBUG waiting for creation of 'vfs.sock' in '/run/user/0/ucx'
+[1747556857.136364] [hpc117:48643:0]          module.c:304  UCX  DEBUG loading modules for uct_ib
+[1747556857.144735] [hpc117:48643:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp6s0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:1c.2/0000:06:00.0'
+[1747556857.144811] [hpc117:48643:0]            topo.c:304  UCX  DEBUG added sys_dev 0 for bus id 06:00.0
+[1747556857.144821] [hpc117:48643:0]            topo.c:560  UCX  DEBUG enp6s0: bdf_name 0000:06:00.0 sys_dev 0
+[1747556857.145198] [hpc117:48643:0]            topo.c:938  UCX  DEBUG /sys/class/net/ens2f0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0'
+[1747556857.145255] [hpc117:48643:0]            topo.c:304  UCX  DEBUG added sys_dev 1 for bus id 01:00.0
+[1747556857.145262] [hpc117:48643:0]            topo.c:560  UCX  DEBUG ens2f0: bdf_name 0000:01:00.0 sys_dev 1
+[1747556857.145631] [hpc117:48643:0]            topo.c:938  UCX  DEBUG /sys/class/net/ens6f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:03:00.0'
+[1747556857.145685] [hpc117:48643:0]            topo.c:304  UCX  DEBUG added sys_dev 2 for bus id 03:00.0
+[1747556857.145693] [hpc117:48643:0]            topo.c:560  UCX  DEBUG ens6f0np0: bdf_name 0000:03:00.0 sys_dev 2
+[1747556857.146616] [hpc117:48643:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1747556857.146626] [hpc117:48643:0]            topo.c:564  UCX  DEBUG lo: system device unknown
+tid:48643, _verbs_init_and_alloc_context(), ../libibverbs/device.c:284, drv_context:0x5578629066c0, dev:xtrdma_0, context:0x5578629066c0
+tid:48643, xtrdma_ualloc_context(), ../providers/xtrdma/umain.c:247, dev:xtrdma_0, uctx:0x5578629066c0
+tid:48643, huge_mem_init(), ../providers/xtrdma/huge_mem.c:99, Huge map file /dev/hugepages/huge_ctx_map_file_1747556857_0x5578629066c0_2098975188
+[1747556857.165662] [hpc117:48643:0]       ib_efa_md.c:38   UCX  DEBUG efadv_query_device(xtrdma_0) failed: 95
+[1747556857.165803] [hpc117:48643:0]           ib_md.c:1058 UCX  DEBUG xtrdma_0: md open by 'uct_ib_efa_md_ops' failed, trying next
+[1747556857.165842] [hpc117:48643:0]    ib_mlx5dv_md.c:2523 UCX  DEBUG xtrdma_0: DEVX is not supported
+[1747556857.165848] [hpc117:48643:0]           ib_md.c:1058 UCX  DEBUG xtrdma_0: md open by 'uct_ib_mlx5_devx_md_ops' failed, trying next
+[1747556857.165854] [hpc117:48643:0]           ib_md.c:1058 UCX  DEBUG xtrdma_0: md open by 'uct_ib_mlx5_md_ops' failed, trying next
+tid:48643, _verbs_init_and_alloc_context(), ../libibverbs/device.c:284, drv_context:0x5578629066c0, dev:xtrdma_0, context:0x5578629066c0
+tid:48643, xtrdma_ualloc_context(), ../providers/xtrdma/umain.c:247, dev:xtrdma_0, uctx:0x5578629066c0
+tid:48643, huge_mem_init(), ../providers/xtrdma/huge_mem.c:99, Huge map file /dev/hugepages/huge_ctx_map_file_1747556857_0x5578629066c0_4125781
+[1747556857.173339] [hpc117:48643:0]            topo.c:938  UCX  DEBUG /sys/class/infiniband/xtrdma_0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0'
+[1747556857.173363] [hpc117:48643:0]            topo.c:560  UCX  DEBUG xtrdma_0: bdf_name 0000:01:00.0 sys_dev 1
+[1747556857.173400] [hpc117:48643:0]       ib_device.c:532  UCX  DEBUG xtrdma_0: vendor_id 0x10ee device_id 36920
+[1747556857.173491] [hpc117:48643:0]           async.c:247  UCX  DEBUG added async handler 0x5578629019b0 [id=7 ref 1] ???() to hash
+[1747556857.173632] [hpc117:48643:0]           async.c:521  UCX  DEBUG listening to async event fd 7 events 0x1 mode thread_spinlock
+[1747556857.173647] [hpc117:48643:0]       ib_device.c:643  UCX  DEBUG initialized device 'xtrdma_0' (InfiniBand channel adapter) with 1 ports
+[1747556857.173663] [hpc117:48643:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: cuda GPUDirect RDMA is not detected by checking /sys/kernel/mm/memory_peers/nv_mem/version
+[1747556857.173672] [hpc117:48643:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nvidia_peermem/version
+[1747556857.173679] [hpc117:48643:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nv_peer_mem/version
+[1747556857.173689] [hpc117:48643:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: rocm GPUDirect RDMA is not detected by checking /dev/kfd
+[1747556857.173728] [hpc117:48643:0]           ib_md.c:1238 UCX  DEBUG xtrdma_0: ibv_reg_dmabuf_mr(fd=-1) returned Operation not supported, dmabuf is not supported
+[1747556857.284679] [hpc117:48643:0]           ib_md.c:1202 UCX  DEBUG xtrdma_0: relaxed order memory access is disabled
+[1747556857.284706] [hpc117:48643:0]           ib_md.c:1271 UCX  DEBUG xtrdma_0: ODP is disabled because device does not support IBV_ACCESS_ON_DEMAND
+[1747556857.284715] [hpc117:48643:0]           ib_md.c:1062 UCX  DEBUG xtrdma_0: md open by 'uct_ib_verbs_md_ops' is successful
+[1747556857.396841] [hpc117:48643:0]          uct_md.c:96   UCX  DEBUG failed to query dc_mlx5 resources: No such device
+[1747556857.396874] [hpc117:48643:0]          uct_md.c:96   UCX  DEBUG failed to query rc_mlx5 resources: No such device
+[1747556857.396886] [hpc117:48643:0]          uct_md.c:96   UCX  DEBUG failed to query ud_mlx5 resources: No such device
+tid:48643, _verbs_init_and_alloc_context(), ../libibverbs/device.c:284, drv_context:0x557862918300, dev:xtrdma_0, context:0x557862918300
+tid:48643, xtrdma_ualloc_context(), ../providers/xtrdma/umain.c:247, dev:xtrdma_0, uctx:0x557862918300
+tid:48643, huge_mem_init(), ../providers/xtrdma/huge_mem.c:99, Huge map file /dev/hugepages/huge_ctx_map_file_1747556857_0x557862918300_1691957518
+[1747556857.410557] [hpc117:48643:0]          uct_md.c:96   UCX  DEBUG failed to query srd resources: No such device
+[1747556857.410759] [hpc117:48643:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on xtrdma_0:1/RoCE
+[1747556857.410889] [hpc117:48643:0]       ib_device.c:1132 UCX  DEBUG xtrdma_0:1 using gid_index 1
+[1747556857.411000] [hpc117:48643:0]             sys.c:440  UCX  DEBUG failed to open /sys/class/net/bonding/ad_num_ports: No such file or directory
+[1747556857.411009] [hpc117:48643:0]       ib_device.c:1575 UCX  DEBUG RoCE LAG level on xtrdma_0:1 (ens2f0) is 1
+[1747556857.440320] [hpc117:48643:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 12 payload_ofs 16 hdr_ofs 15 data_sz 8256
+[1747556857.440398] [hpc117:48643:0]           mpool.c:136  UCX  DEBUG mpool rc_recv_desc: align 64, maxelems 4294967295, elemsize 8279
+[1747556857.440412] [hpc117:48643:0]           mpool.c:136  UCX  DEBUG mpool rc_send_desc: align 64, maxelems 4294967295, elemsize 8328
+[1747556857.440643] [hpc117:48643:0]           mpool.c:136  UCX  DEBUG mpool send-ops-mpool: align 64, maxelems 4294967295, elemsize 56
+[1747556857.456353] [hpc117:48643:0]           mpool.c:136  UCX  DEBUG mpool pending-ops: align 1, maxelems 4294967295, elemsize 64
+[1747556857.456385] [hpc117:48643:0]           mpool.c:136  UCX  DEBUG mpool rc_verbs_short_desc: align 64, maxelems 4294967295, elemsize 200
+[1747556857.472359] [hpc117:48643:0]        ib_iface.c:1300 UCX  DEBUG xtrdma_0: iface 0x557862918300 created RC QP 0x8 on xtrdma_0:1 TX wr:256 sge:32 inl:512 resp:64 RX wr:256 sge:32 resp:64
+[1747556857.564317] [hpc117:48643:0]           mpool.c:281  UCX  DEBUG mpool rc_recv_desc: allocated chunk 0x7f8ee3200018 of 37748712 bytes with 4537 elements
+[1747556857.568864] [hpc117:48643:0]             sys.c:440  UCX  DEBUG failed to open /sys/class/net/bonding/ad_num_ports: No such file or directory
+[1747556857.568882] [hpc117:48643:0]       ib_device.c:1575 UCX  DEBUG RoCE LAG level on xtrdma_0:1 (ens2f0) is 1
+Using rc_verbs/xtrdma_0:1 dev_tl_lookup uct_hello_world.c:393
+[1747556857.568970] [hpc117:48643:0]             sys.c:440  UCX  DEBUG failed to open /sys/class/net/bonding/ad_num_ports: No such file or directory
+[1747556857.568981] [hpc117:48643:0]       ib_device.c:1575 UCX  DEBUG RoCE LAG level on xtrdma_0:1 (ens2f0) is 1
+Waiting for connection... connect_common hello_world_util.h:245 
+
+
+
+

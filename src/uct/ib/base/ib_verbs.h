@@ -22,6 +22,10 @@
 #include <ucs/type/status.h>
 #include <ucs/debug/log.h>
 
+
+#define printf_ffl(format, arg...)						\
+	printf("%s(), %s:%d, " format, __func__, __FILE__, __LINE__, ##arg)
+	
 /* Read device properties */
 #if HAVE_DECL_IBV_QUERY_DEVICE_EX
 

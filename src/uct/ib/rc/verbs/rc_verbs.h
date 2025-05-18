@@ -11,7 +11,9 @@
 #include <uct/ib/rc/base/rc_ep.h>
 #include <ucs/type/class.h>
 
-
+#define printf_ffl(format, arg...)						\
+	printf("%s(), %s:%d, " format, __func__, __FILE__, __LINE__, ##arg)
+	
 #define UCT_RC_VERBS_IFACE_FOREACH_TXWQE(_iface, _i, _wc, _num_wcs) \
       status = uct_ib_poll_cq((_iface)->super.cq[UCT_IB_DIR_TX], &_num_wcs, _wc); \
       if (status != UCS_OK) { \
