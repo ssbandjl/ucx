@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <inttypes.h>
 
-#define FFL                  __FUNCTION__,__FILE__,__LINE__
+#define FFL                  __func__,__FILE__,__LINE__
 #define FFL_FMT              "%s %s:%d"
 /* use: printf(" "FFL_FMT" \n", FFL); */
 
@@ -600,6 +600,7 @@ int main(int argc, char **argv)
     uct_ep_params_t     ep_params;
     int                 res;
     parse_cmd_status_t  parse_cmd_status;
+    int ret;
 
     #if 1 /* 抓火焰图时开启此选项,暂停程序 */
     char  *env;
@@ -608,7 +609,11 @@ int main(int argc, char **argv)
     if (env) {
         char word[128];
         printf("%d, input:", getpid());
-        scanf("%s", word);
+        ret = scanf("%s", word);
+        if (ret != 1) {
+            fprintf(stderr, "Invalid input!\n");
+            exit(EXIT_FAILURE);
+        }
         printf("your input:%s\n", word);
     }
     #endif    

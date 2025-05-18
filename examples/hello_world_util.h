@@ -18,7 +18,7 @@
 #include <netdb.h>
 
 #define FFL_FMT              "%s %s:%d"
-#define FFL                  __FUNCTION__,__FILE__,__LINE__
+#define FFL                  __func__,__FILE__,__LINE__
 
 #ifdef HAVE_CUDA
 #  include <cuda_runtime.h>
