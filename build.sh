@@ -1,7 +1,7 @@
 clear
 export HAVE_EXAMPLES=true
 ./autogen.sh
-./contrib/configure-devel --prefix=$PWD/install-debug --without-java --without-go --enable-gtest=no
+./contrib/configure-devel --prefix=$PWD/install-debug --without-java --without-go --enable-gtest=no --enable-debug
 make -j4
 make install
 
