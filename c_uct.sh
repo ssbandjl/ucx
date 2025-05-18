@@ -5,7 +5,7 @@ export UCX_LOG_LEVEL=debug
 ibdev2netdev
 
 cd examples/.libs
-./uct_hello_world -d mlx5_1:1 -t rc_verbs -n 192.168.1.118
+./uct_hello_world -d mlx5_1:1 -t rc_verbs -n 192.168.1.117
 
 
 root@hpc118:~/project/net/ucx/examples/.libs# ./uct_hello_world -d mlx5_1:1 -t rc_verbs -n 192.168.1.117
