@@ -1,0 +1,564 @@
+[1747652890.783603] [hpc117:28127:0]           stats.c:847  UCX  TRACE statistics disabled
+[1747652890.783618] [hpc117:28127:0]        memtrack.c:429  UCX  TRACE memtrack disabled
+[1747652890.783645] [hpc117:28127:0]           debug.c:1157 UCX  DEBUG using signal stack 0x7ffff7823000 size 141824
+[1747652890.801887] [hpc117:28127:0]            init.c:120  UCX  DEBUG /root/project/net/ucx/install-debug/lib/libucs.so.0 loaded at 0x7ffff7bfa000
+[1747652890.801942] [hpc117:28127:0]            init.c:122  UCX  DEBUG cmd line: /root/project/net/ucx/src/tools/info/.libs/ucx_info -d 
+[1747652890.801973] [hpc117:28127:0]          module.c:72   UCX  DEBUG ucs library path: /root/project/net/ucx/install-debug/lib/libucs.so.0
+[1747652890.801986] [hpc117:28127:0]          module.c:304  UCX  DEBUG loading modules for ucs
+[1747652890.801995] [hpc117:28127:0]          module.c:257  UCX  TRACE loading module 'fuse' with mode 0x101
+[1747652890.816897] [hpc117:28127:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libucs_fuse.so.0.0.0 [0x55555556a3f0]
+[1747652890.816923] [hpc117:28127:f]        vfs_fuse.c:424  UCX  DEBUG connecting vfs socket 3 to daemon on '/run/user/0/ucx/vfs.sock'
+[1747652890.816965] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff7cf7ac0 self
+[1747652890.816975] [hpc117:28127:f]        vfs_fuse.c:432  UCX  DEBUG failed to connect to vfs socket '/run/user/0/ucx/vfs.sock': No such file or directory
+[1747652890.816994] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff7cf8e80 tcp
+[1747652890.817009] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff7cf7380 sysv
+[1747652890.817019] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff7cf6fe0 posix
+[1747652890.817027] [hpc117:28127:f]        vfs_fuse.c:313  UCX  DEBUG waiting for creation of 'vfs.sock' in '/run/user/0/ucx'
+[1747652890.881374] [hpc117:28127:0]          module.c:304  UCX  DEBUG loading modules for uct
+[1747652890.881397] [hpc117:28127:0]          module.c:257  UCX  TRACE loading module 'ib' with mode 0x1
+[1747652890.908128] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff6fcc7e0 ib
+[1747652890.908167] [hpc117:28127:0]          module.c:304  UCX  DEBUG loading modules for uct_ib
+[1747652890.908186] [hpc117:28127:0]          module.c:257  UCX  TRACE loading module 'mlx5' with mode 0x1
+[1747652890.939539] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff6e84f20 gga
+[1747652890.939650] [hpc117:28127:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_ib_mlx5.so.0.0.0 [0x55555556e690]
+[1747652890.939668] [hpc117:28127:0]          module.c:257  UCX  TRACE loading module 'efa' with mode 0x1
+[1747652890.945331] [hpc117:28127:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_ib_efa.so.0.0.0 [0x55555556d700]
+[1747652890.945390] [hpc117:28127:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0.0.0 [0x5555555695f0]
+[1747652890.945402] [hpc117:28127:0]          module.c:257  UCX  TRACE loading module 'rdmacm' with mode 0x1
+[1747652890.952840] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff6bdb580 rdmacm
+[1747652890.952901] [hpc117:28127:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_rdmacm.so.0.0.0 [0x55555556b480]
+[1747652890.952920] [hpc117:28127:0]          module.c:257  UCX  TRACE loading module 'cma' with mode 0x1
+[1747652890.955394] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff7bf1640 cma
+[1747652890.955470] [hpc117:28127:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_cma.so.0.0.0 [0x555555570980]
+[1747652890.955484] [hpc117:28127:0]          module.c:257  UCX  TRACE loading module 'xpmem' with mode 0x1
+[1747652890.958246] [hpc117:28127:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7cf5b90: register 0x7ffff6ba13a0 xpmem
+[1747652890.958334] [hpc117:28127:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_xpmem.so.0.0.0 [0x555555571060]
+#
+# Memory domain: self
+#     Component: self
+#             register: unlimited, cost: 0 nsec
+#           remote key: 0 bytes
+#           rkey_ptr is supported
+#         memory types: host (access,reg_nonblock,reg,cache)
+#
+#      Transport: self
+#         Device: memory
+#           Type: loopback
+#  System device: <unknown>
+[1747652894.071346] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool self_msg_desc: align 64, maxelems 4294967295, elemsize 8200
+[1747652894.071362] [hpc117:28127:0]            self.c:247  UCX  DEBUG created self iface id 0x5e8c2c526bdd305a send_size 8192
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 19360.00 MB/sec
+#              latency: 0 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 0 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+[1747652894.071546] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool self_msg_desc destroyed
+#
+[1747652895.688941] [hpc117:28127:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp5s0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:1c.2/0000:05:00.0'
+[1747652895.689010] [hpc117:28127:0]            topo.c:304  UCX  DEBUG added sys_dev 0 for bus id 05:00.0
+[1747652895.689019] [hpc117:28127:0]            topo.c:560  UCX  DEBUG enp5s0: bdf_name 0000:05:00.0 sys_dev 0
+[1747652895.689300] [hpc117:28127:0]            topo.c:938  UCX  DEBUG /sys/class/net/ens2f0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0'
+[1747652895.689343] [hpc117:28127:0]            topo.c:304  UCX  DEBUG added sys_dev 1 for bus id 01:00.0
+[1747652895.689349] [hpc117:28127:0]            topo.c:560  UCX  DEBUG ens2f0: bdf_name 0000:01:00.0 sys_dev 1
+[1747652895.689634] [hpc117:28127:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1747652895.689642] [hpc117:28127:0]            topo.c:564  UCX  DEBUG lo: system device unknown
+#
+# Memory domain: tcp
+#     Component: tcp
+#         memory types: 
+#
+[1747652895.689703] [hpc117:28127:0]            time.c:22   UCX  DEBUG arch clock frequency: 2300000000.00 Hz
+#      Transport: tcp
+#         Device: enp5s0
+#           Type: network
+#  System device: enp5s0 (0)
+[1747652895.689736] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1747652895.689742] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1747652895.690044] [hpc117:28127:0]           async.c:247  UCX  DEBUG added async handler 0x555555573c00 [id=6 ref 1] ???() to hash
+[1747652895.690534] [hpc117:28127:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x5 mode thread_spinlock
+[1747652895.690568] [hpc117:28127:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x555555572100: listening for connections (fd=6) on 10.20.10.117:57465 netif enp5s0
+#
+#      capabilities:
+[1747652895.690755] [hpc117:28127:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp5s0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:1c.2/0000:05:00.0'
+[1747652895.690821] [hpc117:28127:0]            topo.c:881  UCX  TRACE enp5s0: PCIe gen1 1x, effective throughput 214.913 MB/s 1.803 Gb/s
+#            bandwidth: 11.32/ppn + 0.00 MB/sec
+#              latency: 10960 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: 256
+#       device address: 6 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+[1747652895.691009] [hpc117:28127:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x555555572100: destroying
+[1747652895.691026] [hpc117:28127:0]           async.c:172  UCX  DEBUG removed async handler 0x555555573c00 [id=6 ref 1] ???() from hash
+[1747652895.691035] [hpc117:28127:0]           async.c:575  UCX  DEBUG removing async handler 0x555555573c00 [id=6 ref 1] ???()
+[1747652895.691147] [hpc117:28127:0]           async.c:591  UCX  TRACE waiting for 0x555555573c00 [id=6 ref 1] ???() completion (called=0)
+[1747652895.691158] [hpc117:28127:0]           async.c:187  UCX  DEBUG release async handler 0x555555573c00 [id=6 ref 0] ???()
+[1747652895.691167] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1747652895.691173] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+#
+#      Transport: tcp
+#         Device: ens2f0
+#           Type: network
+#  System device: ens2f0 (1)
+[1747652895.691255] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1747652895.691264] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1747652895.691622] [hpc117:28127:0]           async.c:247  UCX  DEBUG added async handler 0x555555571c70 [id=6 ref 1] ???() to hash
+[1747652895.691957] [hpc117:28127:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x5 mode thread_spinlock
+[1747652895.691971] [hpc117:28127:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x555555574a10: listening for connections (fd=6) on 192.168.2.117:51137 netif ens2f0
+#
+#      capabilities:
+[1747652895.692021] [hpc117:28127:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=ens2f0) failed: Operation not supported
+[1747652895.692040] [hpc117:28127:0]         tcp_net.c:61   UCX  DEBUG speed of ens2f0 is UNKNOWN, assuming 100 Mbps
+[1747652895.692152] [hpc117:28127:0]            topo.c:938  UCX  DEBUG /sys/class/net/ens2f0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0'
+[1747652895.692221] [hpc117:28127:0]            topo.c:881  UCX  TRACE ens2f0: PCIe gen3 4x, effective throughput 3362.023 MB/s 28.203 Gb/s
+#            bandwidth: 11.32/ppn + 0.00 MB/sec
+#              latency: 10960 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 1
+#     device num paths: 1
+#              max eps: 256
+#       device address: 6 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+[1747652895.692403] [hpc117:28127:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x555555574a10: destroying
+[1747652895.692413] [hpc117:28127:0]           async.c:172  UCX  DEBUG removed async handler 0x555555571c70 [id=6 ref 1] ???() from hash
+[1747652895.692421] [hpc117:28127:0]           async.c:575  UCX  DEBUG removing async handler 0x555555571c70 [id=6 ref 1] ???()
+[1747652895.692527] [hpc117:28127:0]           async.c:591  UCX  TRACE waiting for 0x555555571c70 [id=6 ref 1] ???() completion (called=0)
+[1747652895.692536] [hpc117:28127:0]           async.c:187  UCX  DEBUG release async handler 0x555555571c70 [id=6 ref 0] ???()
+[1747652895.692544] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1747652895.692551] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+#
+#      Transport: tcp
+#         Device: lo
+#           Type: network
+#  System device: <unknown>
+[1747652895.692629] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1747652895.692638] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1747652895.692993] [hpc117:28127:0]           async.c:247  UCX  DEBUG added async handler 0x555555573c00 [id=6 ref 1] ???() to hash
+[1747652895.693464] [hpc117:28127:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x5 mode thread_spinlock
+[1747652895.693488] [hpc117:28127:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x555555574a10: listening for connections (fd=6) on 127.0.0.1:41045 netif lo
+#
+#      capabilities:
+[1747652895.693546] [hpc117:28127:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1747652895.693570] [hpc117:28127:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1747652895.693692] [hpc117:28127:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1747652895.693703] [hpc117:28127:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+#            bandwidth: 11.91/ppn + 0.00 MB/sec
+#              latency: 10960 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 1
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+[1747652895.693910] [hpc117:28127:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x555555574a10: destroying
+[1747652895.693921] [hpc117:28127:0]           async.c:172  UCX  DEBUG removed async handler 0x555555573c00 [id=6 ref 1] ???() from hash
+[1747652895.693929] [hpc117:28127:0]           async.c:575  UCX  DEBUG removing async handler 0x555555573c00 [id=6 ref 1] ???()
+[1747652895.694036] [hpc117:28127:0]           async.c:591  UCX  TRACE waiting for 0x555555573c00 [id=6 ref 1] ???() completion (called=0)
+[1747652895.694046] [hpc117:28127:0]           async.c:187  UCX  DEBUG release async handler 0x555555573c00 [id=6 ref 0] ???()
+[1747652895.694055] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1747652895.694062] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+#
+[1747652895.694132] [hpc117:28127:0]      tcp_sockcm.c:225  UCX  DEBUG created tcp_sockcm 0x555555574a10
+#
+# Connection manager: tcp
+#      max_conn_priv: 2064 bytes
+#
+# Memory domain: sysv
+#     Component: sysv
+#             allocate: unlimited
+#           remote key: 12 bytes
+#           rkey_ptr is supported
+#         memory types: host (access,alloc,cache)
+#
+#      Transport: sysv
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+[1747652897.206853] [hpc117:28127:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_fifo: length 33023 host memory sys_dev <unknown> flags 0x3e0
+[1747652897.206869] [hpc117:28127:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747652897.206959] [hpc117:28127:0]             sys.c:683  UCX  TRACE   detected huge page size: 2097152
+[1747652897.206972] [hpc117:28127:0]         mm_sysv.c:97   UCX  DEBUG   mm failed to allocate 33023 bytes with hugetlb
+[1747652897.207031] [hpc117:28127:0]         uct_mem.c:319  UCX  TRACE   allocated 36864 bytes at 0x7ffff6390000 using sysv
+[1747652897.207093] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool mm_recv_desc: align 64, maxelems 4294967295, elemsize 8288
+[1747652897.207114] [hpc117:28127:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_desc: length 4259952 host memory sys_dev <unknown> flags 0x304
+[1747652897.207123] [hpc117:28127:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747652897.207156] [hpc117:28127:0]         uct_mem.c:319  UCX  TRACE   allocated 6291456 bytes at 0x7ffff5c00000 using sysv
+[1747652897.207450] [hpc117:28127:0]           mpool.c:281  UCX  DEBUG mpool mm_recv_desc: allocated chunk 0x7ffff5c00018 of 6291432 bytes with 756 elements
+[1747652897.208127] [hpc117:28127:0]        mm_iface.c:734  UCX  DEBUG created mm iface 0x555555574e30 FIFO id 0x801d va 0x7ffff6390000 size 36864 (128 x 256 elems)
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 15360.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 100
+#             am_bcopy: <= 8256
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+[1747652897.208472] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool mm_recv_desc destroyed
+#
+#
+# Memory domain: posix
+#     Component: posix
+#             allocate: <= 8131484K
+#           remote key: 24 bytes
+#           rkey_ptr is supported
+#         memory types: host (access,alloc,cache)
+#
+#      Transport: posix
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+[1747652900.282673] [hpc117:28127:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_fifo: length 33023 host memory sys_dev <unknown> flags 0x3e0
+[1747652900.282688] [hpc117:28127:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747652900.282951] [hpc117:28127:0]        mm_posix.c:607  UCX  DEBUG   allocated posix shared memory at 0x7ffff6390000 length 36864
+[1747652900.282968] [hpc117:28127:0]         uct_mem.c:319  UCX  TRACE   allocated 36864 bytes at 0x7ffff6390000 using posix
+[1747652900.283018] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool mm_recv_desc: align 64, maxelems 4294967295, elemsize 8288
+[1747652900.283041] [hpc117:28127:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_desc: length 4259952 host memory sys_dev <unknown> flags 0x304
+[1747652900.283051] [hpc117:28127:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747652900.285950] [hpc117:28127:0]        mm_posix.c:373  UCX  DEBUG   shared memory mmap(addr=(nil), length=6291456, flags= HUGETLB, fd=7) failed: Invalid argument
+[1747652900.285976] [hpc117:28127:0]        mm_posix.c:607  UCX  DEBUG   allocated posix shared memory at 0x7ffff5f7f000 length 4263936
+[1747652900.285984] [hpc117:28127:0]         uct_mem.c:319  UCX  TRACE   allocated 4263936 bytes at 0x7ffff5f7f000 using posix
+[1747652900.286004] [hpc117:28127:0]           mpool.c:281  UCX  DEBUG mpool mm_recv_desc: allocated chunk 0x7ffff5f7f018 of 4263912 bytes with 512 elements
+[1747652900.287499] [hpc117:28127:0]        mm_iface.c:734  UCX  DEBUG created mm iface 0x5555555777b0 FIFO id 0xc000000140006ddf va 0x7ffff6390000 size 36864 (128 x 256 elems)
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 15360.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 100
+#             am_bcopy: <= 8256
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+[1747652900.289183] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool mm_recv_desc destroyed
+#
+[1747652904.862418] [hpc117:28127:0]           ib_md.c:1140 UCX  TRACE opening IB device xtrdma_0
+tid:28127, _verbs_init_and_alloc_context(), ../libibverbs/device.c:284, drv_context:0x555555581740, dev:xtrdma_0, context:0x555555581740
+tid:28127, xtrdma_ualloc_context(), ../providers/xtrdma/umain.c:247, dev:xtrdma_0, uctx:0x555555581740
+tid:28127, huge_mem_init(), ../providers/xtrdma/huge_mem.c:99, Huge map file /dev/hugepages/huge_ctx_map_file_1747652904_0x555555581740_206366302
+[1747652904.876328] [hpc117:28127:0]       ib_efa_md.c:38   UCX  DEBUG efadv_query_device(xtrdma_0) failed: 95
+[1747652904.876471] [hpc117:28127:0]           ib_md.c:1058 UCX  DEBUG xtrdma_0: md open by 'uct_ib_efa_md_ops' failed, trying next
+[1747652904.876513] [hpc117:28127:0]    ib_mlx5dv_md.c:2523 UCX  DEBUG xtrdma_0: DEVX is not supported
+[1747652904.876519] [hpc117:28127:0]           ib_md.c:1058 UCX  DEBUG xtrdma_0: md open by 'uct_ib_mlx5_devx_md_ops' failed, trying next
+[1747652904.876527] [hpc117:28127:0]           ib_md.c:1058 UCX  DEBUG xtrdma_0: md open by 'uct_ib_mlx5_md_ops' failed, trying next
+tid:28127, _verbs_init_and_alloc_context(), ../libibverbs/device.c:284, drv_context:0x555555581740, dev:xtrdma_0, context:0x555555581740
+tid:28127, xtrdma_ualloc_context(), ../providers/xtrdma/umain.c:247, dev:xtrdma_0, uctx:0x555555581740
+tid:28127, huge_mem_init(), ../providers/xtrdma/huge_mem.c:99, Huge map file /dev/hugepages/huge_ctx_map_file_1747652904_0x555555581740_119653543
+[1747652904.884442] [hpc117:28127:0]            topo.c:938  UCX  DEBUG /sys/class/infiniband/xtrdma_0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0'
+[1747652904.884462] [hpc117:28127:0]            topo.c:560  UCX  DEBUG xtrdma_0: bdf_name 0000:01:00.0 sys_dev 1
+[1747652904.884499] [hpc117:28127:0]       ib_device.c:532  UCX  DEBUG xtrdma_0: vendor_id 0x10ee device_id 36920
+[1747652904.884543] [hpc117:28127:0]            topo.c:881  UCX  TRACE xtrdma_0: PCIe gen3 4x, effective throughput 3362.023 MB/s 28.203 Gb/s
+[1747652904.884596] [hpc117:28127:0]           async.c:247  UCX  DEBUG added async handler 0x555555573e30 [id=7 ref 1] ???() to hash
+[1747652904.885124] [hpc117:28127:0]           async.c:521  UCX  DEBUG listening to async event fd 7 events 0x1 mode thread_spinlock
+[1747652904.885145] [hpc117:28127:0]       ib_device.c:643  UCX  DEBUG initialized device 'xtrdma_0' (InfiniBand channel adapter) with 1 ports
+[1747652904.885161] [hpc117:28127:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: cuda GPUDirect RDMA is not detected by checking /sys/kernel/mm/memory_peers/nv_mem/version
+[1747652904.885168] [hpc117:28127:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nvidia_peermem/version
+[1747652904.885174] [hpc117:28127:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nv_peer_mem/version
+[1747652904.885185] [hpc117:28127:0]           ib_md.c:1217 UCX  DEBUG xtrdma_0: rocm GPUDirect RDMA is not detected by checking /dev/kfd
+[1747652904.885225] [hpc117:28127:0]           ib_md.c:1238 UCX  DEBUG xtrdma_0: ibv_reg_dmabuf_mr(fd=-1) returned Operation not supported, dmabuf is not supported
+tid:28127, ucreate_cq(), ../providers/xtrdma/ucq.c:234, Create cq, cqn:178
+tid:28127, xtrdma_uqp_init_process(), ../providers/xtrdma/uqp.c:293, Create QP, qpn:112, s_cqn:178, r_cqn:178
+[1747652904.996715] [hpc117:28127:0]           ib_md.c:1202 UCX  DEBUG xtrdma_0: relaxed order memory access is disabled
+[1747652904.996740] [hpc117:28127:0]           ib_md.c:1271 UCX  DEBUG xtrdma_0: ODP is disabled because device does not support IBV_ACCESS_ON_DEMAND
+[1747652904.996747] [hpc117:28127:0]           ib_md.c:1062 UCX  DEBUG xtrdma_0: md open by 'uct_ib_verbs_md_ops' is successful
+tid:28127, ucreate_cq(), ../providers/xtrdma/ucq.c:234, Create cq, cqn:179
+tid:28127, xtrdma_uqp_init_process(), ../providers/xtrdma/uqp.c:293, Create QP, qpn:113, s_cqn:179, r_cqn:179
+[1747652905.108862] [hpc117:28127:0]          uct_md.c:96   UCX  DEBUG failed to query dc_mlx5 resources: No such device
+[1747652905.108893] [hpc117:28127:0]          uct_md.c:96   UCX  DEBUG failed to query rc_mlx5 resources: No such device
+[1747652905.108906] [hpc117:28127:0]          uct_md.c:96   UCX  DEBUG failed to query ud_mlx5 resources: No such device
+tid:28127, _verbs_init_and_alloc_context(), ../libibverbs/device.c:284, drv_context:0x555555591f60, dev:xtrdma_0, context:0x555555591f60
+tid:28127, xtrdma_ualloc_context(), ../providers/xtrdma/umain.c:247, dev:xtrdma_0, uctx:0x555555591f60
+tid:28127, huge_mem_init(), ../providers/xtrdma/huge_mem.c:99, Huge map file /dev/hugepages/huge_ctx_map_file_1747652905_0x555555591f60_852665068
+[1747652905.122196] [hpc117:28127:0]          uct_md.c:96   UCX  DEBUG failed to query srd resources: No such device
+#
+# Memory domain: xtrdma_0
+#     Component: ib
+#             register: unlimited, cost: 16000 + 0.060 * N nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#         memory types: host (access,reg,cache)
+#
+#      Transport: rc_verbs
+#         Device: xtrdma_0:1
+#           Type: network
+#  System device: xtrdma_0 (1)
+[1747652905.122416] [hpc117:28127:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on xtrdma_0:1/RoCE
+[1747652905.122511] [hpc117:28127:0]       ib_device.c:1132 UCX  DEBUG xtrdma_0:1 using gid_index 1
+[1747652905.122586] [hpc117:28127:0]             sys.c:440  UCX  DEBUG failed to open /sys/class/net/bonding/ad_num_ports: No such file or directory
+[1747652905.122593] [hpc117:28127:0]            sock.c:197  UCX  TRACE failed to read from /sys/class/net/bonding/ad_num_ports: No such file or directory, assuming 802.3ad bonding is disabled
+[1747652905.122599] [hpc117:28127:0]       ib_device.c:1575 UCX  DEBUG RoCE LAG level on xtrdma_0:1 (ens2f0) is 1
+tid:28127, ucreate_cq(), ../providers/xtrdma/ucq.c:234, Create cq, cqn:180
+tid:28127, ucreate_cq(), ../providers/xtrdma/ucq.c:234, Create cq, cqn:181
+[1747652905.156365] [hpc117:28127:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 12 payload_ofs 12 hdr_ofs 11 data_sz 8256
+[1747652905.156431] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool rc_recv_desc: align 64, maxelems 4294967295, elemsize 8275
+[1747652905.156442] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool rc_send_desc: align 64, maxelems 4294967295, elemsize 8328
+[1747652905.156660] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool send-ops-mpool: align 64, maxelems 4294967295, elemsize 56
+[1747652905.172350] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool pending-ops: align 1, maxelems 4294967295, elemsize 64
+[1747652905.172380] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool rc_verbs_short_desc: align 64, maxelems 4294967295, elemsize 200
+tid:28127, xtrdma_uqp_init_process(), ../providers/xtrdma/uqp.c:293, Create QP, qpn:114, s_cqn:180, r_cqn:181
+[1747652905.188376] [hpc117:28127:0]        ib_iface.c:1300 UCX  DEBUG xtrdma_0: iface 0x555555591f60 created RC QP 0x72 on xtrdma_0:1 TX wr:256 sge:32 inl:512 resp:64 RX wr:256 sge:32 resp:64
+#
+#      capabilities:
+[1747652905.253362] [hpc117:28127:0]             sys.c:440  UCX  DEBUG failed to open /sys/class/net/bonding/ad_num_ports: No such file or directory
+[1747652905.253381] [hpc117:28127:0]            sock.c:197  UCX  TRACE failed to read from /sys/class/net/bonding/ad_num_ports: No such file or directory, assuming 802.3ad bonding is disabled
+[1747652905.253393] [hpc117:28127:0]       ib_device.c:1575 UCX  DEBUG RoCE LAG level on xtrdma_0:1 (ens2f0) is 1
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 75 nsec
+#            put_short: <= 512
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 2G, up to 8 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..2G, up to 8 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 511
+#             am_bcopy: <= 8255
+#             am_zcopy: <= 8255, up to 7 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 127
+#               domain: cpu
+#           atomic_add: 64 bit
+#          atomic_fadd: 64 bit
+#         atomic_cswap: 64 bit
+#           connection: to ep
+#      device priority: 0
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 4 bytes
+#       error handling: peer failure, ep_check
+[1747652905.253608] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool rc_verbs_short_desc destroyed
+[1747652905.269241] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool send-ops-mpool destroyed
+[1747652905.269266] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool rc_send_desc destroyed
+[1747652905.269274] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool rc_recv_desc destroyed
+[1747652905.269280] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool pending-ops destroyed
+#
+#
+#      Transport: ud_verbs
+#         Device: xtrdma_0:1
+#           Type: network
+#  System device: xtrdma_0 (1)
+[1747652905.301074] [hpc117:28127:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on xtrdma_0:1/RoCE
+[1747652905.301242] [hpc117:28127:0]       ib_device.c:1132 UCX  DEBUG xtrdma_0:1 using gid_index 1
+[1747652905.301377] [hpc117:28127:0]             sys.c:440  UCX  DEBUG failed to open /sys/class/net/bonding/ad_num_ports: No such file or directory
+[1747652905.301392] [hpc117:28127:0]            sock.c:197  UCX  TRACE failed to read from /sys/class/net/bonding/ad_num_ports: No such file or directory, assuming 802.3ad bonding is disabled
+[1747652905.301404] [hpc117:28127:0]       ib_device.c:1575 UCX  DEBUG RoCE LAG level on xtrdma_0:1 (ens2f0) is 1
+tid:28127, ucreate_cq(), ../providers/xtrdma/ucq.c:234, Create cq, cqn:182
+tid:28127, ucreate_cq(), ../providers/xtrdma/ucq.c:234, Create cq, cqn:183
+[1747652905.332362] [hpc117:28127:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 88 payload_ofs 88 hdr_ofs 40 data_sz 1064
+[1747652905.332397] [hpc117:28127:0]        ud_iface.c:205  UCX  DEBUG create QP: max_send_sge=6 (config=6, dev=32) max_inline_data=64B (config=64B, dev=4096B) 
+tid:28127, xtrdma_uqp_init_process(), ../providers/xtrdma/uqp.c:293, Create QP, qpn:115, s_cqn:182, r_cqn:183
+[1747652905.348451] [hpc117:28127:0]        ib_iface.c:1300 UCX  DEBUG xtrdma_0: iface 0x555555592990 created UD QP 0x73 on xtrdma_0:1 TX wr:256 sge:32 inl:512 resp:0 RX wr:4096 sge:32 resp:0
+[1747652905.380315] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool ud_recv_skb: align 64, maxelems 4294967295, elemsize 1112
+[1747652905.380356] [hpc117:28127:0]         uct_mem.c:118  UCX  TRACE allocating ud_recv_skb: length 147568 host memory sys_dev <unknown> flags 0x304
+[1747652905.380365] [hpc117:28127:0]         uct_mem.c:124  UCX  TRACE   trying allocation method thp
+[1747652905.380420] [hpc117:28127:0]         uct_mem.c:124  UCX  TRACE   trying allocation method mmap
+[1747652905.380447] [hpc117:28127:0]         uct_mem.c:319  UCX  TRACE   allocated 151552 bytes at 0x7ffff5e93000 using mmap
+[1747652905.396315] [hpc117:28127:0]           ib_md.c:514  UCX  TRACE ibv_reg_mr(pd=0x5555555726e0 addr=0x7ffff5e93000 len=151552 fd=-1 offset=0 access=0xf): mr=0x555555577ae0 lkey=0x3073 retry=0 took 15.835 ms
+[1747652905.396341] [hpc117:28127:0]           mpool.c:281  UCX  DEBUG mpool ud_recv_skb: allocated chunk 0x7ffff5e93018 of 151528 bytes with 131 elements
+[1747652905.396363] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool ud_tx_skb: align 64, maxelems 4294967295, elemsize 1136
+[1747652905.396440] [hpc117:28127:0]        ud_iface.c:389  UCX  DEBUG iface 0x555555592990: adding gid fe80::201:2ff:fe04:0 to hash on device xtrdma_0 port 1 index 0)
+[1747652905.396491] [hpc117:28127:0]        ud_iface.c:389  UCX  DEBUG iface 0x555555592990: adding gid ::ffff:192.168.2.117 to hash on device xtrdma_0 port 1 index 1)
+[1747652905.396523] [hpc117:28127:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/xtrdma_0/ports/1/gid_attrs/types/2: Invalid argument
+[1747652905.396555] [hpc117:28127:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/xtrdma_0/ports/1/gid_attrs/types/3: Invalid argument
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+tid:28127, xtrdma_upost_recv(), ../providers/xtrdma/wr.c:1959, Post recv for qp:115
+[1747652905.396753] [hpc117:28127:0]     timer_wheel.c:40   UCX  DEBUG high res timer created log=23 resolution=3647.220870 usec wanted: 2500.000000 usec
+#
+#      capabilities:
+[1747652905.396896] [hpc117:28127:0]             sys.c:440  UCX  DEBUG failed to open /sys/class/net/bonding/ad_num_ports: No such file or directory
+[1747652905.396908] [hpc117:28127:0]            sock.c:197  UCX  TRACE failed to read from /sys/class/net/bonding/ad_num_ports: No such file or directory, assuming 802.3ad bonding is disabled
+[1747652905.396917] [hpc117:28127:0]       ib_device.c:1575 UCX  DEBUG RoCE LAG level on xtrdma_0:1 (ens2f0) is 1
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 830 nsec
+#             overhead: 105 nsec
+#             am_short: <= 504
+#             am_bcopy: <= 1016
+#             am_zcopy: <= 1016, up to 8 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 920
+#           connection: to ep, to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 3 bytes
+#           ep address: 6 bytes
+#       error handling: peer failure, ep_check
+[1747652905.397036] [hpc117:28127:0]        ud_iface.c:622  UCX  DEBUG iface(0x555555592990): cep cleanup
+[1747652905.397045] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool ud_tx_skb destroyed
+[1747652905.460961] [hpc117:28127:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x555555577ae0 addr=0x7ffff5e93000 length=151552)
+[1747652905.508355] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool ud_recv_skb destroyed
+[1747652905.508380] [hpc117:28127:0]        ud_iface.c:635  UCX  DEBUG iface(0x555555592990): ptr_array cleanup
+#
+[1747652905.540755] [hpc117:28127:0]       ib_device.c:664  UCX  DEBUG destroying ib device xtrdma_0
+[1747652905.540779] [hpc117:28127:0]           async.c:172  UCX  DEBUG removed async handler 0x555555573e30 [id=7 ref 1] ???() from hash
+[1747652905.540790] [hpc117:28127:0]           async.c:575  UCX  DEBUG removing async handler 0x555555573e30 [id=7 ref 1] ???()
+[1747652905.540999] [hpc117:28127:0]           async.c:591  UCX  TRACE waiting for 0x555555573e30 [id=7 ref 1] ???() completion (called=0)
+[1747652905.541023] [hpc117:28127:0]           async.c:187  UCX  DEBUG release async handler 0x555555573e30 [id=7 ref 0] ???()
+[1747652905.541415] [hpc117:28127:0]    ib_mlx5dv_md.c:1788 UCX  DEBUG mlx5dv_open_device(xtrdma_0) failed: Operation not supported
+[1747652905.541560] [hpc117:28127:0]    ib_mlx5dv_md.c:1788 UCX  DEBUG mlx5dv_open_device(xtrdma_0) failed: Operation not supported
+[1747652905.541960] [hpc117:28127:0]           async.c:247  UCX  DEBUG added async handler 0x55555557f1e0 [id=5 ref 1] ???() to hash
+[1747652905.542538] [hpc117:28127:0]           async.c:521  UCX  DEBUG listening to async event fd 5 events 0x1 mode thread_spinlock
+[1747652905.542565] [hpc117:28127:0]       rdmacm_cm.c:981  UCX  DEBUG created rdmacm_cm 0x555555592d80 with event_channel 0x5555555932f0 (fd=5)
+#
+# Connection manager: rdmacm
+#      max_conn_priv: 54 bytes
+[1747652905.542611] [hpc117:28127:0]           async.c:172  UCX  DEBUG removed async handler 0x55555557f1e0 [id=5 ref 1] ???() from hash
+[1747652905.542621] [hpc117:28127:0]           async.c:575  UCX  DEBUG removing async handler 0x55555557f1e0 [id=5 ref 1] ???()
+[1747652905.542702] [hpc117:28127:0]           async.c:591  UCX  TRACE waiting for 0x55555557f1e0 [id=5 ref 1] ???() completion (called=0)
+[1747652905.542717] [hpc117:28127:0]           async.c:187  UCX  DEBUG release async handler 0x55555557f1e0 [id=5 ref 0] ???()
+[1747652905.542727] [hpc117:28127:0]       rdmacm_cm.c:1006 UCX  TRACE destroying event_channel 0x5555555932f0 on cm 0x555555592d80
+[1747652905.542823] [hpc117:28127:0]          cma_md.c:113  UCX  TRACE ptrace_scope is 1, enabled PR_SET_PTRACER_ANY, CMA is supported
+[1747652905.542861] [hpc117:28127:0]          cma_md.c:113  UCX  TRACE ptrace_scope is 1, enabled PR_SET_PTRACER_ANY, CMA is supported
+#
+# Memory domain: cma
+#     Component: cma
+#         memory types: 
+#
+#      Transport: cma
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+[1747652913.015206] [hpc117:28127:0]           mpool.c:136  UCX  DEBUG mpool uct_scopy_iface_tx_mp: align 64, maxelems 4294967295, elemsize 736
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 11145.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 2000 nsec
+#            put_zcopy: unlimited, up to 16 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 1
+#            get_zcopy: unlimited, up to 16 iov
+#  get_opt_zcopy_align: <= 1
+#        get_align_mtu: <= 1
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 4 bytes
+#       error handling: peer failure, ep_check
+[1747652913.015355] [hpc117:28127:0]           mpool.c:194  UCX  DEBUG mpool uct_scopy_iface_tx_mp destroyed
+#
+[1747652913.015434] [hpc117:28127:0]        mm_xpmem.c:86   UCX  DEBUG xpmem_version() returned -1 (No such file or directory), xpmem is unavailable
+[1747652913.015454] [hpc117:28127:0]        mm_xpmem.c:86   UCX  DEBUG xpmem_version() returned -1 (No such file or directory), xpmem is unavailable
+[1747652913.015692] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff6e84f20 gga
+[1747652913.015716] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff6bdb580 rdmacm
+[1747652913.015743] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff6fcc7e0 ib
+[1747652913.015764] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff7bf1640 cma
+[1747652913.015778] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff6ba13a0 xpmem
+[1747652913.015798] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff7cf6fe0 posix
+[1747652913.015812] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff7cf7380 sysv
+[1747652913.015826] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff7cf8e80 tcp
+[1747652913.015840] [hpc117:28127:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7cf5b90: unregister 0x7ffff7cf7ac0 self
+[1] + Done                       "/bin/gdb" --interpreter=mi --tty=${DbgTerm} 0<"/tmp/Microsoft-MIEngine-In-axfoif4e.l2c" 1>"/tmp/Microsoft-MIEngine-Out-ppgnpufz.kra"
+root@hpc117:~/project/net/ucx# 
