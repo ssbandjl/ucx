@@ -48,6 +48,9 @@ uct_rc_verbs_ep_post_send(uct_rc_verbs_iface_t* iface, uct_rc_verbs_ep_t* ep,
         send_flags |= uct_rc_ep_fm(&iface->super, &ep->fi, IBV_SEND_FENCE);
     }
 
+    if (send_flags & IBV_SEND_SIGNALED)
+         printf_ffl("RDMA post send wr with IBV_SEND_SIGNALED(need generate cqe)\n");
+
     wr->send_flags = send_flags;
     wr->wr_id      = ep->txcnt.pi + 1;
 
