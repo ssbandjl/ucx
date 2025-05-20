@@ -1,0 +1,1318 @@
+[1747653881.023418] [hpc118:19239:0]           stats.c:847  UCX  TRACE statistics disabled
+[1747653881.023437] [hpc118:19239:0]        memtrack.c:429  UCX  TRACE memtrack disabled
+[1747653881.023456] [hpc118:19239:0]           debug.c:1157 UCX  DEBUG using signal stack 0x7ffff794f000 size 141824
+[1747653881.041893] [hpc118:19239:0]            init.c:120  UCX  DEBUG /root/project/net/ucx/install-debug/lib/libucs.so.0 loaded at 0x7ffff7d20000
+[1747653881.041949] [hpc118:19239:0]            init.c:122  UCX  DEBUG cmd line: /root/project/net/ucx/src/tools/info/.libs/ucx_info -d 
+[1747653881.041979] [hpc118:19239:0]          module.c:72   UCX  DEBUG ucs library path: /root/project/net/ucx/install-debug/lib/libucs.so.0
+[1747653881.041992] [hpc118:19239:0]          module.c:304  UCX  DEBUG loading modules for ucs
+[1747653881.042001] [hpc118:19239:0]          module.c:257  UCX  TRACE loading module 'fuse' with mode 0x101
+[1747653881.056130] [hpc118:19239:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libucs_fuse.so.0.0.0 [0x55555556d3f0]
+[1747653881.056194] [hpc118:19239:f]        vfs_fuse.c:424  UCX  DEBUG connecting vfs socket 3 to daemon on '/run/user/0/ucx/vfs.sock'
+[1747653881.056206] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff7dfeaa0 self
+[1747653881.056261] [hpc118:19239:f]        vfs_fuse.c:432  UCX  DEBUG failed to connect to vfs socket '/run/user/0/ucx/vfs.sock': No such file or directory
+[1747653881.056269] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff7dffe60 tcp
+[1747653881.056292] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff7dfe360 sysv
+[1747653881.056301] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff7dfdfc0 posix
+[1747653881.056311] [hpc118:19239:f]        vfs_fuse.c:313  UCX  DEBUG waiting for creation of 'vfs.sock' in '/run/user/0/ucx'
+[1747653881.104702] [hpc118:19239:0]          module.c:304  UCX  DEBUG loading modules for uct
+[1747653881.104724] [hpc118:19239:0]          module.c:257  UCX  TRACE loading module 'ib' with mode 0x1
+[1747653881.131146] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff70f97c0 ib
+[1747653881.131183] [hpc118:19239:0]          module.c:304  UCX  DEBUG loading modules for uct_ib
+[1747653881.131191] [hpc118:19239:0]          module.c:257  UCX  TRACE loading module 'mlx5' with mode 0x1
+[1747653881.161216] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff6fcbf20 gga
+[1747653881.161327] [hpc118:19239:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_ib_mlx5.so.0.0.0 [0x555555571650]
+[1747653881.161345] [hpc118:19239:0]          module.c:257  UCX  TRACE loading module 'efa' with mode 0x1
+[1747653881.165902] [hpc118:19239:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_ib_efa.so.0.0.0 [0x5555555706c0]
+[1747653881.165963] [hpc118:19239:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0.0.0 [0x55555556c5f0]
+[1747653881.165975] [hpc118:19239:0]          module.c:257  UCX  TRACE loading module 'rdmacm' with mode 0x1
+[1747653881.172608] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff6e43580 rdmacm
+[1747653881.172635] [hpc118:19239:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_rdmacm.so.0.0.0 [0x55555556e480]
+[1747653881.172641] [hpc118:19239:0]          module.c:257  UCX  TRACE loading module 'cma' with mode 0x1
+[1747653881.176588] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff7d17580 cma
+[1747653881.176616] [hpc118:19239:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_cma.so.0.0.0 [0x555555573930]
+[1747653881.176622] [hpc118:19239:0]          module.c:257  UCX  TRACE loading module 'xpmem' with mode 0x1
+[1747653881.180921] [hpc118:19239:0]   uct_component.c:175  UCX  TRACE component_list 0x7ffff7dfcb70: register 0x7ffff6e0c3a0 xpmem
+[1747653881.180977] [hpc118:19239:0]          module.c:192  UCX  TRACE loaded /root/project/net/ucx/install-debug/lib/ucx/libuct_xpmem.so.0.0.0 [0x555555574010]
+#
+# Memory domain: self
+#     Component: self
+#             register: unlimited, cost: 0 nsec
+#           remote key: 0 bytes
+#           rkey_ptr is supported
+#         memory types: host (access,reg_nonblock,reg,cache)
+#
+#      Transport: self
+#         Device: memory
+#           Type: loopback
+#  System device: <unknown>
+[1747653881.181122] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool self_msg_desc: align 64, maxelems 4294967295, elemsize 8200
+[1747653881.181128] [hpc118:19239:0]            self.c:247  UCX  DEBUG created self iface id 0x2cd3fd80f198aae2 send_size 8192
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 19360.00 MB/sec
+#              latency: 0 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 0 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+[1747653881.181223] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool self_msg_desc destroyed
+#
+[1747653881.181592] [hpc118:19239:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp6s0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:1c.2/0000:06:00.0'
+[1747653881.181646] [hpc118:19239:0]            topo.c:304  UCX  DEBUG added sys_dev 0 for bus id 06:00.0
+[1747653881.181652] [hpc118:19239:0]            topo.c:560  UCX  DEBUG enp6s0: bdf_name 0000:06:00.0 sys_dev 0
+[1747653881.181837] [hpc118:19239:0]            topo.c:938  UCX  DEBUG /sys/class/net/ens6f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:03:00.0'
+[1747653881.181878] [hpc118:19239:0]            topo.c:304  UCX  DEBUG added sys_dev 1 for bus id 03:00.0
+[1747653881.181883] [hpc118:19239:0]            topo.c:560  UCX  DEBUG ens6f0np0: bdf_name 0000:03:00.0 sys_dev 1
+[1747653881.182275] [hpc118:19239:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1747653881.182281] [hpc118:19239:0]            topo.c:564  UCX  DEBUG lo: system device unknown
+#
+# Memory domain: tcp
+#     Component: tcp
+#         memory types: 
+#
+[1747653881.182329] [hpc118:19239:0]            time.c:22   UCX  DEBUG arch clock frequency: 2300000000.00 Hz
+#      Transport: tcp
+#         Device: enp6s0
+#           Type: network
+#  System device: enp6s0 (0)
+[1747653881.182355] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1747653881.182361] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1747653881.182550] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x555555576c10 [id=6 ref 1] ???() to hash
+[1747653881.182988] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x5 mode thread_spinlock
+[1747653881.183007] [hpc118:19239:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x555555575130: listening for connections (fd=6) on 10.20.10.118:37431 netif enp6s0
+#
+#      capabilities:
+[1747653881.183124] [hpc118:19239:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp6s0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:1c.2/0000:06:00.0'
+[1747653881.183165] [hpc118:19239:0]            topo.c:881  UCX  TRACE enp6s0: PCIe gen1 1x, effective throughput 214.913 MB/s 1.803 Gb/s
+#            bandwidth: 11.32/ppn + 0.00 MB/sec
+#              latency: 10960 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: 256
+#       device address: 6 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+[1747653881.183277] [hpc118:19239:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x555555575130: destroying
+[1747653881.183288] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x555555576c10 [id=6 ref 1] ???() from hash
+[1747653881.183293] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x555555576c10 [id=6 ref 1] ???()
+[1747653881.183407] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x555555576c10 [id=6 ref 1] ???() completion (called=0)
+[1747653881.183413] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x555555576c10 [id=6 ref 0] ???()
+[1747653881.183419] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1747653881.183423] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+#
+#      Transport: tcp
+#         Device: ens6f0np0
+#           Type: network
+#  System device: ens6f0np0 (1)
+[1747653881.183473] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1747653881.183478] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1747653881.183640] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x555555574ca0 [id=6 ref 1] ???() to hash
+[1747653881.183847] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x5 mode thread_spinlock
+[1747653881.183856] [hpc118:19239:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x5555555779f0: listening for connections (fd=6) on 192.168.2.118:40013 netif ens6f0np0
+#
+#      capabilities:
+[1747653881.184725] [hpc118:19239:0]            topo.c:938  UCX  DEBUG /sys/class/net/ens6f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:03:00.0'
+[1747653881.184780] [hpc118:19239:0]            topo.c:881  UCX  TRACE ens6f0np0: PCIe gen3 8x, effective throughput 6724.045 MB/s 56.405 Gb/s
+#            bandwidth: 2200.00/ppn + 0.00 MB/sec
+#              latency: 5223 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 1
+#     device num paths: 1
+#              max eps: 256
+#       device address: 6 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+[1747653881.184877] [hpc118:19239:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x5555555779f0: destroying
+[1747653881.184883] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x555555574ca0 [id=6 ref 1] ???() from hash
+[1747653881.184888] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x555555574ca0 [id=6 ref 1] ???()
+[1747653881.185007] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x555555574ca0 [id=6 ref 1] ???() completion (called=0)
+[1747653881.185013] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x555555574ca0 [id=6 ref 0] ???()
+[1747653881.185018] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1747653881.185022] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+#
+#      Transport: tcp
+#         Device: lo
+#           Type: network
+#  System device: <unknown>
+[1747653881.185066] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1747653881.185071] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1747653881.185223] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x555555576c10 [id=6 ref 1] ???() to hash
+[1747653881.185452] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x5 mode thread_spinlock
+[1747653881.185462] [hpc118:19239:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x5555555779f0: listening for connections (fd=6) on 127.0.0.1:58883 netif lo
+#
+#      capabilities:
+[1747653881.185494] [hpc118:19239:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1747653881.185507] [hpc118:19239:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1747653881.185578] [hpc118:19239:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1747653881.185584] [hpc118:19239:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+#            bandwidth: 11.91/ppn + 0.00 MB/sec
+#              latency: 10960 nsec
+#             overhead: 50000 nsec
+#            put_zcopy: <= 18446744073709551590, up to 6 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 0
+#             am_short: <= 8K
+#             am_bcopy: <= 8K
+#             am_zcopy: <= 64K, up to 6 iov
+#   am_opt_zcopy_align: <= 1
+#         am_align_mtu: <= 0
+#            am header: <= 8037
+#           connection: to ep, to iface
+#      device priority: 1
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#        iface address: 2 bytes
+#           ep address: 10 bytes
+#       error handling: peer failure, ep_check, keepalive
+[1747653881.185699] [hpc118:19239:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x5555555779f0: destroying
+[1747653881.185706] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x555555576c10 [id=6 ref 1] ???() from hash
+[1747653881.185711] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x555555576c10 [id=6 ref 1] ???()
+[1747653881.185762] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x555555576c10 [id=6 ref 1] ???() completion (called=0)
+[1747653881.185768] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x555555576c10 [id=6 ref 0] ???()
+[1747653881.185774] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1747653881.185779] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+#
+[1747653881.185819] [hpc118:19239:0]      tcp_sockcm.c:225  UCX  DEBUG created tcp_sockcm 0x5555555779f0
+#
+# Connection manager: tcp
+#      max_conn_priv: 2064 bytes
+#
+# Memory domain: sysv
+#     Component: sysv
+#             allocate: unlimited
+#           remote key: 12 bytes
+#           rkey_ptr is supported
+#         memory types: host (access,alloc,cache)
+#
+#      Transport: sysv
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+[1747653881.185954] [hpc118:19239:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_fifo: length 33023 host memory sys_dev <unknown> flags 0x3e0
+[1747653881.185960] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747653881.186010] [hpc118:19239:0]             sys.c:683  UCX  TRACE   detected huge page size: 2097152
+[1747653881.186017] [hpc118:19239:0]         mm_sysv.c:97   UCX  DEBUG   mm failed to allocate 33023 bytes with hugetlb
+[1747653881.186046] [hpc118:19239:0]         uct_mem.c:319  UCX  TRACE   allocated 36864 bytes at 0x7ffff6dfc000 using sysv
+[1747653881.186081] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool mm_recv_desc: align 64, maxelems 4294967295, elemsize 8288
+[1747653881.186093] [hpc118:19239:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_desc: length 4259952 host memory sys_dev <unknown> flags 0x304
+[1747653881.186098] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747653881.186121] [hpc118:19239:0]         uct_mem.c:319  UCX  TRACE   allocated 6291456 bytes at 0x7ffff5e00000 using sysv
+[1747653881.186377] [hpc118:19239:0]           mpool.c:281  UCX  DEBUG mpool mm_recv_desc: allocated chunk 0x7ffff5e00018 of 6291432 bytes with 756 elements
+[1747653881.186930] [hpc118:19239:0]        mm_iface.c:734  UCX  DEBUG created mm iface 0x555555577e10 FIFO id 0x8029 va 0x7ffff6dfc000 size 36864 (128 x 256 elems)
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 15360.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 100
+#             am_bcopy: <= 8256
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+[1747653881.187102] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool mm_recv_desc destroyed
+#
+#
+# Memory domain: posix
+#     Component: posix
+#             allocate: <= 8130708K
+#           remote key: 24 bytes
+#           rkey_ptr is supported
+#         memory types: host (access,alloc,cache)
+#
+#      Transport: posix
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+[1747653881.187293] [hpc118:19239:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_fifo: length 33023 host memory sys_dev <unknown> flags 0x3e0
+[1747653881.187300] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747653881.187412] [hpc118:19239:0]        mm_posix.c:607  UCX  DEBUG   allocated posix shared memory at 0x7ffff6dfc000 length 36864
+[1747653881.187420] [hpc118:19239:0]         uct_mem.c:319  UCX  TRACE   allocated 36864 bytes at 0x7ffff6dfc000 using posix
+[1747653881.187443] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool mm_recv_desc: align 64, maxelems 4294967295, elemsize 8288
+[1747653881.187454] [hpc118:19239:0]         uct_mem.c:118  UCX  TRACE allocating mm_recv_desc: length 4259952 host memory sys_dev <unknown> flags 0x304
+[1747653881.187459] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method md
+[1747653881.189137] [hpc118:19239:0]        mm_posix.c:373  UCX  DEBUG   shared memory mmap(addr=(nil), length=6291456, flags= HUGETLB, fd=7) failed: Invalid argument
+[1747653881.189150] [hpc118:19239:0]        mm_posix.c:607  UCX  DEBUG   allocated posix shared memory at 0x7ffff61da000 length 4263936
+[1747653881.189154] [hpc118:19239:0]         uct_mem.c:319  UCX  TRACE   allocated 4263936 bytes at 0x7ffff61da000 using posix
+[1747653881.189165] [hpc118:19239:0]           mpool.c:281  UCX  DEBUG mpool mm_recv_desc: allocated chunk 0x7ffff61da018 of 4263912 bytes with 512 elements
+[1747653881.190013] [hpc118:19239:0]        mm_iface.c:734  UCX  DEBUG created mm iface 0x555555578470 FIFO id 0xc000000140004b27 va 0x7ffff6dfc000 size 36864 (128 x 256 elems)
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 15360.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 10 nsec
+#            put_short: <= 4294967295
+#            put_bcopy: unlimited
+#            get_bcopy: unlimited
+#             am_short: <= 100
+#             am_bcopy: <= 8256
+#               domain: cpu
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 8 bytes
+#       error handling: ep_check
+[1747653881.190886] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool mm_recv_desc destroyed
+#
+[1747653881.191403] [hpc118:19239:0]           ib_md.c:1140 UCX  TRACE opening IB device mlx5_0
+[1747653881.215994] [hpc118:19239:0]       ib_efa_md.c:38   UCX  DEBUG efadv_query_device(mlx5_0) failed: 95
+[1747653881.217098] [hpc118:19239:0]           ib_md.c:1058 UCX  DEBUG mlx5_0: md open by 'uct_ib_efa_md_ops' failed, trying next
+[1747653881.223378] [hpc118:19239:0]            topo.c:938  UCX  DEBUG /sys/class/infiniband/mlx5_0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:03:00.0'
+[1747653881.223396] [hpc118:19239:0]            topo.c:560  UCX  DEBUG mlx5_0: bdf_name 0000:03:00.0 sys_dev 1
+[1747653881.223434] [hpc118:19239:0]       ib_device.c:532  UCX  DEBUG mlx5_0: vendor_id 0x15b3 device_id 4127
+[1747653881.223491] [hpc118:19239:0]            topo.c:881  UCX  TRACE mlx5_0: PCIe gen3 8x, effective throughput 6724.045 MB/s 56.405 Gb/s
+[1747653881.224294] [hpc118:19239:0]    ib_mlx5dv_md.c:1953 UCX  DEBUG mlx5_0: mkey_by_name_reserve is not supported
+[1747653881.224303] [hpc118:19239:0]    ib_mlx5dv_md.c:1936 UCX  DEBUG mlx5_0: dp_ordering support: force=0 ooo_rw_rc=0 ooo_rw_dc=0
+[1747653881.224510] [hpc118:19239:0]    ib_mlx5dv_md.c:1727 UCX  DEBUG mlx5_0: ODP is disabled because version 1 is not supported for DevX QP
+[1747653881.224744] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x5555555c3010 [id=6 ref 1] ???() to hash
+[1747653881.225140] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x1 mode thread_spinlock
+[1747653881.225153] [hpc118:19239:0]       ib_device.c:643  UCX  DEBUG initialized device 'mlx5_0' (InfiniBand channel adapter) with 1 ports
+[1747653881.225166] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: cuda GPUDirect RDMA is not detected by checking /sys/kernel/mm/memory_peers/nv_mem/version
+[1747653881.225174] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nvidia_peermem/version
+[1747653881.225182] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nv_peer_mem/version
+[1747653881.225190] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: rocm GPUDirect RDMA is not detected by checking /dev/kfd
+[1747653881.225212] [hpc118:19239:0]           ib_md.c:1244 UCX  DEBUG mlx5_0: dmabuf is supported
+[1747653881.225222] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool devx dbrec: align 64, maxelems 4294967295, elemsize 40
+[1747653881.225624] [hpc118:19239:0]    ib_mlx5dv_md.c:2444 UCX  DEBUG mlx5_0: opened DEVX md log_max_qp=17
+[1747653881.226142] [hpc118:19239:0]           ib_md.c:514  UCX  TRACE ibv_reg_dm_mr(pd=0x555555577fc0 addr=0x7ffff793c000 len=32 fd=-1 offset=0 access=0xf): mr=0x5555555bfae0 lkey=0x184521 retry=0 took 0.365 ms
+[1747653881.226152] [hpc118:19239:0]    ib_mlx5dv_md.c:152  UCX  TRACE mlx5_0: init KSM list dm address 0x7ffff793c000 length 32 iova 0x0
+[1747653881.226159] [hpc118:19239:0]    ib_mlx5dv_md.c:163  UCX  TRACE   klm[0] va 0x7ffff793c000 mr [addr (nil) len 32 lkey 0x184521]
+[1747653881.226657] [hpc118:19239:0]    ib_mlx5dv_md.c:124  UCX  TRACE mlx5_0: registered KSM for dm 0..20 with 1 entries of 2147483648 bytes, mkey=0x184900 mr=0x5555555bfc60
+[1747653881.226667] [hpc118:19239:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_0: KSM dm memory registration status "Success" range 0x7ffff793c000..0x7ffff793c020 iova 0x0 mkey_index 0x0
+[1747653881.226675] [hpc118:19239:0]    ib_mlx5dv_md.c:152  UCX  TRACE mlx5_0: init KSM list atomic-key address (nil) length 32 iova 0x7ffff793c000
+[1747653881.226681] [hpc118:19239:0]    ib_mlx5dv_md.c:163  UCX  TRACE   klm[0] va (nil) mr [addr (nil) len 32 lkey 0x184521]
+[1747653881.227164] [hpc118:19239:0]    ib_mlx5dv_md.c:124  UCX  TRACE mlx5_0: registered KSM atomic for atomic-key 7ffff793c000..7ffff793c020 with 1 entries of 2147483648 bytes, mkey=0x184a00 mr=0x5555555bfdd0
+[1747653881.227171] [hpc118:19239:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_0: KSM atomic-key memory registration status "Success" range (nil)..0x20 iova 0x7ffff793c000 atomic mkey_index 0x0
+[1747653881.227702] [hpc118:19239:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x5555555bfae0 addr=(nil) length=32)
+[1747653881.228615] [hpc118:19239:0]           ib_md.c:1202 UCX  DEBUG mlx5_0: relaxed order memory access is disabled
+[1747653881.228710] [hpc118:19239:0]           ib_md.c:514  UCX  TRACE ibv_reg_mr(pd=0x555555577fc0 addr=0x5555555c0000 len=8 fd=-1 offset=0 access=0xf): mr=0x555555577220 lkey=0x18a48 retry=0 took 0.079 ms
+[1747653881.228721] [hpc118:19239:0]    ib_mlx5dv_md.c:152  UCX  TRACE mlx5_0: init KSM list flush-mr address 0x5555555c0000 length 8 iova 0x0
+[1747653881.228727] [hpc118:19239:0]    ib_mlx5dv_md.c:163  UCX  TRACE   klm[0] va 0x5555555c0000 mr [addr 0x5555555c0000 len 8 lkey 0x18a48]
+[1747653881.229204] [hpc118:19239:0]    ib_mlx5dv_md.c:124  UCX  TRACE mlx5_0: registered KSM for flush-mr 0..8 with 1 entries of 2147483648 bytes, mkey=0x184500 mr=0x5555555bfdd0
+[1747653881.229212] [hpc118:19239:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_0: KSM flush-mr memory registration status "Success" range 0x5555555c0000..0x5555555c0008 iova 0x0 mkey_index 0x0
+[1747653881.229448] [hpc118:19239:0]         ib_mlx5.h:998  UCX  DEBUG mlx5dv_devx_general_cmd(ALLOW_OTHER_VHCA_ACCESS) failed on mlx5_0, syndrome 0x0: Invalid argument
+[1747653881.229455] [hpc118:19239:0]    ib_mlx5dv_md.c:2497 UCX  DEBUG mlx5_0: XGVMI is not supported
+[1747653881.229461] [hpc118:19239:0]           ib_md.c:1062 UCX  DEBUG mlx5_0: md open by 'uct_ib_mlx5_devx_md_ops' is successful
+[1747653881.241517] [hpc118:19239:0]          uct_md.c:96   UCX  DEBUG failed to query srd resources: No such device
+#
+# Memory domain: mlx5_0
+#     Component: ib
+#             allocate: <= 128K
+#             register: unlimited, dmabuf, cost: 16000 + 0.060 * N nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#           memory invalidation is supported
+#         memory types: host (access,reg,cache), rdma (alloc,cache)
+#
+#      Transport: rc_verbs
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (1)
+[1747653881.241744] [hpc118:19239:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on mlx5_0:1/RoCE
+[1747653881.241888] [hpc118:19239:0]       ib_device.c:1132 UCX  DEBUG mlx5_0:1 using gid_index 3
+[1747653881.243720] [hpc118:19239:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 12 payload_ofs 12 hdr_ofs 11 data_sz 8256
+[1747653881.243777] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_recv_desc: align 64, maxelems 4294967295, elemsize 8275
+[1747653881.243788] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_send_desc: align 64, maxelems 4294967295, elemsize 8328
+[1747653881.244017] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool send-ops-mpool: align 64, maxelems 4294967295, elemsize 56
+[1747653881.245042] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool pending-ops: align 1, maxelems 4294967295, elemsize 64
+[1747653881.245055] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_verbs_short_desc: align 64, maxelems 4294967295, elemsize 200
+[1747653881.245721] [hpc118:19239:0]        ib_iface.c:1300 UCX  DEBUG mlx5_0: iface 0x5555555c9110 created RC QP 0x120 on mlx5_0:1 TX wr:409 sge:5 inl:124 resp:64 RX wr:0 sge:0 resp:64
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 75 nsec
+#            put_short: <= 124
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 5 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 5 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 123
+#             am_bcopy: <= 8255
+#             am_zcopy: <= 8255, up to 4 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 127
+#               domain: device
+#           atomic_add: 64 bit
+#          atomic_fadd: 64 bit
+#         atomic_cswap: 64 bit
+#           connection: to ep
+#      device priority: 45
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 7 bytes
+#       error handling: peer failure, ep_check
+[1747653881.247221] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_verbs_short_desc destroyed
+[1747653881.247649] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool send-ops-mpool destroyed
+[1747653881.247656] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_send_desc destroyed
+[1747653881.247660] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_recv_desc destroyed
+[1747653881.247663] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool pending-ops destroyed
+#
+#
+#      Transport: ud_verbs
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (1)
+[1747653881.248417] [hpc118:19239:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on mlx5_0:1/RoCE
+[1747653881.248527] [hpc118:19239:0]       ib_device.c:1132 UCX  DEBUG mlx5_0:1 using gid_index 3
+[1747653881.249936] [hpc118:19239:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 88 payload_ofs 88 hdr_ofs 40 data_sz 1064
+[1747653881.249958] [hpc118:19239:0]        ud_iface.c:205  UCX  DEBUG create QP: max_send_sge=6 (config=6, dev=30) max_inline_data=64B (config=64B, dev=4096B) 
+[1747653881.250541] [hpc118:19239:0]        ib_iface.c:1300 UCX  DEBUG mlx5_0: iface 0x5555555c78f0 created UD QP 0x1281 on mlx5_0:1 TX wr:341 sge:6 inl:124 resp:0 RX wr:4096 sge:1 resp:0
+[1747653881.251692] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool ud_recv_skb: align 64, maxelems 4294967295, elemsize 1112
+[1747653881.251710] [hpc118:19239:0]         uct_mem.c:118  UCX  TRACE allocating ud_recv_skb: length 147568 host memory sys_dev <unknown> flags 0x304
+[1747653881.251718] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method thp
+[1747653881.251758] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method mmap
+[1747653881.251778] [hpc118:19239:0]         uct_mem.c:319  UCX  TRACE   allocated 151552 bytes at 0x7ffff6544000 using mmap
+[1747653881.251961] [hpc118:19239:0]           ib_md.c:514  UCX  TRACE ibv_reg_mr(pd=0x555555577fc0 addr=0x7ffff6544000 len=151552 fd=-1 offset=0 access=0xf): mr=0x5555555c8b70 lkey=0x7432 retry=0 took 0.159 ms
+[1747653881.251976] [hpc118:19239:0]           mpool.c:281  UCX  DEBUG mpool ud_recv_skb: allocated chunk 0x7ffff6544018 of 151528 bytes with 131 elements
+[1747653881.251992] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool ud_tx_skb: align 64, maxelems 4294967295, elemsize 1136
+[1747653881.252048] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555c78f0: adding gid fe80::e29d:73ff:feea:a548 to hash on device mlx5_0 port 1 index 0)
+[1747653881.252088] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555c78f0: adding gid fe80::e29d:73ff:feea:a548 to hash on device mlx5_0 port 1 index 1)
+[1747653881.252130] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555c78f0: adding gid ::ffff:192.168.2.118 to hash on device mlx5_0 port 1 index 2)
+[1747653881.252151] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555c78f0: adding gid ::ffff:192.168.2.118 to hash on device mlx5_0 port 1 index 3)
+[1747653881.252171] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/4: Invalid argument
+[1747653881.252191] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/5: Invalid argument
+[1747653881.252230] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/6: Invalid argument
+[1747653881.252254] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/7: Invalid argument
+[1747653881.252273] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/8: Invalid argument
+[1747653881.252292] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/9: Invalid argument
+[1747653881.252311] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/10: Invalid argument
+[1747653881.252329] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/11: Invalid argument
+[1747653881.252348] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/12: Invalid argument
+[1747653881.252366] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/13: Invalid argument
+[1747653881.252384] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/14: Invalid argument
+[1747653881.252403] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/15: Invalid argument
+[1747653881.252421] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/16: Invalid argument
+[1747653881.252439] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/17: Invalid argument
+[1747653881.252458] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/18: Invalid argument
+[1747653881.252477] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/19: Invalid argument
+[1747653881.252495] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/20: Invalid argument
+[1747653881.252513] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/21: Invalid argument
+[1747653881.252532] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/22: Invalid argument
+[1747653881.252550] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/23: Invalid argument
+[1747653881.252569] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/24: Invalid argument
+[1747653881.252587] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/25: Invalid argument
+[1747653881.252606] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/26: Invalid argument
+[1747653881.252624] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/27: Invalid argument
+[1747653881.252643] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/28: Invalid argument
+[1747653881.252661] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/29: Invalid argument
+[1747653881.252679] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/30: Invalid argument
+[1747653881.252698] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/31: Invalid argument
+[1747653881.252716] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/32: Invalid argument
+[1747653881.252734] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/33: Invalid argument
+[1747653881.252753] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/34: Invalid argument
+[1747653881.252771] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/35: Invalid argument
+[1747653881.252796] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/36: Invalid argument
+[1747653881.252814] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/37: Invalid argument
+[1747653881.252832] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/38: Invalid argument
+[1747653881.252851] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/39: Invalid argument
+[1747653881.252869] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/40: Invalid argument
+[1747653881.252888] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/41: Invalid argument
+[1747653881.252906] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/42: Invalid argument
+[1747653881.252924] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/43: Invalid argument
+[1747653881.252943] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/44: Invalid argument
+[1747653881.252961] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/45: Invalid argument
+[1747653881.252979] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/46: Invalid argument
+[1747653881.252998] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/47: Invalid argument
+[1747653881.253016] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/48: Invalid argument
+[1747653881.253039] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/49: Invalid argument
+[1747653881.253058] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/50: Invalid argument
+[1747653881.253076] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/51: Invalid argument
+[1747653881.253095] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/52: Invalid argument
+[1747653881.253113] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/53: Invalid argument
+[1747653881.253132] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/54: Invalid argument
+[1747653881.253150] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/55: Invalid argument
+[1747653881.253168] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/56: Invalid argument
+[1747653881.253186] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/57: Invalid argument
+[1747653881.253205] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/58: Invalid argument
+[1747653881.253223] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/59: Invalid argument
+[1747653881.253241] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/60: Invalid argument
+[1747653881.253260] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/61: Invalid argument
+[1747653881.253278] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/62: Invalid argument
+[1747653881.253297] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/63: Invalid argument
+[1747653881.253315] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/64: Invalid argument
+[1747653881.253333] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/65: Invalid argument
+[1747653881.253352] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/66: Invalid argument
+[1747653881.253370] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/67: Invalid argument
+[1747653881.253388] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/68: Invalid argument
+[1747653881.253406] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/69: Invalid argument
+[1747653881.253425] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/70: Invalid argument
+[1747653881.253443] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/71: Invalid argument
+[1747653881.253461] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/72: Invalid argument
+[1747653881.253479] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/73: Invalid argument
+[1747653881.253497] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/74: Invalid argument
+[1747653881.253515] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/75: Invalid argument
+[1747653881.253534] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/76: Invalid argument
+[1747653881.253552] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/77: Invalid argument
+[1747653881.253570] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/78: Invalid argument
+[1747653881.253589] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/79: Invalid argument
+[1747653881.253607] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/80: Invalid argument
+[1747653881.253625] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/81: Invalid argument
+[1747653881.253644] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/82: Invalid argument
+[1747653881.253662] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/83: Invalid argument
+[1747653881.253680] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/84: Invalid argument
+[1747653881.253699] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/85: Invalid argument
+[1747653881.253717] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/86: Invalid argument
+[1747653881.253735] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/87: Invalid argument
+[1747653881.253754] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/88: Invalid argument
+[1747653881.253772] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/89: Invalid argument
+[1747653881.253790] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/90: Invalid argument
+[1747653881.253809] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/91: Invalid argument
+[1747653881.253827] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/92: Invalid argument
+[1747653881.253845] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/93: Invalid argument
+[1747653881.253864] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/94: Invalid argument
+[1747653881.253882] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/95: Invalid argument
+[1747653881.253900] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/96: Invalid argument
+[1747653881.253919] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/97: Invalid argument
+[1747653881.253937] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/98: Invalid argument
+[1747653881.253956] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/99: Invalid argument
+[1747653881.253974] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/100: Invalid argument
+[1747653881.253993] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/101: Invalid argument
+[1747653881.254011] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/102: Invalid argument
+[1747653881.254029] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/103: Invalid argument
+[1747653881.254048] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/104: Invalid argument
+[1747653881.254066] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/105: Invalid argument
+[1747653881.254084] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/106: Invalid argument
+[1747653881.254103] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/107: Invalid argument
+[1747653881.254121] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/108: Invalid argument
+[1747653881.254140] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/109: Invalid argument
+[1747653881.254158] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/110: Invalid argument
+[1747653881.254176] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/111: Invalid argument
+[1747653881.254195] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/112: Invalid argument
+[1747653881.254213] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/113: Invalid argument
+[1747653881.254232] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/114: Invalid argument
+[1747653881.254250] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/115: Invalid argument
+[1747653881.254268] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/116: Invalid argument
+[1747653881.254286] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/117: Invalid argument
+[1747653881.254304] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/118: Invalid argument
+[1747653881.254323] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/119: Invalid argument
+[1747653881.254341] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/120: Invalid argument
+[1747653881.254359] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/121: Invalid argument
+[1747653881.254377] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/122: Invalid argument
+[1747653881.254395] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/123: Invalid argument
+[1747653881.254414] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/124: Invalid argument
+[1747653881.254432] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/125: Invalid argument
+[1747653881.254450] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/126: Invalid argument
+[1747653881.254469] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/127: Invalid argument
+[1747653881.254488] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/128: Invalid argument
+[1747653881.254506] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/129: Invalid argument
+[1747653881.254525] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/130: Invalid argument
+[1747653881.254543] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/131: Invalid argument
+[1747653881.254561] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/132: Invalid argument
+[1747653881.254580] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/133: Invalid argument
+[1747653881.254598] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/134: Invalid argument
+[1747653881.254616] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/135: Invalid argument
+[1747653881.254635] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/136: Invalid argument
+[1747653881.254653] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/137: Invalid argument
+[1747653881.254671] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/138: Invalid argument
+[1747653881.254690] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/139: Invalid argument
+[1747653881.254709] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/140: Invalid argument
+[1747653881.254727] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/141: Invalid argument
+[1747653881.254746] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/142: Invalid argument
+[1747653881.254764] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/143: Invalid argument
+[1747653881.254782] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/144: Invalid argument
+[1747653881.254801] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/145: Invalid argument
+[1747653881.254819] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/146: Invalid argument
+[1747653881.254837] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/147: Invalid argument
+[1747653881.254856] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/148: Invalid argument
+[1747653881.254874] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/149: Invalid argument
+[1747653881.254892] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/150: Invalid argument
+[1747653881.254911] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/151: Invalid argument
+[1747653881.254929] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/152: Invalid argument
+[1747653881.254947] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/153: Invalid argument
+[1747653881.254966] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/154: Invalid argument
+[1747653881.254984] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/155: Invalid argument
+[1747653881.255002] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/156: Invalid argument
+[1747653881.255021] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/157: Invalid argument
+[1747653881.255039] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/158: Invalid argument
+[1747653881.255057] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/159: Invalid argument
+[1747653881.255076] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/160: Invalid argument
+[1747653881.255094] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/161: Invalid argument
+[1747653881.255113] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/162: Invalid argument
+[1747653881.255131] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/163: Invalid argument
+[1747653881.255149] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/164: Invalid argument
+[1747653881.255167] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/165: Invalid argument
+[1747653881.255186] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/166: Invalid argument
+[1747653881.255204] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/167: Invalid argument
+[1747653881.255222] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/168: Invalid argument
+[1747653881.255241] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/169: Invalid argument
+[1747653881.255259] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/170: Invalid argument
+[1747653881.255277] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/171: Invalid argument
+[1747653881.255296] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/172: Invalid argument
+[1747653881.255314] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/173: Invalid argument
+[1747653881.255332] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/174: Invalid argument
+[1747653881.255350] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/175: Invalid argument
+[1747653881.255369] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/176: Invalid argument
+[1747653881.255387] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/177: Invalid argument
+[1747653881.255405] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/178: Invalid argument
+[1747653881.255423] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/179: Invalid argument
+[1747653881.255442] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/180: Invalid argument
+[1747653881.255460] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/181: Invalid argument
+[1747653881.255478] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/182: Invalid argument
+[1747653881.255503] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/183: Invalid argument
+[1747653881.255522] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/184: Invalid argument
+[1747653881.255540] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/185: Invalid argument
+[1747653881.255558] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/186: Invalid argument
+[1747653881.255576] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/187: Invalid argument
+[1747653881.255595] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/188: Invalid argument
+[1747653881.255613] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/189: Invalid argument
+[1747653881.255631] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/190: Invalid argument
+[1747653881.255650] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/191: Invalid argument
+[1747653881.255668] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/192: Invalid argument
+[1747653881.255686] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/193: Invalid argument
+[1747653881.255704] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/194: Invalid argument
+[1747653881.255723] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/195: Invalid argument
+[1747653881.255741] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/196: Invalid argument
+[1747653881.255759] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/197: Invalid argument
+[1747653881.255777] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/198: Invalid argument
+[1747653881.255796] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/199: Invalid argument
+[1747653881.255814] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/200: Invalid argument
+[1747653881.255833] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/201: Invalid argument
+[1747653881.255852] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/202: Invalid argument
+[1747653881.255870] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/203: Invalid argument
+[1747653881.255888] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/204: Invalid argument
+[1747653881.255907] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/205: Invalid argument
+[1747653881.255925] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/206: Invalid argument
+[1747653881.255943] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/207: Invalid argument
+[1747653881.255962] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/208: Invalid argument
+[1747653881.255980] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/209: Invalid argument
+[1747653881.255998] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/210: Invalid argument
+[1747653881.256016] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/211: Invalid argument
+[1747653881.256034] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/212: Invalid argument
+[1747653881.256052] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/213: Invalid argument
+[1747653881.256071] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/214: Invalid argument
+[1747653881.256089] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/215: Invalid argument
+[1747653881.256107] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/216: Invalid argument
+[1747653881.256125] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/217: Invalid argument
+[1747653881.256143] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/218: Invalid argument
+[1747653881.256161] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/219: Invalid argument
+[1747653881.256179] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/220: Invalid argument
+[1747653881.256197] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/221: Invalid argument
+[1747653881.256237] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/222: Invalid argument
+[1747653881.256259] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/223: Invalid argument
+[1747653881.256277] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/224: Invalid argument
+[1747653881.256295] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/225: Invalid argument
+[1747653881.256313] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/226: Invalid argument
+[1747653881.256331] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/227: Invalid argument
+[1747653881.256350] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/228: Invalid argument
+[1747653881.256368] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/229: Invalid argument
+[1747653881.256386] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/230: Invalid argument
+[1747653881.256405] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/231: Invalid argument
+[1747653881.256423] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/232: Invalid argument
+[1747653881.256442] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/233: Invalid argument
+[1747653881.256460] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/234: Invalid argument
+[1747653881.256478] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/235: Invalid argument
+[1747653881.256507] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/236: Invalid argument
+[1747653881.256522] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/237: Invalid argument
+[1747653881.256536] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/238: Invalid argument
+[1747653881.256550] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/239: Invalid argument
+[1747653881.256564] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/240: Invalid argument
+[1747653881.256579] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/241: Invalid argument
+[1747653881.256593] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/242: Invalid argument
+[1747653881.256607] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/243: Invalid argument
+[1747653881.256621] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/244: Invalid argument
+[1747653881.256635] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/245: Invalid argument
+[1747653881.256649] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/246: Invalid argument
+[1747653881.256663] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/247: Invalid argument
+[1747653881.256677] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/248: Invalid argument
+[1747653881.256691] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/249: Invalid argument
+[1747653881.256706] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/250: Invalid argument
+[1747653881.256719] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/251: Invalid argument
+[1747653881.256734] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/252: Invalid argument
+[1747653881.256748] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/253: Invalid argument
+[1747653881.256762] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/254: Invalid argument
+[1747653881.256948] [hpc118:19239:0]     timer_wheel.c:40   UCX  DEBUG high res timer created log=23 resolution=3647.220870 usec wanted: 2500.000000 usec
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 830 nsec
+#             overhead: 105 nsec
+#             am_short: <= 116
+#             am_bcopy: <= 1016
+#             am_zcopy: <= 1016, up to 5 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 920
+#           connection: to ep, to iface
+#      device priority: 45
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 3 bytes
+#           ep address: 6 bytes
+#       error handling: peer failure, ep_check
+[1747653881.257014] [hpc118:19239:0]        ud_iface.c:622  UCX  DEBUG iface(0x5555555c78f0): cep cleanup
+[1747653881.257018] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool ud_tx_skb destroyed
+[1747653881.257955] [hpc118:19239:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x5555555c8b70 addr=0x7ffff6544000 length=151552)
+[1747653881.258037] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool ud_recv_skb destroyed
+[1747653881.258044] [hpc118:19239:0]        ud_iface.c:635  UCX  DEBUG iface(0x5555555c78f0): ptr_array cleanup
+#
+#
+#      Transport: dc_mlx5
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (1)
+[1747653881.258750] [hpc118:19239:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on mlx5_0:1/RoCE
+[1747653881.258833] [hpc118:19239:0]       ib_device.c:1132 UCX  DEBUG mlx5_0:1 using gid_index 3
+[1747653881.258867] [hpc118:19239:0]       ib_device.c:1480 UCX  DEBUG max IB CQE size is 128
+[1747653881.259317] [hpc118:19239:0]           mpool.c:281  UCX  DEBUG mpool devx dbrec: allocated chunk 0x5555555cc010 of 8176 bytes with 127 elements
+[1747653881.262001] [hpc118:19239:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 12 payload_ofs 12 hdr_ofs 10 data_sz 8256
+[1747653881.262013] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_recv_desc: align 64, maxelems 4294967295, elemsize 8274
+[1747653881.262017] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_send_desc: align 64, maxelems 4294967295, elemsize 8328
+[1747653881.262395] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool send-ops-mpool: align 64, maxelems 4294967295, elemsize 56
+[1747653881.263281] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool pending-ops: align 1, maxelems 4294967295, elemsize 112
+[1747653881.263311] [hpc118:19239:0]         ib_mlx5.c:1084 UCX  DEBUG SL=0 (AR support - no) was selected on mlx5_0:1, SLs with AR support = { <none> }, SLs without AR support = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
+[1747653881.264038] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool mlx5_dm_desc: align 64, maxelems 1, elemsize 72
+[1747653881.264046] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_mlx5_atomic_desc: align 64, maxelems 4294967295, elemsize 80
+[1747653881.264065] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x5555555783d0 [id=11 ref 1] ???() to hash
+[1747653881.264075] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 11 events 0x1 mode thread_spinlock
+[1747653881.266574] [hpc118:19239:0]    ib_mlx5dv_md.c:2654 UCX  DEBUG counter_set_id on mlx5_0:1 is 0x3
+[1747653881.268205] [hpc118:19239:0]         dc_mlx5.c:408  UCX  DEBUG created DevX DCI 0x122, rdma_wr_disabled=0
+[1747653881.268985] [hpc118:19239:0]         dc_mlx5.c:1729 UCX  DEBUG dc iface 0x555555614050: using 'dcs_quota' policy with 32 dcis and 16384 cqes, dct 0x1284
+[1747653881.269008] [hpc118:19239:0]         dc_mlx5.c:813  UCX  DEBUG creating dci pool 0 with 32 QPs
+[1747653881.269014] [hpc118:19239:0]         dc_mlx5.c:795  UCX  DEBUG dci pool config: (path_index=0, max_rd_atomic=16)
+[1747653881.269028] [hpc118:19239:0]         uct_mem.c:118  UCX  TRACE allocating rc_recv_desc: length 37481712 host memory sys_dev <unknown> flags 0x304
+[1747653881.269034] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method thp
+[1747653881.269084] [hpc118:19239:0]         uct_mem.c:319  UCX  TRACE   allocated 37748736 bytes at 0x7fffeda00000 using thp
+[1747653881.277161] [hpc118:19239:0]           ib_md.c:514  UCX  TRACE ibv_reg_mr(pd=0x555555577fc0 addr=0x7fffeda00000 len=37748736 fd=-1 offset=0 access=0xf): mr=0x5555555c81b0 lkey=0x1a55f retry=0 took 8.057 ms
+[1747653881.277174] [hpc118:19239:0]           mpool.c:281  UCX  DEBUG mpool rc_recv_desc: allocated chunk 0x7fffeda00018 of 37748712 bytes with 4537 elements
+[1747653881.277398] [hpc118:19239:0]         dc_mlx5.c:1752 UCX  DEBUG created dc iface 0x555555614050
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 860 nsec
+#             overhead: 40 nsec
+#            put_short: <= 2K
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 11 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 11 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 2046
+#             am_bcopy: <= 8254
+#             am_zcopy: <= 8254, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 138
+#               domain: device
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to iface
+#      device priority: 45
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 7 bytes
+#       error handling: buffer (zcopy), remote access, peer failure
+[1747653881.278239] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x5555555783d0 [id=11 ref 1] ???() from hash
+[1747653881.278251] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x5555555783d0 [id=11 ref 1] ???()
+[1747653881.278264] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x5555555783d0 [id=11 ref 1] ???() completion (called=0)
+[1747653881.278271] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x5555555783d0 [id=11 ref 0] ???()
+[1747653881.278293] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_mlx5_atomic_desc destroyed
+[1747653881.278304] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool mlx5_dm_desc destroyed
+[1747653881.279984] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool send-ops-mpool destroyed
+[1747653881.279994] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_send_desc destroyed
+[1747653881.280011] [hpc118:19239:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x5555555c81b0 addr=0x7fffeda00000 length=37748736)
+[1747653881.280158] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_recv_desc destroyed
+[1747653881.280167] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool pending-ops destroyed
+#
+#
+#      Transport: rc_mlx5
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (1)
+[1747653881.281229] [hpc118:19239:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on mlx5_0:1/RoCE
+[1747653881.281327] [hpc118:19239:0]       ib_device.c:1132 UCX  DEBUG mlx5_0:1 using gid_index 3
+[1747653881.283243] [hpc118:19239:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 12 payload_ofs 12 hdr_ofs 10 data_sz 8256
+[1747653881.283255] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_recv_desc: align 64, maxelems 4294967295, elemsize 8274
+[1747653881.283271] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_send_desc: align 64, maxelems 4294967295, elemsize 8328
+[1747653881.283315] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool send-ops-mpool: align 64, maxelems 4294967295, elemsize 56
+[1747653881.284067] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool pending-ops: align 1, maxelems 4294967295, elemsize 64
+[1747653881.284089] [hpc118:19239:0]         ib_mlx5.c:1084 UCX  DEBUG SL=0 (AR support - no) was selected on mlx5_0:1, SLs with AR support = { <none> }, SLs without AR support = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
+[1747653881.284712] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool mlx5_dm_desc: align 64, maxelems 1, elemsize 72
+[1747653881.284719] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool rc_mlx5_atomic_desc: align 64, maxelems 4294967295, elemsize 80
+[1747653881.284730] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x555555576e30 [id=11 ref 1] ???() to hash
+[1747653881.284740] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 11 events 0x1 mode thread_spinlock
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 800 + 1.000 * N nsec
+#             overhead: 40 nsec
+#            put_short: <= 2K
+#            put_bcopy: <= 8256
+#            put_zcopy: <= 1G, up to 14 iov
+#  put_opt_zcopy_align: <= 512
+#        put_align_mtu: <= 1K
+#            get_bcopy: <= 8256
+#            get_zcopy: 65..1G, up to 14 iov
+#  get_opt_zcopy_align: <= 512
+#        get_align_mtu: <= 1K
+#             am_short: <= 2046
+#             am_bcopy: <= 8254
+#             am_zcopy: <= 8254, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 186
+#               domain: device
+#           atomic_add: 32, 64 bit
+#           atomic_and: 32, 64 bit
+#            atomic_or: 32, 64 bit
+#           atomic_xor: 32, 64 bit
+#          atomic_fadd: 32, 64 bit
+#          atomic_fand: 32, 64 bit
+#           atomic_for: 32, 64 bit
+#          atomic_fxor: 32, 64 bit
+#          atomic_swap: 32, 64 bit
+#         atomic_cswap: 32, 64 bit
+#           connection: to ep
+#      device priority: 45
+#     device num paths: 1
+#              max eps: 256
+#       device address: 18 bytes
+#           ep address: 10 bytes
+#       error handling: buffer (zcopy), remote access, peer failure, ep_check
+[1747653881.284877] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x555555576e30 [id=11 ref 1] ???() from hash
+[1747653881.284882] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x555555576e30 [id=11 ref 1] ???()
+[1747653881.284887] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x555555576e30 [id=11 ref 1] ???() completion (called=0)
+[1747653881.284891] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x555555576e30 [id=11 ref 0] ???()
+[1747653881.284899] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_mlx5_atomic_desc destroyed
+[1747653881.284903] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool mlx5_dm_desc destroyed
+[1747653881.286010] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool send-ops-mpool destroyed
+[1747653881.286018] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_send_desc destroyed
+[1747653881.286022] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool rc_recv_desc destroyed
+[1747653881.286025] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool pending-ops destroyed
+#
+#
+#      Transport: ud_mlx5
+#         Device: mlx5_0:1
+#           Type: network
+#  System device: mlx5_0 (1)
+[1747653881.288568] [hpc118:19239:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on mlx5_0:1/RoCE
+[1747653881.288708] [hpc118:19239:0]       ib_device.c:1132 UCX  DEBUG mlx5_0:1 using gid_index 3
+[1747653881.290497] [hpc118:19239:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 88 payload_ofs 88 hdr_ofs 40 data_sz 1064
+[1747653881.290520] [hpc118:19239:0]        ud_iface.c:205  UCX  DEBUG create QP: max_send_sge=6 (config=6, dev=30) max_inline_data=64B (config=64B, dev=4096B) 
+[1747653881.291145] [hpc118:19239:0]        ib_iface.c:1300 UCX  DEBUG mlx5_0: iface 0x5555555cb150 created UD QP 0x1287 on mlx5_0:1 TX wr:256 sge:2 inl:60 resp:0 RX wr:4096 sge:1 resp:0
+[1747653881.291174] [hpc118:19239:0]         ib_mlx5.c:778  UCX  DEBUG tx wq 32768 bytes [bb=64, nwqe=512] mmio_mode bf_post
+[1747653881.291794] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool ud_recv_skb: align 64, maxelems 4294967295, elemsize 1112
+[1747653881.291812] [hpc118:19239:0]         uct_mem.c:118  UCX  TRACE allocating ud_recv_skb: length 147568 host memory sys_dev <unknown> flags 0x304
+[1747653881.291820] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method thp
+[1747653881.291863] [hpc118:19239:0]         uct_mem.c:124  UCX  TRACE   trying allocation method mmap
+[1747653881.291883] [hpc118:19239:0]         uct_mem.c:319  UCX  TRACE   allocated 151552 bytes at 0x7ffff65c6000 using mmap
+[1747653881.292074] [hpc118:19239:0]           ib_md.c:514  UCX  TRACE ibv_reg_mr(pd=0x555555577fc0 addr=0x7ffff65c6000 len=151552 fd=-1 offset=0 access=0xf): mr=0x5555555c81b0 lkey=0x1b372 retry=0 took 0.170 ms
+[1747653881.292089] [hpc118:19239:0]           mpool.c:281  UCX  DEBUG mpool ud_recv_skb: allocated chunk 0x7ffff65c6018 of 151528 bytes with 131 elements
+[1747653881.292105] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool ud_tx_skb: align 64, maxelems 4294967295, elemsize 1136
+[1747653881.292162] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555cb150: adding gid fe80::e29d:73ff:feea:a548 to hash on device mlx5_0 port 1 index 0)
+[1747653881.292198] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555cb150: adding gid fe80::e29d:73ff:feea:a548 to hash on device mlx5_0 port 1 index 1)
+[1747653881.292246] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555cb150: adding gid ::ffff:192.168.2.118 to hash on device mlx5_0 port 1 index 2)
+[1747653881.292280] [hpc118:19239:0]        ud_iface.c:389  UCX  DEBUG iface 0x5555555cb150: adding gid ::ffff:192.168.2.118 to hash on device mlx5_0 port 1 index 3)
+[1747653881.292312] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/4: Invalid argument
+[1747653881.292342] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/5: Invalid argument
+[1747653881.292371] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/6: Invalid argument
+[1747653881.292400] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/7: Invalid argument
+[1747653881.292433] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/8: Invalid argument
+[1747653881.292463] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/9: Invalid argument
+[1747653881.292491] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/10: Invalid argument
+[1747653881.292520] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/11: Invalid argument
+[1747653881.292549] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/12: Invalid argument
+[1747653881.292577] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/13: Invalid argument
+[1747653881.292606] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/14: Invalid argument
+[1747653881.292635] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/15: Invalid argument
+[1747653881.292663] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/16: Invalid argument
+[1747653881.292692] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/17: Invalid argument
+[1747653881.292720] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/18: Invalid argument
+[1747653881.292748] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/19: Invalid argument
+[1747653881.292777] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/20: Invalid argument
+[1747653881.292805] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/21: Invalid argument
+[1747653881.292834] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/22: Invalid argument
+[1747653881.292862] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/23: Invalid argument
+[1747653881.292891] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/24: Invalid argument
+[1747653881.292919] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/25: Invalid argument
+[1747653881.292949] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/26: Invalid argument
+[1747653881.292978] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/27: Invalid argument
+[1747653881.293006] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/28: Invalid argument
+[1747653881.293035] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/29: Invalid argument
+[1747653881.293064] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/30: Invalid argument
+[1747653881.293093] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/31: Invalid argument
+[1747653881.293122] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/32: Invalid argument
+[1747653881.293150] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/33: Invalid argument
+[1747653881.293179] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/34: Invalid argument
+[1747653881.293208] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/35: Invalid argument
+[1747653881.293237] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/36: Invalid argument
+[1747653881.293266] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/37: Invalid argument
+[1747653881.293294] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/38: Invalid argument
+[1747653881.293323] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/39: Invalid argument
+[1747653881.293352] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/40: Invalid argument
+[1747653881.293380] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/41: Invalid argument
+[1747653881.293409] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/42: Invalid argument
+[1747653881.293437] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/43: Invalid argument
+[1747653881.293469] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/44: Invalid argument
+[1747653881.293498] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/45: Invalid argument
+[1747653881.293526] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/46: Invalid argument
+[1747653881.293555] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/47: Invalid argument
+[1747653881.293584] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/48: Invalid argument
+[1747653881.293612] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/49: Invalid argument
+[1747653881.293641] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/50: Invalid argument
+[1747653881.293670] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/51: Invalid argument
+[1747653881.293698] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/52: Invalid argument
+[1747653881.293727] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/53: Invalid argument
+[1747653881.293757] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/54: Invalid argument
+[1747653881.293786] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/55: Invalid argument
+[1747653881.293815] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/56: Invalid argument
+[1747653881.293843] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/57: Invalid argument
+[1747653881.293872] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/58: Invalid argument
+[1747653881.293901] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/59: Invalid argument
+[1747653881.293930] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/60: Invalid argument
+[1747653881.293959] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/61: Invalid argument
+[1747653881.293988] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/62: Invalid argument
+[1747653881.294018] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/63: Invalid argument
+[1747653881.294046] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/64: Invalid argument
+[1747653881.294075] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/65: Invalid argument
+[1747653881.294104] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/66: Invalid argument
+[1747653881.294132] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/67: Invalid argument
+[1747653881.294161] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/68: Invalid argument
+[1747653881.294189] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/69: Invalid argument
+[1747653881.294218] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/70: Invalid argument
+[1747653881.294246] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/71: Invalid argument
+[1747653881.294275] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/72: Invalid argument
+[1747653881.294303] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/73: Invalid argument
+[1747653881.294332] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/74: Invalid argument
+[1747653881.294361] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/75: Invalid argument
+[1747653881.294389] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/76: Invalid argument
+[1747653881.294417] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/77: Invalid argument
+[1747653881.294446] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/78: Invalid argument
+[1747653881.294475] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/79: Invalid argument
+[1747653881.294504] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/80: Invalid argument
+[1747653881.294532] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/81: Invalid argument
+[1747653881.294561] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/82: Invalid argument
+[1747653881.294590] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/83: Invalid argument
+[1747653881.294619] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/84: Invalid argument
+[1747653881.294647] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/85: Invalid argument
+[1747653881.294675] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/86: Invalid argument
+[1747653881.294704] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/87: Invalid argument
+[1747653881.294733] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/88: Invalid argument
+[1747653881.294761] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/89: Invalid argument
+[1747653881.294790] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/90: Invalid argument
+[1747653881.294819] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/91: Invalid argument
+[1747653881.294847] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/92: Invalid argument
+[1747653881.294876] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/93: Invalid argument
+[1747653881.294905] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/94: Invalid argument
+[1747653881.294935] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/95: Invalid argument
+[1747653881.294964] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/96: Invalid argument
+[1747653881.294993] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/97: Invalid argument
+[1747653881.295022] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/98: Invalid argument
+[1747653881.295051] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/99: Invalid argument
+[1747653881.295079] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/100: Invalid argument
+[1747653881.295108] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/101: Invalid argument
+[1747653881.295137] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/102: Invalid argument
+[1747653881.295166] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/103: Invalid argument
+[1747653881.295195] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/104: Invalid argument
+[1747653881.295224] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/105: Invalid argument
+[1747653881.295252] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/106: Invalid argument
+[1747653881.295281] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/107: Invalid argument
+[1747653881.295310] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/108: Invalid argument
+[1747653881.295339] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/109: Invalid argument
+[1747653881.295367] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/110: Invalid argument
+[1747653881.295400] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/111: Invalid argument
+[1747653881.295429] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/112: Invalid argument
+[1747653881.295458] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/113: Invalid argument
+[1747653881.295487] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/114: Invalid argument
+[1747653881.295515] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/115: Invalid argument
+[1747653881.295545] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/116: Invalid argument
+[1747653881.295573] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/117: Invalid argument
+[1747653881.295602] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/118: Invalid argument
+[1747653881.295630] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/119: Invalid argument
+[1747653881.295659] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/120: Invalid argument
+[1747653881.295688] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/121: Invalid argument
+[1747653881.295717] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/122: Invalid argument
+[1747653881.295746] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/123: Invalid argument
+[1747653881.295774] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/124: Invalid argument
+[1747653881.295803] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/125: Invalid argument
+[1747653881.295832] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/126: Invalid argument
+[1747653881.295865] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/127: Invalid argument
+[1747653881.295895] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/128: Invalid argument
+[1747653881.295924] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/129: Invalid argument
+[1747653881.295952] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/130: Invalid argument
+[1747653881.295981] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/131: Invalid argument
+[1747653881.296010] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/132: Invalid argument
+[1747653881.296038] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/133: Invalid argument
+[1747653881.296067] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/134: Invalid argument
+[1747653881.296096] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/135: Invalid argument
+[1747653881.296125] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/136: Invalid argument
+[1747653881.296154] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/137: Invalid argument
+[1747653881.296183] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/138: Invalid argument
+[1747653881.296244] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/139: Invalid argument
+[1747653881.296278] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/140: Invalid argument
+[1747653881.296308] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/141: Invalid argument
+[1747653881.296336] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/142: Invalid argument
+[1747653881.296365] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/143: Invalid argument
+[1747653881.296407] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/144: Invalid argument
+[1747653881.296423] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/145: Invalid argument
+[1747653881.296442] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/146: Invalid argument
+[1747653881.296459] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/147: Invalid argument
+[1747653881.296475] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/148: Invalid argument
+[1747653881.296491] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/149: Invalid argument
+[1747653881.296507] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/150: Invalid argument
+[1747653881.296523] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/151: Invalid argument
+[1747653881.296539] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/152: Invalid argument
+[1747653881.296555] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/153: Invalid argument
+[1747653881.296571] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/154: Invalid argument
+[1747653881.296587] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/155: Invalid argument
+[1747653881.296604] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/156: Invalid argument
+[1747653881.296620] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/157: Invalid argument
+[1747653881.296636] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/158: Invalid argument
+[1747653881.296653] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/159: Invalid argument
+[1747653881.296669] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/160: Invalid argument
+[1747653881.296685] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/161: Invalid argument
+[1747653881.296701] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/162: Invalid argument
+[1747653881.296717] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/163: Invalid argument
+[1747653881.296733] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/164: Invalid argument
+[1747653881.296750] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/165: Invalid argument
+[1747653881.296766] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/166: Invalid argument
+[1747653881.296781] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/167: Invalid argument
+[1747653881.296798] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/168: Invalid argument
+[1747653881.296814] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/169: Invalid argument
+[1747653881.296831] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/170: Invalid argument
+[1747653881.296847] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/171: Invalid argument
+[1747653881.296863] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/172: Invalid argument
+[1747653881.296883] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/173: Invalid argument
+[1747653881.296900] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/174: Invalid argument
+[1747653881.296916] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/175: Invalid argument
+[1747653881.296933] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/176: Invalid argument
+[1747653881.296949] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/177: Invalid argument
+[1747653881.296966] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/178: Invalid argument
+[1747653881.296982] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/179: Invalid argument
+[1747653881.296998] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/180: Invalid argument
+[1747653881.297014] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/181: Invalid argument
+[1747653881.297030] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/182: Invalid argument
+[1747653881.297047] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/183: Invalid argument
+[1747653881.297063] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/184: Invalid argument
+[1747653881.297079] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/185: Invalid argument
+[1747653881.297095] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/186: Invalid argument
+[1747653881.297112] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/187: Invalid argument
+[1747653881.297128] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/188: Invalid argument
+[1747653881.297144] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/189: Invalid argument
+[1747653881.297160] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/190: Invalid argument
+[1747653881.297177] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/191: Invalid argument
+[1747653881.297193] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/192: Invalid argument
+[1747653881.297210] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/193: Invalid argument
+[1747653881.297226] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/194: Invalid argument
+[1747653881.297242] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/195: Invalid argument
+[1747653881.297259] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/196: Invalid argument
+[1747653881.297275] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/197: Invalid argument
+[1747653881.297292] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/198: Invalid argument
+[1747653881.297308] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/199: Invalid argument
+[1747653881.297324] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/200: Invalid argument
+[1747653881.297341] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/201: Invalid argument
+[1747653881.297357] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/202: Invalid argument
+[1747653881.297373] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/203: Invalid argument
+[1747653881.297389] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/204: Invalid argument
+[1747653881.297405] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/205: Invalid argument
+[1747653881.297421] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/206: Invalid argument
+[1747653881.297438] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/207: Invalid argument
+[1747653881.297454] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/208: Invalid argument
+[1747653881.297471] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/209: Invalid argument
+[1747653881.297487] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/210: Invalid argument
+[1747653881.297503] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/211: Invalid argument
+[1747653881.297519] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/212: Invalid argument
+[1747653881.297535] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/213: Invalid argument
+[1747653881.297551] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/214: Invalid argument
+[1747653881.297567] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/215: Invalid argument
+[1747653881.297584] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/216: Invalid argument
+[1747653881.297600] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/217: Invalid argument
+[1747653881.297616] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/218: Invalid argument
+[1747653881.297632] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/219: Invalid argument
+[1747653881.297648] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/220: Invalid argument
+[1747653881.297665] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/221: Invalid argument
+[1747653881.297681] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/222: Invalid argument
+[1747653881.297697] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/223: Invalid argument
+[1747653881.297713] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/224: Invalid argument
+[1747653881.297729] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/225: Invalid argument
+[1747653881.297745] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/226: Invalid argument
+[1747653881.297761] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/227: Invalid argument
+[1747653881.297777] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/228: Invalid argument
+[1747653881.297793] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/229: Invalid argument
+[1747653881.297809] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/230: Invalid argument
+[1747653881.297825] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/231: Invalid argument
+[1747653881.297842] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/232: Invalid argument
+[1747653881.297858] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/233: Invalid argument
+[1747653881.297874] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/234: Invalid argument
+[1747653881.297890] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/235: Invalid argument
+[1747653881.297906] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/236: Invalid argument
+[1747653881.297923] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/237: Invalid argument
+[1747653881.297939] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/238: Invalid argument
+[1747653881.297954] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/239: Invalid argument
+[1747653881.297971] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/240: Invalid argument
+[1747653881.297987] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/241: Invalid argument
+[1747653881.298003] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/242: Invalid argument
+[1747653881.298019] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/243: Invalid argument
+[1747653881.298035] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/244: Invalid argument
+[1747653881.298051] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/245: Invalid argument
+[1747653881.298067] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/246: Invalid argument
+[1747653881.298083] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/247: Invalid argument
+[1747653881.298099] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/248: Invalid argument
+[1747653881.298117] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/249: Invalid argument
+[1747653881.298133] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/250: Invalid argument
+[1747653881.298148] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/251: Invalid argument
+[1747653881.298165] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/252: Invalid argument
+[1747653881.298180] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/253: Invalid argument
+[1747653881.298196] [hpc118:19239:0]             sys.c:447  UCX  DEBUG failed to read from /sys/class/infiniband/mlx5_0/ports/1/gid_attrs/types/254: Invalid argument
+[1747653881.298208] [hpc118:19239:0]         ib_mlx5.c:1084 UCX  DEBUG SL=0 (AR support - no) was selected on mlx5_0:1, SLs with AR support = { <none> }, SLs without AR support = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
+[1747653881.298238] [hpc118:19239:0]     timer_wheel.c:40   UCX  DEBUG high res timer created log=23 resolution=3647.220870 usec wanted: 2500.000000 usec
+#
+#      capabilities:
+#            bandwidth: 2739.46/ppn + 0.00 MB/sec
+#              latency: 830 nsec
+#             overhead: 80 nsec
+#             am_short: <= 180
+#             am_bcopy: <= 1016
+#             am_zcopy: <= 1016, up to 3 iov
+#   am_opt_zcopy_align: <= 512
+#         am_align_mtu: <= 1K
+#            am header: <= 132
+#           connection: to ep, to iface
+#      device priority: 45
+#     device num paths: 1
+#              max eps: inf
+#       device address: 18 bytes
+#        iface address: 3 bytes
+#           ep address: 6 bytes
+#       error handling: peer failure, ep_check
+[1747653881.298315] [hpc118:19239:0]        ud_iface.c:622  UCX  DEBUG iface(0x5555555cb150): cep cleanup
+[1747653881.298320] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool ud_tx_skb destroyed
+[1747653881.299094] [hpc118:19239:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x5555555c81b0 addr=0x7ffff65c6000 length=151552)
+[1747653881.299182] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool ud_recv_skb destroyed
+[1747653881.299191] [hpc118:19239:0]        ud_iface.c:635  UCX  DEBUG iface(0x5555555cb150): ptr_array cleanup
+#
+[1747653881.299654] [hpc118:19239:0]    ib_mlx5dv_md.c:2533 UCX  DEBUG mlx5_0: md=0x5555555bf480 md->flags=0x3f11fbb flush_rkey=0x184500
+[1747653881.299886] [hpc118:19239:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x555555577220 addr=0x5555555c0000 length=8)
+[1747653881.300234] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool devx dbrec destroyed
+[1747653881.300247] [hpc118:19239:0]       ib_device.c:664  UCX  DEBUG destroying ib device mlx5_0
+[1747653881.300255] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x5555555c3010 [id=6 ref 1] ???() from hash
+[1747653881.300260] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x5555555c3010 [id=6 ref 1] ???()
+[1747653881.300360] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x5555555c3010 [id=6 ref 1] ???() completion (called=0)
+[1747653881.300365] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x5555555c3010 [id=6 ref 0] ???()
+[1747653881.301574] [hpc118:19239:0]           ib_md.c:1140 UCX  TRACE opening IB device mlx5_1
+[1747653881.323798] [hpc118:19239:0]       ib_efa_md.c:38   UCX  DEBUG efadv_query_device(mlx5_1) failed: 95
+[1747653881.324852] [hpc118:19239:0]           ib_md.c:1058 UCX  DEBUG mlx5_1: md open by 'uct_ib_efa_md_ops' failed, trying next
+[1747653881.353587] [hpc118:19239:0]            topo.c:938  UCX  DEBUG /sys/class/infiniband/mlx5_1: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:03:00.1'
+[1747653881.353686] [hpc118:19239:0]            topo.c:304  UCX  DEBUG added sys_dev 2 for bus id 03:00.1
+[1747653881.353699] [hpc118:19239:0]            topo.c:560  UCX  DEBUG mlx5_1: bdf_name 0000:03:00.1 sys_dev 2
+[1747653881.353741] [hpc118:19239:0]       ib_device.c:532  UCX  DEBUG mlx5_1: vendor_id 0x15b3 device_id 4127
+[1747653881.353814] [hpc118:19239:0]            topo.c:881  UCX  TRACE mlx5_1: PCIe gen3 8x, effective throughput 6724.045 MB/s 56.405 Gb/s
+[1747653881.354573] [hpc118:19239:0]    ib_mlx5dv_md.c:1953 UCX  DEBUG mlx5_1: mkey_by_name_reserve is not supported
+[1747653881.354584] [hpc118:19239:0]    ib_mlx5dv_md.c:1936 UCX  DEBUG mlx5_1: dp_ordering support: force=0 ooo_rw_rc=0 ooo_rw_dc=0
+[1747653881.354781] [hpc118:19239:0]    ib_mlx5dv_md.c:1727 UCX  DEBUG mlx5_1: ODP is disabled because version 1 is not supported for DevX QP
+[1747653881.355019] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x5555555783d0 [id=6 ref 1] ???() to hash
+[1747653881.355478] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 6 events 0x1 mode thread_spinlock
+[1747653881.355498] [hpc118:19239:0]       ib_device.c:643  UCX  DEBUG initialized device 'mlx5_1' (InfiniBand channel adapter) with 1 ports
+[1747653881.355525] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_1: cuda GPUDirect RDMA is not detected by checking /sys/kernel/mm/memory_peers/nv_mem/version
+[1747653881.355550] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_1: cuda GPUDirect RDMA is not detected by checking /sys/module/nvidia_peermem/version
+[1747653881.355573] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_1: cuda GPUDirect RDMA is not detected by checking /sys/module/nv_peer_mem/version
+[1747653881.355601] [hpc118:19239:0]           ib_md.c:1217 UCX  DEBUG mlx5_1: rocm GPUDirect RDMA is not detected by checking /dev/kfd
+[1747653881.355637] [hpc118:19239:0]           ib_md.c:1244 UCX  DEBUG mlx5_1: dmabuf is supported
+[1747653881.355655] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool devx dbrec: align 64, maxelems 4294967295, elemsize 40
+[1747653881.356064] [hpc118:19239:0]    ib_mlx5dv_md.c:2444 UCX  DEBUG mlx5_1: opened DEVX md log_max_qp=17
+[1747653881.356642] [hpc118:19239:0]           ib_md.c:514  UCX  TRACE ibv_reg_dm_mr(pd=0x555555576b40 addr=0x7ffff793c000 len=32 fd=-1 offset=0 access=0xf): mr=0x5555555736e0 lkey=0x1c03f4 retry=0 took 0.382 ms
+[1747653881.356661] [hpc118:19239:0]    ib_mlx5dv_md.c:152  UCX  TRACE mlx5_1: init KSM list dm address 0x7ffff793c000 length 32 iova 0x0
+[1747653881.356670] [hpc118:19239:0]    ib_mlx5dv_md.c:163  UCX  TRACE   klm[0] va 0x7ffff793c000 mr [addr (nil) len 32 lkey 0x1c03f4]
+[1747653881.357166] [hpc118:19239:0]    ib_mlx5dv_md.c:124  UCX  TRACE mlx5_1: registered KSM for dm 0..20 with 1 entries of 2147483648 bytes, mkey=0x1c0400 mr=0x5555555ce5a0
+[1747653881.357178] [hpc118:19239:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_1: KSM dm memory registration status "Success" range 0x7ffff793c000..0x7ffff793c020 iova 0x0 mkey_index 0x0
+[1747653881.357187] [hpc118:19239:0]    ib_mlx5dv_md.c:152  UCX  TRACE mlx5_1: init KSM list atomic-key address (nil) length 32 iova 0x7ffff793c000
+[1747653881.357194] [hpc118:19239:0]    ib_mlx5dv_md.c:163  UCX  TRACE   klm[0] va (nil) mr [addr (nil) len 32 lkey 0x1c03f4]
+[1747653881.357716] [hpc118:19239:0]    ib_mlx5dv_md.c:124  UCX  TRACE mlx5_1: registered KSM atomic for atomic-key 7ffff793c000..7ffff793c020 with 1 entries of 2147483648 bytes, mkey=0x1c0500 mr=0x555555576ba0
+[1747653881.357750] [hpc118:19239:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_1: KSM atomic-key memory registration status "Success" range (nil)..0x20 iova 0x7ffff793c000 atomic mkey_index 0x0
+[1747653881.358302] [hpc118:19239:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x5555555736e0 addr=(nil) length=32)
+[1747653881.359446] [hpc118:19239:0]           ib_md.c:1202 UCX  DEBUG mlx5_1: relaxed order memory access is disabled
+[1747653881.359535] [hpc118:19239:0]           ib_md.c:514  UCX  TRACE ibv_reg_mr(pd=0x555555576b40 addr=0x555555622000 len=8 fd=-1 offset=0 access=0xf): mr=0x5555555c8b70 lkey=0x53837 retry=0 took 0.064 ms
+[1747653881.359552] [hpc118:19239:0]    ib_mlx5dv_md.c:152  UCX  TRACE mlx5_1: init KSM list flush-mr address 0x555555622000 length 8 iova 0x0
+[1747653881.359562] [hpc118:19239:0]    ib_mlx5dv_md.c:163  UCX  TRACE   klm[0] va 0x555555622000 mr [addr 0x555555622000 len 8 lkey 0x53837]
+[1747653881.360006] [hpc118:19239:0]    ib_mlx5dv_md.c:124  UCX  TRACE mlx5_1: registered KSM for flush-mr 0..8 with 1 entries of 2147483648 bytes, mkey=0x1c0300 mr=0x555555576ba0
+[1747653881.360019] [hpc118:19239:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_1: KSM flush-mr memory registration status "Success" range 0x555555622000..0x555555622008 iova 0x0 mkey_index 0x0
+[1747653881.360228] [hpc118:19239:0]         ib_mlx5.h:998  UCX  DEBUG mlx5dv_devx_general_cmd(ALLOW_OTHER_VHCA_ACCESS) failed on mlx5_1, syndrome 0x0: Invalid argument
+[1747653881.360239] [hpc118:19239:0]    ib_mlx5dv_md.c:2497 UCX  DEBUG mlx5_1: XGVMI is not supported
+[1747653881.360249] [hpc118:19239:0]           ib_md.c:1062 UCX  DEBUG mlx5_1: md open by 'uct_ib_mlx5_devx_md_ops' is successful
+[1747653881.362167] [hpc118:19239:0]       ib_device.c:740  UCX  TRACE mlx5_1:1 is not active (state: 1)
+[1747653881.362185] [hpc118:19239:0]       ib_device.c:1253 UCX  TRACE mlx5_1:1 does not support flags 0x10: Destination is unreachable
+[1747653881.362193] [hpc118:19239:0]       ib_device.c:1269 UCX  DEBUG no compatible IB ports found for flags 0x10
+[1747653881.362202] [hpc118:19239:0]          uct_md.c:96   UCX  DEBUG failed to query rc_verbs resources: No such device
+[1747653881.362210] [hpc118:19239:0]       ib_device.c:740  UCX  TRACE mlx5_1:1 is not active (state: 1)
+[1747653881.362218] [hpc118:19239:0]       ib_device.c:1253 UCX  TRACE mlx5_1:1 does not support flags 0x0: Destination is unreachable
+[1747653881.362226] [hpc118:19239:0]       ib_device.c:1269 UCX  DEBUG no compatible IB ports found for flags 0x0
+[1747653881.362233] [hpc118:19239:0]          uct_md.c:96   UCX  DEBUG failed to query ud_verbs resources: No such device
+[1747653881.362241] [hpc118:19239:0]       ib_device.c:740  UCX  TRACE mlx5_1:1 is not active (state: 1)
+[1747653881.362248] [hpc118:19239:0]       ib_device.c:1253 UCX  TRACE mlx5_1:1 does not support flags 0xd4: Destination is unreachable
+[1747653881.362256] [hpc118:19239:0]       ib_device.c:1269 UCX  DEBUG no compatible IB ports found for flags 0xd4
+[1747653881.362263] [hpc118:19239:0]          uct_md.c:96   UCX  DEBUG failed to query dc_mlx5 resources: No such device
+[1747653881.362271] [hpc118:19239:0]       ib_device.c:740  UCX  TRACE mlx5_1:1 is not active (state: 1)
+[1747653881.362278] [hpc118:19239:0]       ib_device.c:1253 UCX  TRACE mlx5_1:1 does not support flags 0x14: Destination is unreachable
+[1747653881.362285] [hpc118:19239:0]       ib_device.c:1269 UCX  DEBUG no compatible IB ports found for flags 0x14
+[1747653881.362292] [hpc118:19239:0]          uct_md.c:96   UCX  DEBUG failed to query rc_mlx5 resources: No such device
+[1747653881.362300] [hpc118:19239:0]       ib_device.c:740  UCX  TRACE mlx5_1:1 is not active (state: 1)
+[1747653881.362307] [hpc118:19239:0]       ib_device.c:1253 UCX  TRACE mlx5_1:1 does not support flags 0x4: Destination is unreachable
+[1747653881.362315] [hpc118:19239:0]       ib_device.c:1269 UCX  DEBUG no compatible IB ports found for flags 0x4
+[1747653881.362322] [hpc118:19239:0]          uct_md.c:96   UCX  DEBUG failed to query ud_mlx5 resources: No such device
+[1747653881.390749] [hpc118:19239:0]          uct_md.c:96   UCX  DEBUG failed to query srd resources: No such device
+#
+# Memory domain: mlx5_1
+#     Component: ib
+#             allocate: <= 128K
+#             register: unlimited, dmabuf, cost: 16000 + 0.060 * N nsec
+#           remote key: 8 bytes
+#           local memory handle is required for zcopy
+#           memory invalidation is supported
+#         memory types: host (access,reg,cache), rdma (alloc,cache)
+#   < no supported devices found >
+[1747653881.390846] [hpc118:19239:0]    ib_mlx5dv_md.c:2533 UCX  DEBUG mlx5_1: md=0x5555555c0350 md->flags=0x3f11fbb flush_rkey=0x1c0300
+[1747653881.391273] [hpc118:19239:0]           ib_md.c:529  UCX  TRACE ibv_dereg_mr(mr=0x5555555c8b70 addr=0x555555622000 length=8)
+[1747653881.391502] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool devx dbrec destroyed
+[1747653881.391515] [hpc118:19239:0]       ib_device.c:664  UCX  DEBUG destroying ib device mlx5_1
+[1747653881.391525] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x5555555783d0 [id=6 ref 1] ???() from hash
+[1747653881.391535] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x5555555783d0 [id=6 ref 1] ???()
+[1747653881.391652] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x5555555783d0 [id=6 ref 1] ???() completion (called=0)
+[1747653881.391662] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x5555555783d0 [id=6 ref 0] ???()
+[1747653881.416418] [hpc118:19239:0]           async.c:247  UCX  DEBUG added async handler 0x5555555bfdd0 [id=5 ref 1] ???() to hash
+[1747653881.416831] [hpc118:19239:0]           async.c:521  UCX  DEBUG listening to async event fd 5 events 0x1 mode thread_spinlock
+[1747653881.416853] [hpc118:19239:0]       rdmacm_cm.c:981  UCX  DEBUG created rdmacm_cm 0x5555555cb150 with event_channel 0x5555555c8250 (fd=5)
+#
+# Connection manager: rdmacm
+#      max_conn_priv: 54 bytes
+[1747653881.416885] [hpc118:19239:0]           async.c:172  UCX  DEBUG removed async handler 0x5555555bfdd0 [id=5 ref 1] ???() from hash
+[1747653881.416891] [hpc118:19239:0]           async.c:575  UCX  DEBUG removing async handler 0x5555555bfdd0 [id=5 ref 1] ???()
+[1747653881.416959] [hpc118:19239:0]           async.c:591  UCX  TRACE waiting for 0x5555555bfdd0 [id=5 ref 1] ???() completion (called=0)
+[1747653881.416967] [hpc118:19239:0]           async.c:187  UCX  DEBUG release async handler 0x5555555bfdd0 [id=5 ref 0] ???()
+[1747653881.416974] [hpc118:19239:0]       rdmacm_cm.c:1006 UCX  TRACE destroying event_channel 0x5555555c8250 on cm 0x5555555cb150
+[1747653881.417039] [hpc118:19239:0]          cma_md.c:113  UCX  TRACE ptrace_scope is 1, enabled PR_SET_PTRACER_ANY, CMA is supported
+[1747653881.417066] [hpc118:19239:0]          cma_md.c:113  UCX  TRACE ptrace_scope is 1, enabled PR_SET_PTRACER_ANY, CMA is supported
+#
+# Memory domain: cma
+#     Component: cma
+#         memory types: 
+#
+#      Transport: cma
+#         Device: memory
+#           Type: intra-node
+#  System device: <unknown>
+[1747653881.417197] [hpc118:19239:0]           mpool.c:136  UCX  DEBUG mpool uct_scopy_iface_tx_mp: align 64, maxelems 4294967295, elemsize 736
+#
+#      capabilities:
+#            bandwidth: 0.00/ppn + 11145.00 MB/sec
+#              latency: 80 nsec
+#             overhead: 2000 nsec
+#            put_zcopy: unlimited, up to 16 iov
+#  put_opt_zcopy_align: <= 1
+#        put_align_mtu: <= 1
+#            get_zcopy: unlimited, up to 16 iov
+#  get_opt_zcopy_align: <= 1
+#        get_align_mtu: <= 1
+#           connection: to iface
+#      device priority: 0
+#     device num paths: 1
+#              max eps: inf
+#       device address: 8 bytes
+#        iface address: 4 bytes
+#       error handling: peer failure, ep_check
+[1747653881.417348] [hpc118:19239:0]           mpool.c:194  UCX  DEBUG mpool uct_scopy_iface_tx_mp destroyed
+#
+[1747653881.417405] [hpc118:19239:0]        mm_xpmem.c:86   UCX  DEBUG xpmem_version() returned -1 (No such file or directory), xpmem is unavailable
+[1747653881.417419] [hpc118:19239:0]        mm_xpmem.c:86   UCX  DEBUG xpmem_version() returned -1 (No such file or directory), xpmem is unavailable
+[1747653881.417618] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff6fcbf20 gga
+[1747653881.417632] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff6e43580 rdmacm
+[1747653881.417641] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff70f97c0 ib
+[1747653881.417674] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff7d17580 cma
+[1747653881.417682] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff6e0c3a0 xpmem
+[1747653881.417694] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff7dfdfc0 posix
+[1747653881.417701] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff7dfe360 sysv
+[1747653881.417708] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff7dffe60 tcp
+[1747653881.417714] [hpc118:19239:0]   uct_component.c:185  UCX  TRACE component_list 0x7ffff7dfcb70: unregister 0x7ffff7dfeaa0 self
+[1] + Done                       "/bin/gdb" --interpreter=mi --tty=${DbgTerm} 0<"/tmp/Microsoft-MIEngine-In-v2vsxvt1.ltc" 1>"/tmp/Microsoft-MIEngine-Out-5rsvvqmw.x34"
+root@hpc118:~/project/net/ucx# 

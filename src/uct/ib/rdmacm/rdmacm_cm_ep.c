@@ -663,6 +663,7 @@ uct_rdmacm_cm_ep_send_priv_data(uct_rdmacm_cm_ep_t *cep, const void *priv_data,
         ucs_trace("%s rdma_connect on cm_id %p",
                   uct_rdmacm_cm_ep_str(cep, ep_str, UCT_RDMACM_EP_STRING_LEN),
                   cep->id);
+        printf("Rdma CM connect\n");
         if (rdma_connect(cep->id, &conn_param)) {
             uct_cm_ep_peer_error(&cep->super,
                                  "rdma_connect(on id=%p) failed: %m", cep->id);
