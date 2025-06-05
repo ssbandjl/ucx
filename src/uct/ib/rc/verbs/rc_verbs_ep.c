@@ -57,7 +57,7 @@ uct_rc_verbs_ep_post_send(uct_rc_verbs_iface_t* iface, uct_rc_verbs_ep_t* ep,
     uct_ib_log_post_send(&iface->super.super, ep->qp, wr, max_log_sge,
                          (wr->opcode == IBV_WR_SEND) ? uct_rc_ep_packet_dump : NULL);
 
-    printf_ffl("RDMA post send wr\n");
+    printf_ffl("RDMA post send wr, wr_id:%lu, wr->opcode:%s\n", wr->wr_id, ibv_wr_opcode_str(wr->opcode));
     ret = ibv_post_send(ep->qp, wr, &bad_wr);
     if (ret != 0) {
         ucs_fatal("ibv_post_send() returned %d (%m)", ret);

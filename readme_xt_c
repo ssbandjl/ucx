@@ -4,6 +4,9 @@ ibdev2netdev
 cd examples/.libs
 ./uct_hello_world -d mlx5_0:1 -t rc_verbs -n 192.168.2.117
 
+# xt
+./uct_hello_world -d xtrdma_0:1 -t rc_verbs -n 192.168.1.11
+
 root@hpc118:~/project/net/ucx/examples/.libs# ./uct_hello_world -d mlx5_0:1 -t rc_verbs -n 192.168.2.117
 [1747557582.580847] [hpc118:47168:0]           debug.c:1157 UCX  DEBUG using signal stack 0x7fd60a9c6000 size 141824
 [1747557582.601718] [hpc118:47168:0]            init.c:120  UCX  DEBUG /root/project/net/ucx/install-debug/lib/libucs.so.0 loaded at 0x7fd60adea000
