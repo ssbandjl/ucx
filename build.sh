@@ -1,9 +1,9 @@
 clear
+# make clean
 export HAVE_EXAMPLES=true
 ./autogen.sh
 ./contrib/configure-devel --prefix=$PWD/install-debug --without-java --without-go --enable-gtest=no --enable-debug
-make -j4
-make install
+make -j64 && make install
 
 # cd examples; make
 
