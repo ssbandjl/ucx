@@ -1,0 +1,66 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+			"name": "uct_hello_world_xt_s",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/examples/.libs/uct_hello_world",
+			"args": ["-d", "mlx5_0:1", "-t", "rc_verbs"],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/examples/.libs/",
+			"environment": [
+				{"name": "UCX_LOG_LEVEL", "value": "debug"},
+				// {"name": "LD_LIBRARY_PATH", "value": "/root/project/rdma/dpu_user_rdma/build/lib"},
+			],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"miDebuggerPath": "/bin/gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				},
+				{
+					"description": "Set Disassembly Flavor to Intel",
+					"text": "-gdb-set disassembly-flavor intel",
+					"ignoreFailures": true
+				}
+			]
+		},
+        {
+			"name": "ucx_perftest_s",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/install-debug/bin/ucx_perftest",
+			// "args": ["-t", "tag_lat"],
+			// "args": ["-t", "tag_bw"],
+			"args": ["-t", "put_bw", "-d", "mlx5_0:1", "-x", "rc_verbs"],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/install-debug/bin",
+			"environment": [
+				{"name": "UCX_LOG_LEVEL", "value": "debug"},
+				{"name": "LD_LIBRARY_PATH", "value": "/root/project/rdma/rdma-core/build/lib"},
+			],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"miDebuggerPath": "/bin/gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				},
+				{
+					"description": "Set Disassembly Flavor to Intel",
+					"text": "-gdb-set disassembly-flavor intel",
+					"ignoreFailures": true
+				}
+			]
+		},
+    ]
+}
