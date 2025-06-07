@@ -1,0 +1,651 @@
+[1749262292.691924] [gdr114:867670:0]           debug.c:1157 UCX  DEBUG using signal stack 0x7ffff7a2f000 size 141824
+[1749262292.694159] [gdr114:867670:0]            init.c:120  UCX  DEBUG /root/project/net/ucx/install-debug/lib/libucs.so.0 loaded at 0x7ffff7b62000
+[1749262292.694209] [gdr114:867670:0]            init.c:122  UCX  DEBUG cmd line: /root/project/net/ucx/install-debug/bin/ucx_perftest -t tag_bw 192.168.1.11 
+[1749262292.694238] [gdr114:867670:0]          module.c:72   UCX  DEBUG ucs library path: /root/project/net/ucx/install-debug/lib/libucs.so.0
+[1749262292.694251] [gdr114:867670:0]          module.c:304  UCX  DEBUG loading modules for ucs
+[1749262292.796803] [gdr114:867670:0]          module.c:304  UCX  DEBUG loading modules for ucx_perftest
+[1749262292.932460] [gdr114:867670:0]        perftest.c:800  UCX  WARN  CPU affinity is not set (bound to 56 cpus). Performance may be impacted.
++--------------+--------------+------------------------------+---------------------+-----------------------+
+|              |              |       overhead (usec)        |   bandwidth (MB/s)  |  message rate (msg/s) |
++--------------+--------------+----------+---------+---------+----------+----------+-----------+-----------+
+|    Stage     | # iterations | 50.0%ile | average | overall |  average |  overall |  average  |  overall  |
++--------------+--------------+----------+---------+---------+----------+----------+-----------+-----------+
+[1749262292.933179] [gdr114:867670:0]         libperf.c:2152 UCX  DEBUG set send allocator by send mem type host
+[1749262292.933192] [gdr114:867670:0]         libperf.c:2156 UCX  DEBUG set recv allocator by recv mem type host
+[1749262292.933208] [gdr114:867670:0]            time.c:22   UCX  DEBUG arch clock frequency: 2400000000.00 Hz
+[1749262292.934524] [gdr114:867670:0]     ucp_context.c:2341 UCX  INFO  Version 1.20.0 (loaded from /root/project/net/ucx/install-debug/lib/libucp.so.0)
+[1749262292.934551] [gdr114:867670:0]     ucp_context.c:2089 UCX  DEBUG estimated number of endpoints is 1
+[1749262292.934558] [gdr114:867670:0]     ucp_context.c:2096 UCX  DEBUG estimated number of endpoints per node is 1
+[1749262292.934568] [gdr114:867670:0]     ucp_context.c:2107 UCX  DEBUG estimated bcopy bandwidth is 7340032000.000000
+[1749262292.935104] [gdr114:867670:0]     ucp_context.c:2166 UCX  DEBUG allocation method[0] is md 'sysv'
+[1749262292.935115] [gdr114:867670:0]     ucp_context.c:2166 UCX  DEBUG allocation method[1] is md 'posix'
+[1749262292.935133] [gdr114:867670:0]     ucp_context.c:2178 UCX  DEBUG allocation method[2] is 'thp'
+[1749262292.935139] [gdr114:867670:0]     ucp_context.c:2166 UCX  DEBUG allocation method[3] is md '*'
+[1749262292.935145] [gdr114:867670:0]     ucp_context.c:2178 UCX  DEBUG allocation method[4] is 'mmap'
+[1749262292.935153] [gdr114:867670:0]     ucp_context.c:2178 UCX  DEBUG allocation method[5] is 'heap'
+[1749262292.935188] [gdr114:867670:0]          module.c:304  UCX  DEBUG loading modules for uct
+[1749262293.035117] [gdr114:867670:0]          module.c:304  UCX  DEBUG loading modules for uct_cuda
+[1749262293.040467] [gdr114:867670:0]          module.c:278  UCX  DEBUG dlopen('/root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0', mode=0x1) failed: /root/project/rdma/rdma-core/build/lib/libibverbs.so.1: version `IBVERBS_PRIVATE_34' not found (required by /root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0)
+[1749262293.041861] [gdr114:867670:0]          module.c:278  UCX  DEBUG dlopen('/root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0', mode=0x1) failed: /root/project/rdma/rdma-core/build/lib/libibverbs.so.1: version `IBVERBS_PRIVATE_34' not found (required by /root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0)
+[1749262293.045849] [gdr114:867670:0]          module.c:278  UCX  DEBUG dlopen('/root/project/net/ucx/install-debug/lib/ucx/libuct_rdmacm.so.0', mode=0x1) failed: /root/project/rdma/rdma-core/build/lib/libibverbs.so.1: version `IBVERBS_PRIVATE_34' not found (required by /root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0)
+[1749262293.047482] [gdr114:867670:0]          module.c:278  UCX  DEBUG dlopen('/root/project/net/ucx/install-debug/lib/ucx/libuct_rdmacm.so.0', mode=0x1) failed: /root/project/rdma/rdma-core/build/lib/libibverbs.so.1: version `IBVERBS_PRIVATE_34' not found (required by /root/project/net/ucx/install-debug/lib/ucx/libuct_ib.so.0)
+[1749262293.145504] [gdr114:867670:0]            topo.c:304  UCX  DEBUG added sys_dev 0 for bus id 08:00.0
+[1749262293.145650] [gdr114:867670:0]        mm_xpmem.c:86   UCX  DEBUG xpmem_version() returned -1 (No such file or directory), xpmem is unavailable
+[1749262293.148112] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.148203] [gdr114:867670:0]            topo.c:304  UCX  DEBUG added sys_dev 1 for bus id 81:00.0
+[1749262293.148215] [gdr114:867670:0]            topo.c:560  UCX  DEBUG enp129s0f0: bdf_name 0000:81:00.0 sys_dev 1
+[1749262293.153800] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.153891] [gdr114:867670:0]            topo.c:304  UCX  DEBUG added sys_dev 2 for bus id 89:00.0
+[1749262293.153901] [gdr114:867670:0]            topo.c:560  UCX  DEBUG enp137s0f0np0: bdf_name 0000:89:00.0 sys_dev 2
+[1749262293.159421] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.159513] [gdr114:867670:0]            topo.c:304  UCX  DEBUG added sys_dev 3 for bus id 04:00.0
+[1749262293.159523] [gdr114:867670:0]            topo.c:560  UCX  DEBUG enp4s0f0np0: bdf_name 0000:04:00.0 sys_dev 3
+[1749262293.164818] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.164832] [gdr114:867670:0]            topo.c:564  UCX  DEBUG lo: system device unknown
+[1749262293.165117] [gdr114:867670:0]    cuda_copy_md.c:110  UCX  DEBUG dmabuf is not supported on cuda device 0
+[1749262293.165195] [gdr114:867670:0]      cuda_iface.c:51   UCX  DEBUG set cuda sys_device to `unknown` as no context is currently active
+[1749262293.190697] [gdr114:867670:0]     cuda_ipc_md.c:571  UCX  DEBUG fabric_info: state=0 status=32767 uuid=00000000:00000000:00000000:00bfffff
+[1749262293.192252] [gdr114:867670:0]     cuda_ipc_md.c:594  UCX  DEBUG multi-node NVLINK support is disabled
+[1749262293.192391] [gdr114:867670:0]      cuda_iface.c:51   UCX  DEBUG set cuda sys_device to `unknown` as no context is currently active
+[1749262293.192528] [gdr114:867670:0]        mm_xpmem.c:86   UCX  DEBUG xpmem_version() returned -1 (No such file or directory), xpmem is unavailable
+[1749262293.192549] [gdr114:867670:0]     ucp_context.c:1786 UCX  DEBUG register host memory on: self, cuda_cpy
+[1749262293.192558] [gdr114:867670:0]     ucp_context.c:1786 UCX  DEBUG register cuda memory on: cuda_cpy, cuda_ipc
+[1749262293.192566] [gdr114:867670:0]     ucp_context.c:1786 UCX  DEBUG register cuda-managed memory on: cuda_cpy
+[1749262293.192573] [gdr114:867670:0]     ucp_context.c:1774 UCX  DEBUG no memory domain supports registering rocm memory
+[1749262293.192612] [gdr114:867670:0]     ucp_context.c:1774 UCX  DEBUG no memory domain supports registering rocm-managed memory
+[1749262293.192620] [gdr114:867670:0]     ucp_context.c:1774 UCX  DEBUG no memory domain supports registering rdma memory
+[1749262293.192627] [gdr114:867670:0]     ucp_context.c:1774 UCX  DEBUG no memory domain supports registering ze-host memory
+[1749262293.192634] [gdr114:867670:0]     ucp_context.c:1774 UCX  DEBUG no memory domain supports registering ze-device memory
+[1749262293.192641] [gdr114:867670:0]     ucp_context.c:1774 UCX  DEBUG no memory domain supports registering ze-managed memory
+[1749262293.193200] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool rcache_mp: align 8, maxelems 4294967295, elemsize 144
+[1749262293.193280] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x55555570e700 [id=16 ref 1] ???() to hash
+[1749262293.193973] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 16 events 0x1 mode thread_spinlock
+[1749262293.194410] [gdr114:867670:0]          module.c:304  UCX  DEBUG loading modules for ucm
+[1749262293.317183] [gdr114:867670:0]     ucp_context.c:2414 UCX  DEBUG created ucp context perftest 0x5555556d06b0 [7 mds 10 tls] features 0x1 tl bitmap 0x3ff 0x0
+[1749262293.317401] [gdr114:867670:0]         mm_sysv.c:97   UCX  DEBUG   mm failed to allocate 8 bytes with hugetlb
+[1749262293.317905] [gdr114:867670:0]    cuda_copy_md.c:151  UCX  DEBUG attempt to register memory without active context
+[1749262293.317919] [gdr114:867670:0]         mm_sysv.c:97   UCX  DEBUG   mm failed to allocate 8 bytes with hugetlb
+[1749262293.318086] [gdr114:867670:0]    cuda_copy_md.c:151  UCX  DEBUG attempt to register memory without active context
+[1749262293.318196] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool self_msg_desc: align 64, maxelems 4294967295, elemsize 8200
+[1749262293.318206] [gdr114:867670:0]            self.c:247  UCX  DEBUG created self iface id 0xf92ac7d72bec3f34 send_size 8192
+[1749262293.318234] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[0]=0x5555556cdad0 using self/memory on worker 0x7ffff73dd010
+[1749262293.318272] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1749262293.318278] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1749262293.320192] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556fb380 [id=28 ref 1] ???() to hash
+[1749262293.320211] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 28 events 0x5 mode thread_spinlock
+[1749262293.320223] [gdr114:867670:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x5555556fdfc0: listening for connections (fd=28) on 10.20.10.114:35697 netif enp129s0f0
+[1749262293.320367] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.321501] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[1]=0x5555556fdfc0 using tcp/enp129s0f0 on worker 0x7ffff73dd010
+[1749262293.321536] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1749262293.321541] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1749262293.323350] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x55555570e6c0 [id=30 ref 1] ???() to hash
+[1749262293.323366] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 30 events 0x5 mode thread_spinlock
+[1749262293.323372] [gdr114:867670:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x555555723710: listening for connections (fd=30) on 192.168.2.10:57609 netif enp137s0f0np0
+[1749262293.324298] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.324412] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[2]=0x555555723710 using tcp/enp137s0f0np0 on worker 0x7ffff73dd010
+[1749262293.324442] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1749262293.324449] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1749262293.326248] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x55555570e680 [id=32 ref 1] ???() to hash
+[1749262293.326264] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 32 events 0x5 mode thread_spinlock
+[1749262293.326269] [gdr114:867670:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x5555557240b0: listening for connections (fd=32) on 192.168.1.10:43403 netif enp4s0f0np0
+[1749262293.327046] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.327174] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[3]=0x5555557240b0 using tcp/enp4s0f0np0 on worker 0x7ffff73dd010
+[1749262293.327205] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: align 64, maxelems 4294967295, elemsize 8205
+[1749262293.327211] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: align 64, maxelems 4294967295, elemsize 131090
+[1749262293.329000] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556fbe30 [id=34 ref 1] ???() to hash
+[1749262293.329015] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 34 events 0x5 mode thread_spinlock
+[1749262293.329021] [gdr114:867670:0]       tcp_iface.c:613  UCX  DEBUG tcp_iface 0x555555724ba0: listening for connections (fd=34) on 127.0.0.1:53967 netif lo
+[1749262293.329047] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.329060] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.329135] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.329142] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.329186] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[4]=0x555555724ba0 using tcp/lo on worker 0x7ffff73dd010
+[1749262293.329246] [gdr114:867670:0]         mm_sysv.c:97   UCX  DEBUG   mm failed to allocate 33023 bytes with hugetlb
+[1749262293.329311] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool mm_recv_desc: align 64, maxelems 4294967295, elemsize 8376
+[1749262293.329365] [gdr114:867670:0]         mm_sysv.c:97   UCX  DEBUG   mm failed to allocate 4292720 bytes with hugetlb
+[1749262293.329398] [gdr114:867670:0]           mpool.c:281  UCX  DEBUG mpool mm_recv_desc: allocated chunk 0x7fffe49c6018 of 4296680 bytes with 512 elements
+[1749262293.331338] [gdr114:867670:0]        mm_iface.c:734  UCX  DEBUG created mm iface 0x5555556ea5b0 FIFO id 0xf va 0x7ffff76bf000 size 36864 (128 x 256 elems)
+[1749262293.331381] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[5]=0x5555556ea5b0 using sysv/memory on worker 0x7ffff73dd010
+[1749262293.331561] [gdr114:867670:0]        mm_posix.c:607  UCX  DEBUG   allocated posix shared memory at 0x7ffff76b6000 length 36864
+[1749262293.331601] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool mm_recv_desc: align 64, maxelems 4294967295, elemsize 8376
+[1749262293.334064] [gdr114:867670:0]        mm_posix.c:373  UCX  DEBUG   shared memory mmap(addr=(nil), length=6291456, flags= HUGETLB, fd=38) failed: Invalid argument
+[1749262293.334084] [gdr114:867670:0]        mm_posix.c:607  UCX  DEBUG   allocated posix shared memory at 0x7fffe45ad000 length 4296704
+[1749262293.334095] [gdr114:867670:0]           mpool.c:281  UCX  DEBUG mpool mm_recv_desc: allocated chunk 0x7fffe45ad018 of 4296680 bytes with 512 elements
+[1749262293.334933] [gdr114:867670:0]        mm_iface.c:734  UCX  DEBUG created mm iface 0x5555556eaed0 FIFO id 0xc0000009000d3d56 va 0x7ffff76b6000 size 36864 (128 x 256 elems)
+[1749262293.334955] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[6]=0x5555556eaed0 using posix/memory on worker 0x7ffff73dd010
+[1749262293.334993] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[7]=0x5555556eb7a0 using cuda_copy/cuda on worker 0x7ffff73dd010
+[1749262293.342942] [gdr114:867670:0]  cuda_ipc_iface.c:230  UCX  DEBUG nvmlDeviceGetNvLinkRemotePciInfo_v2(device, link, &pci) failed: Not Supported
+[1749262293.342954] [gdr114:867670:0]  cuda_ipc_iface.c:234  UCX  DEBUG could not find remote end info for link 0
+[1749262293.343964] [gdr114:867670:0]  cuda_ipc_iface.c:256  UCX  DEBUG cuda-ipc get zcopy disabled as no nvlinks detected
+[1749262293.343977] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[8]=0x5555556ecca0 using cuda_ipc/cuda on worker 0x7ffff73dd010
+[1749262293.344019] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool uct_scopy_iface_tx_mp: align 64, maxelems 4294967295, elemsize 736
+[1749262293.344043] [gdr114:867670:0]      ucp_worker.c:1433 UCX  DEBUG created interface[9]=0x5555556ed520 using cma/memory on worker 0x7ffff73dd010
+[1749262293.344143] [gdr114:867670:0]      ucp_worker.c:1150 UCX  DEBUG selected scalable tl bitmap: 0x3ff 0x0 (10 tls)
+[1749262293.344183] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556ecb70 [id=27 ref 1] ???() to hash
+[1749262293.344199] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 27 events 0x0 mode thread_spinlock
+[1749262293.344334] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.344545] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.344744] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.344928] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.345113] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.345292] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.345486] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.345680] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.345860] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.346038] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.346213] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.346383] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.346559] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262293.346674] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x555555709d40 [id=29 ref 1] ???() to hash
+[1749262293.346689] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 29 events 0x0 mode thread_spinlock
+[1749262293.347550] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.348459] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.349334] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.350213] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.351130] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.352003] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.352878] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.353788] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.354708] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.355579] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.356521] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.357405] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.358286] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.358373] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556cf400 [id=31 ref 1] ???() to hash
+[1749262293.358386] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 31 events 0x0 mode thread_spinlock
+[1749262293.359062] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.359794] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.360518] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.361267] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.361957] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.362653] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.363340] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.364032] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.364741] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.365435] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.366130] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.366829] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.367631] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.367721] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556f8570 [id=33 ref 1] ???() to hash
+[1749262293.367735] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 33 events 0x0 mode thread_spinlock
+[1749262293.367752] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.367764] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.367830] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.367836] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.367880] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.367890] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.367949] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.367956] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368007] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368018] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368075] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368081] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368120] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368131] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368188] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368194] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368233] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368243] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368300] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368306] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368347] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368358] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368415] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368421] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368461] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368472] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368529] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368535] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368575] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368593] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368652] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368659] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368700] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368711] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368769] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368775] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368814] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368824] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368881] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.368887] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.368926] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.368937] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.368994] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.369001] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.369040] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.369051] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.369108] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.369114] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.369153] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262293.369164] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262293.369221] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262293.369227] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262293.369266] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556fb580 [id=35 ref 1] ???() to hash
+[1749262293.369279] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 35 events 0x0 mode thread_spinlock
+[1749262293.369297] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556ec410 [id=37 ref 1] ???() to hash
+[1749262293.369305] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 37 events 0x0 mode thread_spinlock
+[1749262293.369323] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556ec450 [id=39 ref 1] ???() to hash
+[1749262293.369332] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 39 events 0x0 mode thread_spinlock
+[1749262293.369341] [gdr114:867670:0]           async.c:247  UCX  DEBUG added async handler 0x5555556ec490 [id=40 ref 1] ???() to hash
+[1749262293.369357] [gdr114:867670:0]           async.c:521  UCX  DEBUG listening to async event fd 40 events 0x0 mode thread_spinlock
+[1749262293.369380] [gdr114:867670:0]      tcp_sockcm.c:225  UCX  DEBUG created tcp_sockcm 0x5555556edc60
+[1749262293.371161] [gdr114:867670:0]          ucp_ep.c:407  UCX  DEBUG created ep 0x7ffff7380000 to gdr114:867670 mem_type_ep:cuda
+[1749262293.374516] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG         no active message lane for tag/rndv
+[1749262293.375053] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG             no active message lane for rndv/get/zcopy
+[1749262293.375641] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG             no active message lane for rndv/ats
+[1749262293.375656] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG             no active message lane for rndv/rtr
+[1749262293.375688] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG                 no active message lane for rndv/rtr
+[1749262293.375699] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG                 no active message lane for rndv/rtr/mtype
+[1749262293.375741] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG                     no active message lane for rndv/rtr
+[1749262293.375766] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG                     no active message lane for rndv/rtr/mtype
+[1749262293.376405] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG                 no active message lane for rndv/put/zcopy
+[1749262293.376426] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG             no active message lane for rndv/rtr/mtype
+[1749262293.376443] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG                 no active message lane for rndv/rtr
+[1749262293.376447] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG                 no active message lane for rndv/rtr/mtype
+[1749262293.376806] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG         no active message lane for rndv/rtr
+[1749262293.376815] [gdr114:867670:0]      proto_rndv.c:513  UCX  DEBUG         no active message lane for rndv/rtr/mtype
+[1749262293.376842] [gdr114:867670:0]          wireup.c:1267 UCX  DEBUG   ep 0x7ffff7380000: am_lane <none> wireup_msg_lane <none> cm_lane <none> keepalive_lane <none> reachable_mds 0x10
+[1749262293.376851] [gdr114:867670:0]          wireup.c:1290 UCX  DEBUG   ep 0x7ffff7380000: lane[0]:  7:cuda_copy/cuda.0 md[4]        -> addr[0].md[4]/cuda_cpy/sysdev[255] seg 4294967295 rma_bw#0
+[1749262293.376855] [gdr114:867670:0]          wireup.c:1293 UCX  DEBUG   ep 0x7ffff7380000: err mode 0, flags 0x1
+[1749262293.376905] [gdr114:867670:0]          ucp_ep.c:407  UCX  DEBUG created ep 0x7ffff73800a0 to gdr114:867670 mem_type_ep:cuda-managed
+[1749262293.376964] [gdr114:867670:0]          wireup.c:1267 UCX  DEBUG   ep 0x7ffff73800a0: am_lane <none> wireup_msg_lane <none> cm_lane <none> keepalive_lane <none> reachable_mds 0x10
+[1749262293.376973] [gdr114:867670:0]          wireup.c:1290 UCX  DEBUG   ep 0x7ffff73800a0: lane[0]:  7:cuda_copy/cuda.0 md[4]        -> addr[0].md[4]/cuda_cpy/sysdev[255] seg 4294967295 rma_bw#0
+[1749262293.376978] [gdr114:867670:0]          wireup.c:1293 UCX  DEBUG   ep 0x7ffff73800a0: err mode 0, flags 0x1
+[1749262293.376992] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool ucp_requests: align 64, maxelems 4294967295, elemsize 288
+[1749262293.376998] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool ucp_rkeys: align 64, maxelems 4294967295, elemsize 112
+[1749262293.377003] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool ucp_reg_bufs: align 64, maxelems 4294967295, elemsize 8216
+[1749262293.377010] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool ucp_am_bufs: align 64, maxelems 4294967295, elemsize 161
+[1749262293.377024] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool ucp_am_bufs: align 64, maxelems 4294967295, elemsize 1121
+[1749262293.377029] [gdr114:867670:0]           mpool.c:136  UCX  DEBUG mpool ucp_am_bufs: align 64, maxelems 4294967295, elemsize 65633
+[1749262293.377036] [gdr114:867670:0]       mpool_set.c:129  UCX  DEBUG mpool_set:ucp_am_bufs, sizes map 0x80000440, largest size 65536, mpools num 3
+[1749262293.377096] [gdr114:867670:0]          parser.c:2368 UCX  INFO  UCX_* env variable: UCX_LOG_LEVEL=debug
+[1749262293.377352] [gdr114:867670:0]          ucp_ep.c:407  UCX  DEBUG created ep 0x7ffff7380140 to gdr116:99595 from api call
+[1749262293.378316] [gdr114:867670:0]            topo.c:938  UCX  DEBUG   /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.379351] [gdr114:867670:0]            topo.c:938  UCX  DEBUG   /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.380147] [gdr114:867670:0]            topo.c:938  UCX  DEBUG   /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.380269] [gdr114:867670:0]      ucp_worker.c:1903 UCX  INFO    perftest inter-node cfg#1 tag(tcp/enp137s0f0np0 tcp/enp4s0f0np0)
+[1749262293.381136] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.382083] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.383053] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.384049] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.384995] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.385130] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.385152] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG               cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.385165] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG               cuda primary context is inactive on device 0
+[1749262293.385171] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG               no active cuda primary context for memory allocation
+[1749262293.385177] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG               failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.385183] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.385188] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.386065] [gdr114:867670:0]            topo.c:938  UCX  DEBUG             /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.386997] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.387966] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.388089] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.388103] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG                   cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.388110] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG                   cuda primary context is inactive on device 0
+[1749262293.388115] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG                   no active cuda primary context for memory allocation
+[1749262293.388119] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG                   failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.388125] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.388130] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.388157] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                       could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.388166] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG                       cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.388171] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG                       cuda primary context is inactive on device 0
+[1749262293.388176] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG                       no active cuda primary context for memory allocation
+[1749262293.388179] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG                       failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.388185] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                       could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.388190] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                       could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.389053] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.389861] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.390785] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.391824] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.392719] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.393630] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.394560] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.395468] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.396362] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.397303] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.398195] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.399108] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.400048] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.400994] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.401958] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.402979] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.403746] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.404540] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.405267] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.406026] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.406792] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.407541] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.408324] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.409093] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.409895] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.410639] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.411359] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.412097] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.412823] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.413790] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.414806] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.415885] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.416014] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416030] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG               cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.416036] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG               cuda primary context is inactive on device 0
+[1749262293.416041] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG               no active cuda primary context for memory allocation
+[1749262293.416047] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG               failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.416052] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416058] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416083] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416093] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG                   cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.416099] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG                   cuda primary context is inactive on device 0
+[1749262293.416104] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG                   no active cuda primary context for memory allocation
+[1749262293.416109] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG                   failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.416114] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416119] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416132] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416141] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG                   cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.416146] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG                   cuda primary context is inactive on device 0
+[1749262293.416151] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG                   no active cuda primary context for memory allocation
+[1749262293.416156] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG                   failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.416161] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.416167] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.417125] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.418124] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.419117] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.420157] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.421331] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.422306] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.423302] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.424484] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.425728] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.426978] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.428185] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.429310] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.430490] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.431908] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.433116] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.434268] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.435410] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.436574] [gdr114:867670:0]            topo.c:938  UCX  DEBUG         /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.436822] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.436849] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG               cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.436861] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG               cuda primary context is inactive on device 0
+[1749262293.436869] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG               no active cuda primary context for memory allocation
+[1749262293.436878] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG               failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.436888] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.436896] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.437864] [gdr114:867670:0]            topo.c:938  UCX  DEBUG             /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.438983] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.440158] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.440411] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.440436] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG                   cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.440446] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG                   cuda primary context is inactive on device 0
+[1749262293.440455] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG                   no active cuda primary context for memory allocation
+[1749262293.440462] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG                   failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.440471] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.440479] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG                   could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.441469] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.442430] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262293.443646] [gdr114:867670:0]            topo.c:938  UCX  DEBUG                 /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.444891] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.446033] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.447116] [gdr114:867670:0]            topo.c:938  UCX  DEBUG               /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.447328] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.447353] [gdr114:867670:0]    cuda_copy_md.c:383  UCX  DEBUG               cuCtxGetDevice(cu_device_p) failed: invalid device context
+[1749262293.447366] [gdr114:867670:0]         cuda_md.c:143  UCX  DEBUG               cuda primary context is inactive on device 0
+[1749262293.447374] [gdr114:867670:0]    cuda_copy_md.c:443  UCX  DEBUG               no active cuda primary context for memory allocation
+[1749262293.447383] [gdr114:867670:0]         uct_mem.c:168  UCX  DEBUG               failed to allocate 1 bytes using md cuda_cpy for get_alloc_md_id: No such device
+[1749262293.447393] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.447402] [gdr114:867670:0]         uct_mem.c:307  UCX  DEBUG               could not allocate get_alloc_md_id: cuda memory length=1 flags=0x368 num_methods=1
+[1749262293.448419] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.449563] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.450680] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.451777] [gdr114:867670:0]            topo.c:938  UCX  DEBUG           /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262293.452266] [gdr114:867670:0]          wireup.c:1267 UCX  DEBUG   ep 0x7ffff7380140: am_lane 0 wireup_msg_lane 1 cm_lane <none> keepalive_lane <none> reachable_mds 0x2
+[1749262293.452289] [gdr114:867670:0]          wireup.c:1290 UCX  DEBUG   ep 0x7ffff7380140: lane[0]:  2:tcp/enp137s0f0np0.0 md[1]     -> addr[2].md[1]/tcp/sysdev[2] seg 4294967295 rma_bw#1 am
+[1749262293.452300] [gdr114:867670:0]          wireup.c:1290 UCX  DEBUG   ep 0x7ffff7380140: lane[1]:  3:tcp/enp4s0f0np0.0 md[1]       -> addr[3].md[1]/tcp/sysdev[3] seg 4294967295 rma_bw#0 wireup
+[1749262293.452307] [gdr114:867670:0]          wireup.c:1293 UCX  DEBUG   ep 0x7ffff7380140: err mode 0, flags 0x0
+[1749262293.452331] [gdr114:867670:0]          tcp_ep.c:260  UCX  DEBUG   tcp_ep 0x5555557b4010: created on iface 0x555555723710, fd -1
+[1749262293.452358] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG   tcp_ep 0x5555557b4010: CLOSED -> CONNECTING for the [192.168.2.10:57609]<->[192.168.2.11:55373]:0 connection [-:-]
+[1749262293.452463] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG   tcp_ep 0x5555557b4010: CONNECTING -> CONNECTING for the [192.168.2.10:57609]<->[192.168.2.11:55373]:0 connection [-:-]
+[1749262293.452833] [gdr114:867670:0]            sock.c:358  UCX  DEBUG   connect(fd=41, src_addr=192.168.2.10:53755 dest_addr=192.168.2.11:55373): Success
+[1749262293.452896] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG   tcp_ep 0x5555557b4010: CONNECTING -> WAITING_ACK for the [192.168.2.10:57609]<->[192.168.2.11:55373]:0 connection [-:-]
+[1749262293.452937] [gdr114:867670:0]          tcp_ep.c:260  UCX  DEBUG   tcp_ep 0x5555557b4180: created on iface 0x5555557240b0, fd -1
+[1749262293.452953] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG   tcp_ep 0x5555557b4180: CLOSED -> CONNECTING for the [192.168.1.10:43403]<->[192.168.1.11:52241]:0 connection [-:-]
+[1749262293.453028] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG   tcp_ep 0x5555557b4180: CONNECTING -> CONNECTING for the [192.168.1.10:43403]<->[192.168.1.11:52241]:0 connection [-:-]
+[1749262293.453337] [gdr114:867670:0]            sock.c:358  UCX  DEBUG   connect(fd=42, src_addr=192.168.1.10:37671 dest_addr=192.168.1.11:52241): Success
+[1749262293.453385] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG   tcp_ep 0x5555557b4180: CONNECTING -> WAITING_ACK for the [192.168.1.10:43403]<->[192.168.1.11:52241]:0 connection [-:-]
+[1749262293.462968] [gdr114:867670:a]            sock.c:424  UCX  DEBUG [192.168.2.10:57609]<->[192.168.2.11:39129] is a connected pair
+[1749262293.463071] [gdr114:867670:a]          tcp_ep.c:260  UCX  DEBUG tcp_ep 0x7fffe0000b70: created on iface 0x555555723710, fd 43
+[1749262293.463085] [gdr114:867670:a]          tcp_cm.c:106  UCX  DEBUG tcp_ep 0x7fffe0000b70: CLOSED -> RECV_MAGIC_NUMBER
+[1749262293.463106] [gdr114:867670:a]          tcp_cm.c:843  UCX  DEBUG tcp_iface 0x555555723710: accepted connection from 192.168.2.11:39129 on 192.168.2.10:57609 to tcp_ep 0x7fffe0000b70 (fd 43)
+[1749262293.463387] [gdr114:867670:a]            sock.c:424  UCX  DEBUG [192.168.1.10:43403]<->[192.168.1.11:46117] is a connected pair
+[1749262293.463407] [gdr114:867670:a]          tcp_ep.c:260  UCX  DEBUG tcp_ep 0x7fffe0000c50: created on iface 0x5555557240b0, fd 44
+[1749262293.463415] [gdr114:867670:a]          tcp_cm.c:106  UCX  DEBUG tcp_ep 0x7fffe0000c50: CLOSED -> RECV_MAGIC_NUMBER
+[1749262293.463429] [gdr114:867670:a]          tcp_cm.c:843  UCX  DEBUG tcp_iface 0x5555557240b0: accepted connection from 192.168.1.11:46117 on 192.168.1.10:43403 to tcp_ep 0x7fffe0000c50 (fd 44)
+[1749262293.463645] [gdr114:867670:0]           mpool.c:281  UCX  DEBUG mpool ucp_requests: allocated chunk 0x5555557583d4 of 41044 bytes with 128 elements
+[1749262293.463726] [gdr114:867670:0]           mpool.c:281  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: allocated chunk 0x7ffff6cff010 of 1049176 bytes with 8 elements
+[1749262293.463784] [gdr114:867670:0]          tcp_cm.c:106  UCX  DEBUG tcp_ep 0x7fffe0000b70: RECV_MAGIC_NUMBER -> ACCEPTING
+[1749262293.463825] [gdr114:867670:0]           mpool.c:281  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp: allocated chunk 0x7ffff26ff010 of 1049176 bytes with 8 elements
+[1749262293.463872] [gdr114:867670:0]          tcp_cm.c:106  UCX  DEBUG tcp_ep 0x7fffe0000c50: RECV_MAGIC_NUMBER -> ACCEPTING
+[1749262293.463894] [gdr114:867670:0]           flush.c:387  UCX  DEBUG flush_worker ep 0x7ffff7380140
+[1749262293.463943] [gdr114:867670:0]          tcp_cm.c:535  UCX  DEBUG tcp_ep 0x5555557b4010: move accept_ep 0x7fffe0000b70 fd=43 to stale
+[1749262293.463958] [gdr114:867670:0]          tcp_ep.c:359  UCX  DEBUG tcp_ep 0x7fffe0000b70: purge outstanding operations with status Request canceled
+[1749262293.463972] [gdr114:867670:0]          tcp_cm.c:106  UCX  DEBUG tcp_ep 0x7fffe0000b70: ACCEPTING -> CLOSED
+[1749262293.463980] [gdr114:867670:0]          tcp_ep.c:412  UCX  DEBUG tcp_ep 0x7fffe0000b70: destroyed on iface 0x555555723710
+[1749262293.464006] [gdr114:867670:0]          tcp_cm.c:535  UCX  DEBUG tcp_ep 0x5555557b4180: move accept_ep 0x7fffe0000c50 fd=44 to stale
+[1749262293.464016] [gdr114:867670:0]          tcp_ep.c:359  UCX  DEBUG tcp_ep 0x7fffe0000c50: purge outstanding operations with status Request canceled
+[1749262293.464025] [gdr114:867670:0]          tcp_cm.c:106  UCX  DEBUG tcp_ep 0x7fffe0000c50: ACCEPTING -> CLOSED
+[1749262293.464033] [gdr114:867670:0]          tcp_ep.c:412  UCX  DEBUG tcp_ep 0x7fffe0000c50: destroyed on iface 0x5555557240b0
+[1749262293.464167] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG tcp_ep 0x5555557b4010: WAITING_ACK -> CONNECTED for the [192.168.2.10:57609]<->[192.168.2.11:55373]:0 connection [Tx:Rx]
+[1749262293.464285] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG tcp_ep 0x5555557b4180: WAITING_ACK -> CONNECTED for the [192.168.1.10:43403]<->[192.168.1.11:52241]:0 connection [Tx:Rx]
+[1749262293.466052] [gdr114:867670:0]           mpool.c:281  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp: allocated chunk 0x555555762430 of 66136 bytes with 8 elements
+[1749262293.577649] [gdr114:867670:0]            sock.c:546  UCX  DEBUG send(41) failed: Resource temporarily unavailable
+[thread 0]            485204      1.143     2.061     2.061        3.70       3.70      485203      485203
+Final:               1000000      1.162     1.684     1.867        4.53       4.09      593913      535679
+[1749262295.426218] [gdr114:867670:0]          ucp_ep.c:1755 UCX  DEBUG ep 0x7ffff7380140 flags 0x51 cfg_index 1: close_nbx(flags=0x0)
+[1749262295.426233] [gdr114:867670:0]           flush.c:387  UCX  DEBUG close ep 0x7ffff7380140
+[1749262295.426370] [gdr114:867670:0]          ucp_ep.c:1710 UCX  DEBUG ep 0x7ffff7380140: flags 0x451 close flushed callback for request 0x55555575fc00
+[1749262295.426391] [gdr114:867670:0]          ucp_ep.c:1663 UCX  DEBUG ep 0x7ffff7380140: disconnected with request 0x55555575fc00, Success
+[1749262295.426409] [gdr114:867670:0]          ucp_ep.c:1289 UCX  DEBUG ep 0x7ffff7380140: destroy
+[1749262295.426414] [gdr114:867670:0]          ucp_ep.c:1607 UCX  DEBUG ep 0x7ffff7380140: cleanup lanes
+[1749262295.426421] [gdr114:867670:0]          ucp_ep.c:1618 UCX  DEBUG ep 0x7ffff7380140: pending & destroy uct_ep[0]=0x5555557b4010
+[1749262295.426451] [gdr114:867670:0]          tcp_ep.c:359  UCX  DEBUG tcp_ep 0x5555557b4010: purge outstanding operations with status Request canceled
+[1749262295.426469] [gdr114:867670:0]          ucp_ep.c:1618 UCX  DEBUG ep 0x7ffff7380140: pending & destroy uct_ep[1]=0x5555557b4180
+[1749262295.426474] [gdr114:867670:0]          tcp_ep.c:359  UCX  DEBUG tcp_ep 0x5555557b4180: purge outstanding operations with status Request canceled
+[1749262295.427490] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.428523] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.429506] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.430517] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.431430] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.432235] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.433077] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.433921] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.434754] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.435659] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.436458] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.437259] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.438047] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.438754] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.439496] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.440232] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.440919] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.441649] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.442309] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.442972] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.443643] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.444341] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.445042] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.445686] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.446419] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.447269] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.447427] [gdr114:867670:0]          tcp_ep.c:359  UCX  DEBUG tcp_ep 0x5555557b4010: purge outstanding operations with status Request canceled
+[1749262295.447467] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG tcp_ep 0x5555557b4010: CONNECTED -> CLOSED for the [192.168.2.10:57609]<->[192.168.2.11:55373]:0 connection [-:-]
+[1749262295.447474] [gdr114:867670:0]          tcp_ep.c:412  UCX  DEBUG tcp_ep 0x5555557b4010: destroyed on iface 0x555555723710
+[1749262295.447488] [gdr114:867670:0]          tcp_ep.c:359  UCX  DEBUG tcp_ep 0x5555557b4180: purge outstanding operations with status Request canceled
+[1749262295.447510] [gdr114:867670:0]          tcp_cm.c:96   UCX  DEBUG tcp_ep 0x5555557b4180: CONNECTED -> CLOSED for the [192.168.1.10:43403]<->[192.168.1.11:52241]:0 connection [-:-]
+[1749262295.447516] [gdr114:867670:0]          tcp_ep.c:412  UCX  DEBUG tcp_ep 0x5555557b4180: destroyed on iface 0x5555557240b0
+[1749262295.447613] [gdr114:867670:0]      ucp_worker.c:2912 UCX  DEBUG destroy worker 0x7ffff73dd010
+[1749262295.447621] [gdr114:867670:0]      ucp_worker.c:2898 UCX  DEBUG worker 0x7ffff73dd010: destroy all endpoints
+[1749262295.447626] [gdr114:867670:0]      ucp_worker.c:2898 UCX  DEBUG worker 0x7ffff73dd010: destroy internal endpoints
+[1749262295.447635] [gdr114:867670:0]          ucp_ep.c:1282 UCX  DEBUG ep 0x7ffff7380000: purge uct_ep[0]=0x5555556f0460
+[1749262295.447640] [gdr114:867670:0]          ucp_ep.c:1289 UCX  DEBUG ep 0x7ffff7380000: destroy
+[1749262295.447644] [gdr114:867670:0]          ucp_ep.c:1607 UCX  DEBUG ep 0x7ffff7380000: cleanup lanes
+[1749262295.447649] [gdr114:867670:0]          ucp_ep.c:1618 UCX  DEBUG ep 0x7ffff7380000: pending & destroy uct_ep[0]=0x5555556f0460
+[1749262295.447663] [gdr114:867670:0]          ucp_ep.c:1282 UCX  DEBUG ep 0x7ffff73800a0: purge uct_ep[0]=0x5555556f0760
+[1749262295.447668] [gdr114:867670:0]          ucp_ep.c:1289 UCX  DEBUG ep 0x7ffff73800a0: destroy
+[1749262295.447672] [gdr114:867670:0]          ucp_ep.c:1607 UCX  DEBUG ep 0x7ffff73800a0: cleanup lanes
+[1749262295.447677] [gdr114:867670:0]          ucp_ep.c:1618 UCX  DEBUG ep 0x7ffff73800a0: pending & destroy uct_ep[0]=0x5555556f0760
+[1749262295.447684] [gdr114:867670:0]      ucp_worker.c:243  UCX  DEBUG worker 0x7ffff73dd010: remove active message handlers
+[1749262295.447802] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.447990] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.448164] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.448334] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.448505] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.448696] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.448842] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.449011] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.449192] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.449360] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.449529] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.449705] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.449872] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749262295.450697] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.451505] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.452320] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.453125] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.453920] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.454715] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.455606] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.456476] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.457288] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.458094] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.459028] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.459891] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.460757] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp137s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:03.0/0000:86:00.0/0000:87:10.0/0000:89:00.0'
+[1749262295.461427] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.462089] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.462766] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.463416] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.464101] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.464761] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.465420] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.466087] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.466747] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.467406] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.468067] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.468735] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.469387] [gdr114:867670:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749262295.469470] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.469480] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.469545] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.469551] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.469594] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.469607] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.469664] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.469669] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.469705] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.469715] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.469769] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.469775] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.469809] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.469818] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.469876] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.469882] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.469918] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.469928] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.469982] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.469988] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470025] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470034] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470089] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470094] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470130] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470140] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470194] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470199] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470235] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470245] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470299] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470304] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470341] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470350] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470405] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470410] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470446] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470455] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470511] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470516] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470552] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470561] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470623] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470629] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470666] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470676] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470730] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470735] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470773] [gdr114:867670:0]            sock.c:90   UCX  DEBUG ioctl(req=35142, ifr_name=lo) failed: Operation not supported
+[1749262295.470782] [gdr114:867670:0]         tcp_net.c:61   UCX  DEBUG speed of lo is UNKNOWN, assuming 100 Mbps
+[1749262295.470836] [gdr114:867670:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749262295.470842] [gdr114:867670:0]            topo.c:888  UCX  DEBUG lo: pci bandwidth undetected, using maximal value
+[1749262295.470906] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool ucp_reg_bufs destroyed
+[1749262295.470915] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool ucp_am_bufs destroyed
+[1749262295.470919] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool ucp_am_bufs destroyed
+[1749262295.470924] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool ucp_am_bufs destroyed
+[1749262295.470927] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool ucp_rkeys destroyed
+[1749262295.470956] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool ucp_requests destroyed
+[1749262295.470974] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool self_msg_desc destroyed
+[1749262295.470984] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556ecb70 [id=27 ref 1] ???() from hash
+[1749262295.470990] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556ecb70 [id=27 ref 1] ???()
+[1749262295.471000] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556ecb70 [id=27 ref 0] ???()
+[1749262295.471007] [gdr114:867670:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x5555556fdfc0: destroying
+[1749262295.471013] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556fb380 [id=28 ref 1] ???() from hash
+[1749262295.471018] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556fb380 [id=28 ref 1] ???()
+[1749262295.471025] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556fb380 [id=28 ref 0] ???()
+[1749262295.471034] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1749262295.471040] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+[1749262295.471057] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x555555709d40 [id=29 ref 1] ???() from hash
+[1749262295.471063] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x555555709d40 [id=29 ref 1] ???()
+[1749262295.471069] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x555555709d40 [id=29 ref 0] ???()
+[1749262295.471075] [gdr114:867670:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x555555723710: destroying
+[1749262295.471081] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x55555570e6c0 [id=30 ref 1] ???() from hash
+[1749262295.471086] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x55555570e6c0 [id=30 ref 1] ???()
+[1749262295.471091] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x55555570e6c0 [id=30 ref 0] ???()
+[1749262295.471124] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1749262295.471140] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+[1749262295.471155] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556cf400 [id=31 ref 1] ???() from hash
+[1749262295.471159] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556cf400 [id=31 ref 1] ???()
+[1749262295.471166] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556cf400 [id=31 ref 0] ???()
+[1749262295.471174] [gdr114:867670:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x5555557240b0: destroying
+[1749262295.471179] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x55555570e680 [id=32 ref 1] ???() from hash
+[1749262295.471183] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x55555570e680 [id=32 ref 1] ???()
+[1749262295.471190] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x55555570e680 [id=32 ref 0] ???()
+[1749262295.471216] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1749262295.471222] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+[1749262295.471238] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556f8570 [id=33 ref 1] ???() from hash
+[1749262295.471243] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556f8570 [id=33 ref 1] ???()
+[1749262295.471249] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556f8570 [id=33 ref 0] ???()
+[1749262295.471255] [gdr114:867670:0]       tcp_iface.c:874  UCX  DEBUG tcp_iface 0x555555724ba0: destroying
+[1749262295.471260] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556fbe30 [id=34 ref 1] ???() from hash
+[1749262295.471264] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556fbe30 [id=34 ref 1] ???()
+[1749262295.471270] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556fbe30 [id=34 ref 0] ???()
+[1749262295.471276] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_rx_buf_mp destroyed
+[1749262295.471279] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_tcp_iface_tx_buf_mp destroyed
+[1749262295.471290] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556fb580 [id=35 ref 1] ???() from hash
+[1749262295.471295] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556fb580 [id=35 ref 1] ???()
+[1749262295.471302] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556fb580 [id=35 ref 0] ???()
+[1749262295.471755] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool mm_recv_desc destroyed
+[1749262295.471826] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556ec410 [id=37 ref 1] ???() from hash
+[1749262295.471832] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556ec410 [id=37 ref 1] ???()
+[1749262295.471839] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556ec410 [id=37 ref 0] ???()
+[1749262295.472684] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool mm_recv_desc destroyed
+[1749262295.472720] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556ec450 [id=39 ref 1] ???() from hash
+[1749262295.472726] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556ec450 [id=39 ref 1] ???()
+[1749262295.472734] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556ec450 [id=39 ref 0] ???()
+[1749262295.472760] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x5555556ec490 [id=40 ref 1] ???() from hash
+[1749262295.472764] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x5555556ec490 [id=40 ref 1] ???()
+[1749262295.472770] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x5555556ec490 [id=40 ref 0] ???()
+[1749262295.472790] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool uct_scopy_iface_tx_mp destroyed
+[1749262295.473116] [gdr114:867670:0]           async.c:172  UCX  DEBUG removed async handler 0x55555570e700 [id=16 ref 1] ???() from hash
+[1749262295.473124] [gdr114:867670:0]           async.c:575  UCX  DEBUG removing async handler 0x55555570e700 [id=16 ref 1] ???()
+[1749262295.473285] [gdr114:867670:0]           async.c:187  UCX  DEBUG release async handler 0x55555570e700 [id=16 ref 0] ???()
+[1749262295.473310] [gdr114:867670:0]         pgtable.c:618  UCX  DEBUG purge empty page table
+[1749262295.473451] [gdr114:867670:0]           mpool.c:194  UCX  DEBUG mpool rcache_mp destroyed
+[1] + Done                       "/bin/gdb" --interpreter=mi --tty=${DbgTerm} 0<"/tmp/Microsoft-MIEngine-In-1xmttclv.vm0" 1>"/tmp/Microsoft-MIEngine-Out-qvarlkpo.3a0

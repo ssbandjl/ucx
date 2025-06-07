@@ -2,7 +2,7 @@ clear
 # make clean
 export HAVE_EXAMPLES=true
 ./autogen.sh
-./contrib/configure-devel --prefix=$PWD/install-debug --without-java --without-go --enable-gtest=no --enable-debug
+./contrib/configure-devel --prefix=$PWD/install-debug --without-java --without-go --enable-gtest=no --enable-debug --with-verbs=/root/project/rdma/rdma-core/build
 make -j64 && make install
 
 # cd examples; make
