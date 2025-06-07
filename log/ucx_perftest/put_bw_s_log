@@ -1,0 +1,97 @@
+[1749264697.859661] [gdr116:137510:0]           debug.c:1157 UCX  DEBUG using signal stack 0x7ffff7a2f000 size 141824
+[1749264697.861961] [gdr116:137510:0]            init.c:120  UCX  DEBUG /root/project/net/ucx/install-debug/lib/libucs.so.0 loaded at 0x7ffff7b62000
+[1749264697.862019] [gdr116:137510:0]            init.c:122  UCX  DEBUG cmd line: /root/project/net/ucx/install-debug/bin/ucx_perftest -t put_bw -d mlx5_0:1 -x rc_verbs 
+[1749264697.862056] [gdr116:137510:0]          module.c:72   UCX  DEBUG ucs library path: /root/project/net/ucx/install-debug/lib/libucs.so.0
+[1749264697.862077] [gdr116:137510:0]          module.c:304  UCX  DEBUG loading modules for ucs
+[1749264697.967312] [gdr116:137510:0]          module.c:304  UCX  DEBUG loading modules for ucx_perftest
+[1749264697.993871] [gdr116:137510:0]        perftest.c:800  UCX  WARN  CPU affinity is not set (bound to 56 cpus). Performance may be impacted.
+Waiting for connection...
+Accepted connection from 192.168.1.10:40830
++----------------------------------------------------------------------------------------------------------+
+| API:          transport layer                                                                            |
+| Test:         put bandwidth / message rate                                                               |
+| Data layout:  short                                                                                      |
+| Send memory:  host                                                                                       |
+| Recv memory:  host                                                                                       |
+| Message size: 8                                                                                          |
+| Window size:  32                                                                                         |
++----------------------------------------------------------------------------------------------------------+
+[1749264712.188947] [gdr116:137510:0]         libperf.c:2152 UCX  DEBUG set send allocator by send mem type host
+[1749264712.188960] [gdr116:137510:0]         libperf.c:2156 UCX  DEBUG set recv allocator by recv mem type host
+[1749264712.188984] [gdr116:137510:0]            time.c:22   UCX  DEBUG arch clock frequency: 2400000000.00 Hz
+[1749264712.189092] [gdr116:137510:0]          module.c:304  UCX  DEBUG loading modules for uct
+[1749264712.231892] [gdr116:137510:0]          module.c:304  UCX  DEBUG loading modules for uct_cuda
+[1749264712.255944] [gdr116:137510:0]          module.c:304  UCX  DEBUG loading modules for uct_ib
+[1749264712.302221] [gdr116:137510:0]       tcp_iface.c:980  UCX  DEBUG filtered out bridge device docker0
+[1749264712.304329] [gdr116:137510:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp129s0f0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:00.0/0000:81:00.0'
+[1749264712.304459] [gdr116:137510:0]            topo.c:304  UCX  DEBUG added sys_dev 0 for bus id 81:00.0
+[1749264712.304476] [gdr116:137510:0]            topo.c:560  UCX  DEBUG enp129s0f0: bdf_name 0000:81:00.0 sys_dev 0
+[1749264712.309673] [gdr116:137510:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp132s0f0np0: PF sysfs path is '/sys/devices/pci0000:80/0000:80:02.0/0000:82:00.0/0000:83:08.0/0000:84:00.0'
+[1749264712.309784] [gdr116:137510:0]            topo.c:304  UCX  DEBUG added sys_dev 1 for bus id 84:00.0
+[1749264712.309798] [gdr116:137510:0]            topo.c:560  UCX  DEBUG enp132s0f0np0: bdf_name 0000:84:00.0 sys_dev 1
+[1749264712.315643] [gdr116:137510:0]            topo.c:938  UCX  DEBUG /sys/class/net/enp4s0f0np0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749264712.315752] [gdr116:137510:0]            topo.c:304  UCX  DEBUG added sys_dev 2 for bus id 04:00.0
+[1749264712.315766] [gdr116:137510:0]            topo.c:560  UCX  DEBUG enp4s0f0np0: bdf_name 0000:04:00.0 sys_dev 2
+[1749264712.320625] [gdr116:137510:0]            topo.c:935  UCX  DEBUG /sys/class/net/lo: sysfs path undetected
+[1749264712.320642] [gdr116:137510:0]            topo.c:564  UCX  DEBUG lo: system device unknown
+[1749264712.324136] [gdr116:137510:0]            topo.c:304  UCX  DEBUG added sys_dev 3 for bus id 08:00.0
+[1749264712.324195] [gdr116:137510:0]    cuda_copy_md.c:110  UCX  DEBUG dmabuf is not supported on cuda device 0
+[1749264712.324272] [gdr116:137510:0]      cuda_iface.c:51   UCX  DEBUG set cuda sys_device to `unknown` as no context is currently active
+[1749264712.351870] [gdr116:137510:0]     cuda_ipc_md.c:571  UCX  DEBUG fabric_info: state=0 status=0 uuid=00000000:00000000:00000000:00000000
+[1749264712.353560] [gdr116:137510:0]     cuda_ipc_md.c:594  UCX  DEBUG multi-node NVLINK support is disabled
+[1749264712.353653] [gdr116:137510:0]      cuda_iface.c:51   UCX  DEBUG set cuda sys_device to `unknown` as no context is currently active
+[1749264712.359022] [gdr116:137510:0]       ib_efa_md.c:38   UCX  DEBUG efadv_query_device(mlx5_0) failed: 95
+[1749264712.359526] [gdr116:137510:0]           ib_md.c:1058 UCX  DEBUG mlx5_0: md open by 'uct_ib_efa_md_ops' failed, trying next
+[1749264712.365021] [gdr116:137510:0]            topo.c:938  UCX  DEBUG /sys/class/infiniband/mlx5_0: PF sysfs path is '/sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/0000:03:08.0/0000:04:00.0'
+[1749264712.365047] [gdr116:137510:0]            topo.c:560  UCX  DEBUG mlx5_0: bdf_name 0000:04:00.0 sys_dev 2
+[1749264712.365112] [gdr116:137510:0]       ib_device.c:532  UCX  DEBUG mlx5_0: vendor_id 0x15b3 device_id 4125
+[1749264712.365845] [gdr116:137510:0]    ib_mlx5dv_md.c:1953 UCX  DEBUG mlx5_0: mkey_by_name_reserve is not supported
+[1749264712.365858] [gdr116:137510:0]    ib_mlx5dv_md.c:1936 UCX  DEBUG mlx5_0: dp_ordering support: force=0 ooo_rw_rc=0 ooo_rw_dc=0
+[1749264712.366109] [gdr116:137510:0]    ib_mlx5dv_md.c:1727 UCX  DEBUG mlx5_0: ODP is disabled because version 1 is not supported for DevX QP
+[1749264712.366358] [gdr116:137510:0]           async.c:247  UCX  DEBUG added async handler 0x5555557194f0 [id=16 ref 1] ???() to hash
+[1749264712.367139] [gdr116:137510:0]           async.c:521  UCX  DEBUG listening to async event fd 16 events 0x1 mode thread_spinlock
+[1749264712.367162] [gdr116:137510:0]       ib_device.c:643  UCX  DEBUG initialized device 'mlx5_0' (InfiniBand channel adapter) with 1 ports
+[1749264712.367178] [gdr116:137510:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: cuda GPUDirect RDMA is not detected by checking /sys/kernel/mm/memory_peers/nv_mem/version
+[1749264712.367191] [gdr116:137510:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nvidia_peermem/version
+[1749264712.367199] [gdr116:137510:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: cuda GPUDirect RDMA is not detected by checking /sys/module/nv_peer_mem/version
+[1749264712.367227] [gdr116:137510:0]           ib_md.c:1217 UCX  DEBUG mlx5_0: rocm GPUDirect RDMA is not detected by checking /dev/kfd
+[1749264712.367260] [gdr116:137510:0]           ib_md.c:1244 UCX  DEBUG mlx5_0: dmabuf is supported
+[1749264712.367279] [gdr116:137510:0]           mpool.c:136  UCX  DEBUG mpool devx dbrec: align 64, maxelems 4294967295, elemsize 40
+[1749264712.367647] [gdr116:137510:0]    ib_mlx5dv_md.c:2444 UCX  DEBUG mlx5_0: opened DEVX md log_max_qp=17
+[1749264712.368521] [gdr116:137510:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_0: KSM dm memory registration status "Success" range 0x7ffff7387000..0x7ffff7387020 iova 0x0 mkey_index 0x0
+[1749264712.368952] [gdr116:137510:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_0: KSM atomic-key memory registration status "Success" range (nil)..0x20 iova 0x7ffff7387000 atomic mkey_index 0x0
+[1749264712.369761] [gdr116:137510:0]           ib_md.c:1202 UCX  DEBUG mlx5_0: relaxed order memory access is disabled
+[1749264712.370249] [gdr116:137510:0]    ib_mlx5dv_md.c:140  UCX  DEBUG mlx5_0: KSM flush-mr memory registration status "Success" range 0x555555712000..0x555555712008 iova 0x0 mkey_index 0x0
+[1749264712.370439] [gdr116:137510:0]         ib_mlx5.h:998  UCX  DEBUG mlx5dv_devx_general_cmd(ALLOW_OTHER_VHCA_ACCESS) failed on mlx5_0, syndrome 0x172df6: Remote I/O error
+[1749264712.370453] [gdr116:137510:0]    ib_mlx5dv_md.c:2497 UCX  DEBUG mlx5_0: XGVMI is not supported
+[1749264712.370463] [gdr116:137510:0]           ib_md.c:1062 UCX  DEBUG mlx5_0: md open by 'uct_ib_mlx5_devx_md_ops' is successful
+[1749264712.379922] [gdr116:137510:0]          uct_md.c:96   UCX  DEBUG failed to query srd resources: No such device
+[1749264712.380193] [gdr116:137510:0]        ib_iface.c:1181 UCX  DEBUG using pkey[0] 0xffff on mlx5_0:1/RoCE
+[1749264712.380500] [gdr116:137510:0]       ib_device.c:1132 UCX  DEBUG mlx5_0:1 using gid_index 3
+[1749264712.382685] [gdr116:137510:0]        ib_iface.c:1790 UCX  DEBUG created uct_ib_iface_t headroom_ofs 12 payload_ofs 12 hdr_ofs 11 data_sz 8256
+[1749264712.382756] [gdr116:137510:0]           mpool.c:136  UCX  DEBUG mpool rc_recv_desc: align 64, maxelems 4294967295, elemsize 8275
+[1749264712.382768] [gdr116:137510:0]           mpool.c:136  UCX  DEBUG mpool rc_send_desc: align 64, maxelems 4294967295, elemsize 8328
+[1749264712.383115] [gdr116:137510:0]           mpool.c:136  UCX  DEBUG mpool send-ops-mpool: align 64, maxelems 4294967295, elemsize 56
+[1749264712.384284] [gdr116:137510:0]           mpool.c:136  UCX  DEBUG mpool pending-ops: align 1, maxelems 4294967295, elemsize 64
+[1749264712.384308] [gdr116:137510:0]           mpool.c:136  UCX  DEBUG mpool rc_verbs_short_desc: align 64, maxelems 4294967295, elemsize 200
+[1749264712.385063] [gdr116:137510:0]        ib_iface.c:1300 UCX  DEBUG mlx5_0: iface 0x5555556d0040 created RC QP 0x224 on mlx5_0:1 TX wr:409 sge:5 inl:124 resp:64 RX wr:0 sge:0 resp:64
+[1749264712.646191] [gdr116:137510:0]  libperf_memory.c:320  UCX  DEBUG allocated memory. Send buffer 0x7ffff7387000, Recv buffer 0x7ffff7386000
+[1749264712.666230] [gdr116:137510:0]           mpool.c:281  UCX  DEBUG mpool rc_recv_desc: allocated chunk 0x7fffe3a00018 of 37748712 bytes with 4537 elements
+[1749264712.667907] [gdr116:137510:0]        ib_iface.c:1300 UCX  DEBUG mlx5_0: iface 0x5555556d0040 created RC QP 0x225 on mlx5_0:1 TX wr:409 sge:5 inl:124 resp:64 RX wr:0 sge:0 resp:64
+[1749264712.667945] [gdr116:137510:0]           rc_ep.c:165  UCX  DEBUG created rc ep 0x555555717aa0
+[1749264712.668841] [gdr116:137510:0]        ib_iface.c:1033 UCX  DEBUG iface 0x5555556d0040: ah_attr dlid=49152 sl=0 port=1 src_path_bits=0 dgid=::ffff:192.168.1.10 flow_label=0xffffffff sgid_index=3 traffic_class=106
+[1749264712.670183] [gdr116:137510:0]        rc_iface.c:923  UCX  DEBUG connected rc qp 0x225 on mlx5_0:1/RoCE to lid 49152(+0) sl 0 remote_qp 0x227 mtu 1024 timer 18x7 rnr 13x7 rd_atom 16
+[1749264713.278448] [gdr116:137510:0]           rc_ep.c:185  UCX  DEBUG destroy rc ep 0x555555717aa0
+[1749264713.278597] [gdr116:137510:a]       ib_device.c:514  UCX  DEBUG IB Async event on mlx5_0: SRQ-attached QP 0x225 was flushed
+[1749264713.280042] [gdr116:137510:0]           mpool.c:194  UCX  DEBUG mpool rc_verbs_short_desc destroyed
+[1749264713.280599] [gdr116:137510:0]           mpool.c:194  UCX  DEBUG mpool send-ops-mpool destroyed
+[1749264713.280606] [gdr116:137510:0]           mpool.c:194  UCX  DEBUG mpool rc_send_desc destroyed
+[1749264713.280965] [gdr116:137510:0]           mpool.c:194  UCX  DEBUG mpool rc_recv_desc destroyed
+[1749264713.280973] [gdr116:137510:0]           mpool.c:194  UCX  DEBUG mpool pending-ops destroyed
+[1749264713.281581] [gdr116:137510:0]    ib_mlx5dv_md.c:2533 UCX  DEBUG mlx5_0: md=0x5555556ee180 md->flags=0x3f11fbb flush_rkey=0x203600
+[1749264713.281962] [gdr116:137510:0]           mpool.c:194  UCX  DEBUG mpool devx dbrec destroyed
+[1749264713.281977] [gdr116:137510:0]       ib_device.c:664  UCX  DEBUG destroying ib device mlx5_0
+[1749264713.281988] [gdr116:137510:0]           async.c:172  UCX  DEBUG removed async handler 0x5555557194f0 [id=16 ref 1] ???() from hash
+[1749264713.281992] [gdr116:137510:0]           async.c:575  UCX  DEBUG removing async handler 0x5555557194f0 [id=16 ref 1] ???()
+[1749264713.282097] [gdr116:137510:0]           async.c:187  UCX  DEBUG release async handler 0x5555557194f0 [id=16 ref 0] ???()
+[1] + Done                       "/bin/gdb" --interpreter=mi --tty=${DbgTerm} 0<"/tmp/Microsoft-MIEngine-In-vtotn5tg.ram" 1>"/tmp/Microsoft-MIEngine-Out-t5fz3bip.34p"

@@ -1,40 +1,9 @@
 {
-	// Use IntelliSense to learn about possible attributes.
-	// Hover to view descriptions of existing attributes.
-	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "fi_pingpong_s_xt",
-			"type": "cppdbg",
-			"request": "launch",
-			"program": "${workspaceFolder}/build/bin/fi_pingpong",
-			"args": ["-e", "rdm", "-d", "xtrdma_0", "-I", "2", "-p", "\"verbs;ofi_rxm\"", "-m", "tagged", "-v"],
-			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/build/bin/",
-			"environment": [
-				{"name": "FI_LOG_LEVEL", "value": "debug"},
-				{"name": "LD_LIBRARY_PATH", "value": "/root/project/rdma/dpu_user_rdma/build/lib"},
-				{"name": "HUGE_PAGE_NUM", "value": "20"},
-				{"name": "XT_CQ_INLINE_CQE", "value": "0"},
-				{"name": "FI_UNIVERSE_SIZE", "value": "16"},
-			],
-			"externalConsole": false,
-			"MIMode": "gdb",
-			"miDebuggerPath": "/bin/gdb",
-			"setupCommands": [
-				{
-					"description": "Enable pretty-printing for gdb",
-					"text": "-enable-pretty-printing",
-					"ignoreFailures": true
-				},
-				{
-					"description": "Set Disassembly Flavor to Intel",
-					"text": "-gdb-set disassembly-flavor intel",
-					"ignoreFailures": true
-				}
-			]
-		},
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
         {
 			"name": "uct_hello_world_xt_c",
 			"type": "cppdbg",
@@ -68,8 +37,8 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/install-debug/bin/ucx_perftest",
+			"args": ["-t", "put_bw", "-d", "mlx5_0:1", "-x", "rc_verbs", "192.168.1.11"],
 			// "args": ["-t", "tag_bw", "192.168.1.11"],
-			"args": ["-t", "put_bw", "-d", "mlx5_0:1", "192.168.1.11"],
 			// "args": ["-t", "tag_lat", "192.168.1.11"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/install-debug/bin",
@@ -93,5 +62,5 @@
 				}
 			]
 		},
-	]
+    ]
 }
