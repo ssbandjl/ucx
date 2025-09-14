@@ -247,7 +247,6 @@ run_hello() {
 		unset UCX_RC_TIMEOUT
 		unset UCX_RC_RETRY_COUNT
 	fi
-	unset UCX_PROTO_ENABLE
 }
 
 #
@@ -450,7 +449,7 @@ run_ucx_perftest() {
 			opt_transports="-x posix"
 			tls="shm"
 			dev="all"
-		elif [[ " ${ip_ifaces[*]} " == *" ${ucx_dev} "* ]]; then
+		elif printf '%s\n' "$ip_ifaces" | grep -qxF "$ucx_dev"; then
 			opt_transports="-x tcp"
 			tls="tcp"
 			dev=$ucx_dev
@@ -635,6 +634,36 @@ run_ucx_perftest_with_daemon() {
 }
 
 #
+# Run UCX performance cuda device test
+#
+run_ucx_perftest_cuda_device() {
+	if [ "X$have_cuda" != "Xyes" ]; then
+		echo "==== CUDA not available, skipping CUDA device tests ===="
+		return 0
+	fi
+
+	if ! has_gpunetio_devel; then
+		echo "==== DOCA not available, skipping CUDA device tests ===="
+		return 0
+	fi
+
+	if [ "$(get_num_gpus)" -eq 0 ]; then
+		echo "==== No NVIDIA GPUs found, skipping CUDA device tests ===="
+		return 0
+	fi
+
+    echo "==== Running ucx_perftest with cuda kernel ===="
+	ucx_inst_ptest=$ucx_inst/share/ucx/perftest
+	ucx_perftest="$ucx_inst/bin/ucx_perftest"
+	ucp_test_args="-b $ucx_inst_ptest/test_types_ucp_device_cuda"
+
+	# TODO: Run on all GPUs
+	ucp_client_args="-a cuda $(hostname)"
+
+	run_client_server_app "$ucx_perftest" "$ucp_test_args" "$ucp_client_args" 0 0
+}
+
+#
 # Test malloc hooks with mpi
 #
 test_malloc_hooks_mpi() {
@@ -689,7 +718,7 @@ run_mpi_tests() {
 					-mca btl tcp,self \
 					-mca btl_tcp_if_include lo \
 					-mca orte_allowed_exit_without_sync 1 \
-					-mca coll ^hcoll,ml"
+					-mca coll ^hcoll,ml,ucc"
 
 			run_ucx_perftest 1
 
@@ -1072,7 +1101,8 @@ run_gtest_armclang() {
 				CC=armclang \
 				CXX=armclang++ \
 				CFLAGS="${ARMCLANG_CFLAGS}" \
-				--without-go
+				--without-go \
+				--without-valgrind
 
 			run_gtest "armclang"
 		else
@@ -1195,7 +1225,7 @@ run_tests() {
 	run_configure_tests
 
 	# build for devel tests and gtest
-	build devel --enable-gtest
+	build devel --enable-gtest --without-valgrind
 
 	# devel mode tests
 	do_distributed_task 0 4 test_unused_env_var
@@ -1208,6 +1238,7 @@ run_tests() {
 	do_distributed_task 3 4 run_ucp_client_server
 	do_distributed_task 0 4 test_no_cuda_context
 	do_distributed_task 1 4 run_ucx_perftest_with_daemon
+	do_distributed_task 1 4 run_ucx_perftest_cuda_device
 
 	# long devel tests
 	do_distributed_task 0 4 run_ucp_hello
@@ -1226,16 +1257,6 @@ run_tests() {
 
 	# nt_buffer_transfer tests
 	do_distributed_task 0 4 run_nt_buffer_transfer_tests
-}
-
-run_test_proto_disable() {
-	# build for devel tests and gtest
-	build devel --enable-gtest
-
-	export UCX_PROTO_ENABLE=n
-
-	# all are running gtest
-	run_gtest "default"
 }
 
 run_asan_check() {
@@ -1276,9 +1297,7 @@ then
     check_machine
     set_ucx_common_test_env
 
-    if [[ "$PROTO_ENABLE" == "no" ]]; then
-        run_test_proto_disable
-    elif [[ "$ASAN_CHECK" == "yes" ]]; then
+    if [[ "$ASAN_CHECK" == "yes" ]]; then
         run_asan_check
     elif [[ "$VALGRIND_CHECK" == "yes" ]]; then
         run_valgrind_check

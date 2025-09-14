@@ -127,6 +127,9 @@ typedef struct ucp_context_config {
     /** Minimum allowed chunk size when splitting rndv message over multiple
      *  lanes */
     size_t                                 min_rndv_chunk_size;
+    /** Minimum allowed chunk size when splitting rma message over multiple
+     *  lanes */
+    size_t                                 min_rma_chunk_size;
     /** Estimated number of endpoints */
     size_t                                 estimated_num_eps;
     /** Estimated number of processes per node */
@@ -323,6 +326,11 @@ typedef struct ucp_tl_md {
      * Global VA memory handle
      */
     uct_mem_h              gva_mr;
+
+    /**
+     * Set of known system devices associated to the MD
+     */
+    ucp_sys_dev_map_t      sys_dev_map;
 } ucp_tl_md_t;
 
 
@@ -732,6 +740,13 @@ ucp_context_usage_tracker_enabled(ucp_context_h context)
     return context->config.ext.dynamic_tl_switch_interval != UCS_TIME_INFINITY;
 }
 
+static UCS_F_ALWAYS_INLINE int
+ucp_context_rndv_is_enabled(ucp_context_h context)
+{
+    return (context->config.ext.rndv_intra_thresh != UCS_MEMUNITS_INF) ||
+           (context->config.ext.rndv_inter_thresh != UCS_MEMUNITS_INF);
+}
+
 void ucp_context_memaccess_tl_bitmap(ucp_context_h context,
                                      ucs_memory_type_t mem_type,
                                      uint64_t md_reg_flags,
@@ -760,5 +775,11 @@ ucp_config_modify_internal(ucp_config_t *config, const char *name,
 
 
 void ucp_apply_uct_config_list(ucp_context_h context, void *config);
+
+
+void ucp_device_init(void);
+
+
+void ucp_device_cleanup(void);
 
 #endif

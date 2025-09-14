@@ -67,6 +67,10 @@ static void usage(const struct perftest_context *ctx, const char *program)
                api_names[test->api], test->desc);
     }
     printf("\n");
+    printf("     -a <send-device-type[:dev-id]>[,<recv-device-type[:dev-id]>]\n");
+    printf("                   Accelerator device type and device id to use for running the test.\n");
+    printf("                    device id is optional, it corresponds to the index of\n");
+    printf("                    the device in the list of available devices\n");
     printf("     -s <size>      list of scatter-gather sizes for single message (%zu)\n",
                                 ctx->params.super.msg_size_list[0]);
     printf("                    for example: \"-s 16,48,8192,8192,14\"\n");
@@ -106,7 +110,7 @@ static void usage(const struct perftest_context *ctx, const char *program)
     printf("     -N             use numeric formatting (thousands separator)\n");
     printf("     -f             print only final numbers\n");
     printf("     -v             print CSV-formatted output\n");
-    printf("     -I             print extra information about the operation\n");
+    printf("     -X             print extra information about the operation\n");
     printf("     -q             do not print error messages\n");
     printf("\n");
     printf("  UCT only:\n");
@@ -165,6 +169,26 @@ static void usage(const struct perftest_context *ctx, const char *program)
     printf("\n");
 }
 
+static ucs_status_t parse_device_id(const char *opt_arg, int *device_id)
+{
+    char *endptr;
+    int parsed_device_id;
+
+    if (opt_arg == NULL) {
+        ucs_error("device id string is NULL");
+        return UCS_ERR_INVALID_PARAM;
+    }
+
+    parsed_device_id = strtol(opt_arg, &endptr, 10);
+    if ((endptr == opt_arg) || (*endptr != '\0') || (parsed_device_id < 0)) {
+        ucs_error("Failed to parse device id: %s", opt_arg);
+        return UCS_ERR_INVALID_PARAM;
+    }
+
+    *device_id = parsed_device_id;
+    return UCS_OK;
+}
+
 static ucs_status_t parse_mem_type(const char *opt_arg,
                                    ucs_memory_type_t *mem_type)
 {
@@ -184,6 +208,42 @@ static ucs_status_t parse_mem_type(const char *opt_arg,
 
     ucs_error("unsupported memory type: \"%s\"", opt_arg);
     return UCS_ERR_INVALID_PARAM;
+}
+
+static ucs_status_t
+parse_accel_device(char *opt_arg, ucx_perf_accel_dev_t *dev)
+{
+    const char *delim = ":";
+    char *saveptr = NULL;
+    char *token;
+    ucs_status_t status;
+    ucs_memory_type_t mem_type;
+    int device_id;
+
+    if (opt_arg == NULL) {
+        ucs_error("mem type param is NULL");
+        return UCS_ERR_INVALID_PARAM;
+    }
+
+    token  = strtok_r(opt_arg, delim, &saveptr);
+    status = parse_mem_type(token, &mem_type);
+    if (status != UCS_OK) {
+        return status;
+    }
+
+    token = strtok_r(NULL, delim, &saveptr);
+    if (NULL == token) {
+        device_id = UCX_PERF_MEM_DEV_DEFAULT;
+    } else {
+        status = parse_device_id(token, &device_id);
+        if (status != UCS_OK) {
+            return status;
+        }
+    }
+
+    dev->mem_type  = mem_type;
+    dev->device_id = device_id;
+    return UCS_OK;
 }
 
 static ucs_status_t parse_mem_type_params(const char *opt_arg,
@@ -206,6 +266,45 @@ static ucs_status_t parse_mem_type_params(const char *opt_arg,
     } else {
         return parse_mem_type(token, recv_mem_type);
     }
+}
+
+static ucs_status_t parse_accel_device_params(const char *opt_arg,
+                                              ucx_perf_accel_dev_t *send_device,
+                                              ucx_perf_accel_dev_t *recv_device)
+{
+    const char *delim = ",";
+    char *saveptr = NULL;
+    char *token, *arg;
+    ucs_status_t status;
+
+    arg = ucs_alloca(strlen(opt_arg) + 1);
+    strcpy(arg, opt_arg);
+    token  = strtok_r(arg, delim, &saveptr);
+    status = parse_accel_device(token, send_device);
+    if (status != UCS_OK) {
+        return status;
+    }
+
+    token = strtok_r(NULL, delim, &saveptr);
+    if (NULL == token) {
+        *recv_device = *send_device;
+        return UCS_OK;
+    }
+
+    status = parse_accel_device(token, recv_device);
+    if (status != UCS_OK) {
+        return status;
+    }
+
+    if (send_device->mem_type == recv_device->mem_type) {
+        if (send_device->device_id == UCX_PERF_MEM_DEV_DEFAULT) {
+            send_device->device_id = recv_device->device_id;
+        } else if (recv_device->device_id == UCX_PERF_MEM_DEV_DEFAULT) {
+            recv_device->device_id = send_device->device_id;
+        }
+    }
+
+    return UCS_OK;
 }
 
 static ucs_status_t parse_message_sizes_params(const char *opt_arg,
@@ -504,6 +603,13 @@ ucs_status_t parse_test_params(perftest_params_t *params, char opt,
             return UCS_ERR_INVALID_PARAM;
         }
         return UCS_OK;
+    case 'a':
+        if (UCS_OK != parse_accel_device_params(opt_arg,
+                                                &params->super.send_device,
+                                                &params->super.recv_device)) {
+            return UCS_ERR_INVALID_PARAM;
+        }
+        return UCS_OK;
     case 'y':
         params->super.flags |= UCX_PERF_TEST_FLAG_AM_RECV_COPY;
         return UCS_OK;
@@ -649,7 +755,7 @@ ucs_status_t parse_opts(struct perftest_context *ctx, int mpi_initialized,
 
     optind = 1;
     while ((c = getopt_long(argc, argv,
-                            "p:b:6NfvIc:P:hK:g:G:k" TEST_PARAMS_ARGS,
+                            "p:b:6NfvXc:P:hK:g:G:k" TEST_PARAMS_ARGS,
                             TEST_PARAMS_ARGS_LONG, NULL)) != -1) {
         switch (c) {
         case 'p':
@@ -675,7 +781,7 @@ ucs_status_t parse_opts(struct perftest_context *ctx, int mpi_initialized,
         case 'v':
             ctx->flags |= TEST_FLAG_PRINT_CSV;
             break;
-        case 'I':
+        case 'X':
             ctx->flags |= TEST_FLAG_PRINT_EXTRA_INFO;
             break;
         case 'c':
@@ -739,6 +845,12 @@ ucs_status_t parse_opts(struct perftest_context *ctx, int mpi_initialized,
             status = UCS_ERR_INVALID_PARAM;
             goto err;
         }
+    }
+
+    if (ctx->params.super.send_device.mem_type != UCS_MEMORY_TYPE_LAST) {
+        /* TODO: Add getter function for thread count */
+        ctx->params.super.device_thread_count = ctx->params.super.thread_count;
+        ctx->params.super.thread_count        = 1;
     }
 
     return init_daemon_params(&ctx->params.super);

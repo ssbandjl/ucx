@@ -239,6 +239,11 @@ static ucs_config_field_t ucp_context_config_table[] = {
    "multiple rails. Must be greater than 0.",
    ucs_offsetof(ucp_context_config_t, min_rndv_chunk_size), UCS_CONFIG_TYPE_MEMUNITS},
 
+  {"MIN_RMA_CHUNK_SIZE", "8k",
+   "Minimum chunk size to split the message sent with RMA protocol on\n"
+   "multiple rails. Must be greater than 0.",
+   ucs_offsetof(ucp_context_config_t, min_rma_chunk_size), UCS_CONFIG_TYPE_MEMUNITS},
+
   {"RMA_ZCOPY_MAX_SEG_SIZE", "auto",
    "Max size of a segment for rma/rndv zcopy.",
    ucs_offsetof(ucp_context_config_t, rma_zcopy_max_seg_size), UCS_CONFIG_TYPE_MEMUNITS},
@@ -719,6 +724,7 @@ const char *ucp_feature_str[] = {
     [ucs_ilog2(UCP_FEATURE_WAKEUP)] = "UCP_FEATURE_WAKEUP",
     [ucs_ilog2(UCP_FEATURE_STREAM)] = "UCP_FEATURE_STREAM",
     [ucs_ilog2(UCP_FEATURE_AM)]     = "UCP_FEATURE_AM",
+    [ucs_ilog2(UCP_FEATURE_DEVICE)] = "UCP_FEATURE_DEVICE",
     NULL
 };
 
@@ -1185,6 +1191,7 @@ static void ucp_add_tl_resource_if_enabled(
         const uct_tl_resource_desc_t *resource, unsigned *num_resources_p,
         uint64_t dev_cfg_masks[], uint64_t *tl_cfg_mask)
 {
+    ucp_tl_md_t *md = &context->tl_mds[md_index];
     uint8_t rsc_flags;
     ucp_rsc_index_t dev_index, i;
 
@@ -1214,6 +1221,10 @@ static void ucp_add_tl_resource_if_enabled(
             }
         }
         context->tl_rscs[context->num_tls].dev_index = dev_index;
+
+        if (resource->sys_device < UCP_MAX_SYS_DEVICES) {
+            md->sys_dev_map |= UCS_BIT(resource->sys_device);
+        }
 
         ++context->num_tls;
         ++(*num_resources_p);
@@ -1424,8 +1435,9 @@ static ucs_status_t ucp_fill_tl_md(ucp_context_h context,
     ucs_status_t status;
 
     /* Initialize tl_md structure */
-    tl_md->cmpt_index = cmpt_index;
-    tl_md->rsc        = *md_rsc;
+    tl_md->cmpt_index  = cmpt_index;
+    tl_md->rsc         = *md_rsc;
+    tl_md->sys_dev_map = 0;
 
     /* Read MD configuration */
     status = uct_md_config_read(context->tl_cmpts[cmpt_index].cmpt, NULL, NULL,
@@ -2127,6 +2139,12 @@ static ucs_status_t ucp_fill_config(ucp_context_h context,
         return UCS_ERR_INVALID_PARAM;
     }
 
+    if (context->config.ext.min_rma_chunk_size == 0) {
+        ucs_error("minimum chunk size for RMA protocol must be greater"
+                  " than 0");
+        return UCS_ERR_INVALID_PARAM;
+    }
+
     /* Save environment prefix to later notify user for unused variables */
     context->config.env_prefix = ucs_strdup(config->env_prefix, "ucp config");
     if (context->config.env_prefix == NULL) {
@@ -2708,9 +2726,11 @@ double ucp_tl_iface_latency_with_priority(ucp_context_h context,
 UCS_F_CTOR void ucp_global_init(void)
 {
     UCS_CONFIG_ADD_TABLE(ucp_config_table, &ucs_config_global_list);
+    ucp_device_init();
 }
 
 UCS_F_DTOR static void ucp_global_cleanup(void)
 {
+    ucp_device_cleanup();
     UCS_CONFIG_REMOVE_TABLE(ucp_config_table);
 }

@@ -8,6 +8,7 @@
 #  include "config.h"
 #endif
 
+#include "cuda_common.h"
 #include <tools/perf/lib/libperf_int.h>
 
 #include <cuda_runtime.h>
@@ -15,15 +16,6 @@
 #include <ucs/sys/ptr_arith.h>
 #include <uct/api/v2/uct_v2.h>
 
-#define CUDA_CALL(_ret_code, _func, ...) \
-    { \
-        cudaError_t _cerr = _func(__VA_ARGS__); \
-        if (_cerr != cudaSuccess) { \
-            ucs_error("%s() failed: %d (%s)", UCS_PP_MAKE_STRING(_func), \
-                      _cerr, cudaGetErrorString(_cerr)); \
-            return _ret_code; \
-        } \
-    }
 
 static ucs_status_t ucx_perf_cuda_init(ucx_perf_context_t *perf)
 {
@@ -33,13 +25,21 @@ static ucs_status_t ucx_perf_cuda_init(ucx_perf_context_t *perf)
 
     group_index = rte_call(perf, group_index);
 
-    CUDA_CALL(UCS_ERR_NO_DEVICE, cudaGetDeviceCount, &num_gpus)
+    CUDA_CALL(UCS_ERR_NO_DEVICE, cudaGetDeviceCount, &num_gpus);
     if (num_gpus == 0) {
         ucs_error("no cuda devices available");
         return UCS_ERR_NO_DEVICE;
     }
 
-    gpu_index = group_index % num_gpus;
+    gpu_index = (group_index == 0) ? perf->params.recv_device.device_id :
+                                     perf->params.send_device.device_id;
+    if (gpu_index == UCX_PERF_MEM_DEV_DEFAULT) {
+        gpu_index = group_index % num_gpus;
+    } else if (gpu_index >= num_gpus) {
+        ucs_error("Illegal cuda device %d number of devices %d", gpu_index,
+                  num_gpus);
+        return UCS_ERR_NO_DEVICE;
+    }
 
     CUDA_CALL(UCS_ERR_NO_DEVICE, cudaSetDevice, gpu_index);
 
@@ -136,7 +136,7 @@ static void uct_perf_cuda_free(const ucx_perf_context_t *perf,
         ucs_error("failed to deregister memory");
     }
 
-    cudaFree(alloc_mem->address);
+    CUDA_CALL_HANDLER(ucs_warn, , cudaFree, alloc_mem->address);
 }
 
 static void ucx_perf_cuda_memcpy(void *dst, ucs_memory_type_t dst_mem_type,
@@ -150,6 +150,7 @@ static void ucx_perf_cuda_memcpy(void *dst, ucs_memory_type_t dst_mem_type,
 static void* ucx_perf_cuda_memset(void *dst, int value, size_t count)
 {
     CUDA_CALL(dst, cudaMemset, dst, value, count);
+    CUDA_CALL(dst, cudaDeviceSynchronize);
     return dst;
 }
 
@@ -174,8 +175,8 @@ UCS_STATIC_INIT {
     ucx_perf_mem_type_allocators[UCS_MEMORY_TYPE_CUDA]         = &cuda_allocator;
     ucx_perf_mem_type_allocators[UCS_MEMORY_TYPE_CUDA_MANAGED] = &cuda_managed_allocator;
 }
+
 UCS_STATIC_CLEANUP {
     ucx_perf_mem_type_allocators[UCS_MEMORY_TYPE_CUDA]         = NULL;
     ucx_perf_mem_type_allocators[UCS_MEMORY_TYPE_CUDA_MANAGED] = NULL;
-
 }

@@ -68,6 +68,7 @@ typedef struct ucp_mem {
     ucp_context_h       context;        /* UCP context that owns a memory handle */
     uct_alloc_method_t  alloc_method;   /* Method used to allocate the memory */
     ucs_sys_device_t    sys_dev;        /* System device index */
+    ucs_sys_device_t    packed_sys_dev; /* System device index */
     ucs_memory_type_t   mem_type;       /* Type of allocated or registered memory */
     ucp_md_index_t      alloc_md_index; /* Index of MD used to allocate the memory */
     uint64_t            remote_uuid;    /* Remote UUID */
@@ -228,6 +229,12 @@ ucs_status_t ucp_mm_get_alloc_md_index(ucp_context_h context,
                                        ucp_md_index_t *md_idx_p,
                                        ucp_memory_info_t *mem_info_p);
 
+ucs_status_t ucp_mem_do_alloc(ucp_context_h context, void *address,
+                              size_t length, unsigned uct_flags,
+                              ucs_memory_type_t mem_type,
+                              ucs_sys_device_t sys_dev, const char *name,
+                              uct_allocated_memory_t *mem);
+
 static UCS_F_ALWAYS_INLINE ucp_md_map_t
 ucp_rkey_packed_md_map(const void *rkey_buffer)
 {
@@ -238,16 +245,6 @@ static UCS_F_ALWAYS_INLINE ucs_memory_type_t
 ucp_rkey_packed_mem_type(const void *rkey_buffer)
 {
     return (ucs_memory_type_t)(*(uint8_t *)((const ucp_md_map_t*)rkey_buffer + 1));
-}
-
-static UCS_F_ALWAYS_INLINE uct_mem_h
-ucp_memh_map2uct(const uct_mem_h *uct, ucp_md_map_t md_map, ucp_md_index_t md_idx)
-{
-    if (!(md_map & UCS_BIT(md_idx))) {
-        return UCT_MEM_HANDLE_NULL;
-    }
-
-    return uct[ucs_bitmap2idx(md_map, md_idx)];
 }
 
 static UCS_F_ALWAYS_INLINE void *ucp_memh_address(const ucp_mem_h memh)

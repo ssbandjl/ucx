@@ -18,8 +18,10 @@
 #include <ucs/arch/generic/cpu.h>
 #include <ucs/sys/math.h>
 #include <ucs/type/status.h>
+#ifndef __NVCC__
 #ifdef __ARM_NEON
 #include <arm_neon.h>
+#endif
 #endif
 #ifdef __ARM_FEATURE_SVE
 #include <arm_sve.h>
@@ -299,6 +301,11 @@ ucs_memcpy_nontemporal(void *dst, const void *src, size_t len)
 static inline ucs_status_t ucs_arch_get_cache_size(size_t *cache_sizes)
 {
     return UCS_ERR_UNSUPPORTED;
+}
+
+static UCS_F_ALWAYS_INLINE void ucs_cpu_relax()
+{
+    asm volatile ("yield" ::: "memory");
 }
 
 END_C_DECLS
