@@ -31,11 +31,17 @@ BEGIN_C_DECLS
  * The enumeration allows specifying which fields in @ref
  * ucp_device_mem_list_elem are present.
  *
+ * @note Counter elements can omit the @a UCP_DEVICE_MEM_LIST_ELEM_FIELD_MEMH
+ *       and @a UCP_DEVICE_MEM_LIST_ELEM_FIELD_LOCAL_ADDR fields.
+ *
  * It is used to enable backward compatibility support.
  */
 enum ucp_device_mem_list_elem_field {
-    UCP_DEVICE_MEM_LIST_ELEM_FIELD_MEMH = UCS_BIT(0), /**< Source memory handle */
-    UCP_DEVICE_MEM_LIST_ELEM_FIELD_RKEY = UCS_BIT(1)  /**< Unpacked remote memory key */
+    UCP_DEVICE_MEM_LIST_ELEM_FIELD_MEMH        = UCS_BIT(0), /**< Source memory handle */
+    UCP_DEVICE_MEM_LIST_ELEM_FIELD_RKEY        = UCS_BIT(1), /**< Unpacked remote memory key (always required) */
+    UCP_DEVICE_MEM_LIST_ELEM_FIELD_LOCAL_ADDR  = UCS_BIT(2), /**< Local address */
+    UCP_DEVICE_MEM_LIST_ELEM_FIELD_REMOTE_ADDR = UCS_BIT(3), /**< Remote address */
+    UCP_DEVICE_MEM_LIST_ELEM_FIELD_LENGTH      = UCS_BIT(4)  /**< Length of the local buffer in bytes */
 };
 
 
@@ -45,6 +51,8 @@ enum ucp_device_mem_list_elem_field {
  *
  * This describes a pair of local and remote memory for which a memory operation
  * can later be performed multiple times, possibly with varying memory offsets.
+ *
+ * @note Counter elements can omit the @a memh and @a local_addr fields.
  */
 typedef struct ucp_device_mem_list_elem {
     /**
@@ -61,7 +69,23 @@ typedef struct ucp_device_mem_list_elem {
     ucp_mem_h  memh;
 
     /**
+     * Local memory address for the device transfer operations.
+     */
+    void*     local_addr;
+
+    /**
+     * Length of the local buffer in bytes.
+     */
+    size_t    length;
+
+    /**
+     * Remote memory address for the device transfer operations.
+     */
+    uint64_t   remote_addr;
+
+    /**
      * Unpacked memory key for the remote memory endpoint.
+     * Always required.
      */
     ucp_rkey_h rkey;
 } ucp_device_mem_list_elem_t;
@@ -128,14 +152,28 @@ typedef struct ucp_device_mem_list_params {
  *
  * @param [in]  ep        Remote endpoint handle.
  * @param [in]  params    Parameters used to create the handle.
- * @param [out] handle    Created descriptor list handle.
+ * @param [out] handle    Created descriptors list handle.
  *
  * @return Error code as defined by @ref ucs_status_t.
+ * @retval UCS_ERR_NOT_CONNECTED if the endpoint is not connected yet.
+ *         The caller should retry after calling @ref ucp_worker_progress.
  */
 ucs_status_t
 ucp_device_mem_list_create(ucp_ep_h ep,
                            const ucp_device_mem_list_params_t *params,
                            ucp_device_mem_list_handle_h *handle);
+
+
+/**
+ * @ingroup UCP_DEVICE
+ * @brief Return the number of elements in the descriptors mem list handle.
+ *
+ * @param [in] handle     Descriptors list handle.
+ *
+ * @return Descriptors mem list length.
+ */
+uint32_t
+ucp_device_get_mem_list_length(const ucp_device_mem_list_handle_h handle);
 
 
 /**
@@ -152,23 +190,24 @@ void ucp_device_mem_list_release(ucp_device_mem_list_handle_h handle);
 
 /**
  * @ingroup UCP_DEVICE
- * @brief Signal init attributes field mask.
+ * @brief Counter attributes field mask.
  *
  * The enumeration allows specifying which fields in @ref
- * ucp_device_counter_init_params_t are present. It is used to enable backward
+ * ucp_device_counter_params_t are present. It is used to enable backward
  * compatibility support.
  */
-enum ucp_device_counter_init_params_field {
-    UCP_DEVICE_COUNTER_INIT_PARAMS_FIELD_MEM_TYPE = UCS_BIT(0), /**< Source memory handle */
-    UCP_DEVICE_COUNTER_INIT_PARAMS_FIELD_MEMH     = UCS_BIT(1)  /**< Unpacked remote memory key */
+enum ucp_device_counter_params_field {
+    UCP_DEVICE_COUNTER_PARAMS_FIELD_MEM_TYPE = UCS_BIT(0), /**< Source memory handle */
+    UCP_DEVICE_COUNTER_PARAMS_FIELD_MEMH     = UCS_BIT(1)  /**< Unpacked remote memory key */
 };
 
 
 /**
  * @ingroup UCP_DEVICE
- * @brief Parameters which can be used when calling @ref ucp_device_counter_init.
+ * @brief Parameters which can be used when calling @ref ucp_device_counter_init
+ * and @ref ucp_device_counter_read.
  */
-typedef struct ucp_device_counter_init_params {
+typedef struct ucp_device_counter_params {
     /**
      * Mask of valid fields in this structure, using bits from
      * @ref ucp_device_counter_init_params_field.
@@ -186,7 +225,7 @@ typedef struct ucp_device_counter_init_params {
      * Optional memory registration handle for the given @a counter memory area.
      */
     ucp_mem_h         memh;
-} ucp_device_counter_init_params_t;
+} ucp_device_counter_params_t;
 
 
 /**
@@ -203,19 +242,33 @@ typedef struct ucp_device_counter_init_params {
  * The memory type or memory handle from params, might be used to help setting
  * the contents of the counting area.
  *
- * @param [in] context     Context to use when initializing a counter area.
+ * @param [in] worker      Worker to use when initializing a counter area.
  * @param [in] params      Parameters used to initialize the counter area.
  * @param [in] counter_ptr Address of the counting area.
  *
  * @return Error code as defined by @ref ucs_status_t.
  */
-static UCS_F_ALWAYS_INLINE ucs_status_t
-ucp_device_counter_init(ucp_context_h context,
-                        const ucp_device_counter_init_params_t *params,
-                        void *counter_ptr) {
-    /* TODO: actual Implementation will not be in headers */
-    return UCS_ERR_NOT_IMPLEMENTED;
-}
+ucs_status_t ucp_device_counter_init(ucp_worker_h worker,
+                                     const ucp_device_counter_params_t *params,
+                                     void *counter_ptr);
+
+
+/**
+ * @ingroup UCP_DEVICE
+ * @brief Read the value of a counter memory area.
+ *
+ * This host routine is called by the receive side to read the value of a counter
+ * memory area.
+ *
+ * @param [in] worker      Worker to use when reading the counter value.
+ * @param [in] params      Parameters used to read the counter value.
+ * @param [in] counter_ptr Address of the counter memory area.
+ *
+ * @return Value of the counter memory area.
+ */
+uint64_t ucp_device_counter_read(ucp_worker_h worker,
+                                 const ucp_device_counter_params_t *params,
+                                 void *counter_ptr);
 
 END_C_DECLS
 

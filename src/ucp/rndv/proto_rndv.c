@@ -158,6 +158,7 @@ static ucs_status_t ucp_proto_rndv_ctrl_select_remote_proto(
     rkey_config_key.ep_cfg_index = ep_cfg_index;
     rkey_config_key.sys_dev      = params->super.reg_mem_info.sys_dev;
     rkey_config_key.mem_type     = params->super.reg_mem_info.type;
+    rkey_config_key.flags        = 0;
 
     rkey_config_key.unreachable_md_map = 0;
 
@@ -744,7 +745,7 @@ UCS_PROFILE_FUNC(ucs_status_t, ucp_proto_rndv_send_reply,
          */
         status = ucp_ep_rkey_unpack_internal(
                 ep, rkey_buffer, rkey_length, ep_config->key.reachable_md_map,
-                ep_config->rndv.proto_rndv_rkey_skip_mds, sys_dev, 1, &rkey);
+                ep_config->rndv.proto_rndv_rkey_skip_mds, sys_dev, &rkey);
         if (status != UCS_OK) {
             goto err;
         }

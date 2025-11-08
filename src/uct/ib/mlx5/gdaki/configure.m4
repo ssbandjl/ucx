@@ -9,57 +9,51 @@ AC_ARG_WITH([doca-gpunetio],
             [with_doca_gpunetio=$withval],
             [with_doca_gpunetio=guess])
 
-AS_IF([test "x$cuda_happy" = "xyes"], [
+UCX_CHECK_CUDA
 
-# Default value
-GPUNETIO_CFLAGS=""
-GPUNETIO_LDFLAGS=""
-GPUNETIO_LIBS="-ldoca_gpunetio"
+AS_IF([test "x$cuda_happy" = "xyes"],
+      [
+       # Default value
+       GPUNETIO_CFLAGS=""
+       AS_IF([test "x$with_doca_gpunetio" != "xno"],
+             [
+              AS_IF([test "x$with_doca_gpunetio" = "xguess"],
+                    [
+                     AS_IF([$PKG_CONFIG --exists doca-gpunetio],
+                           [GPUNETIO_CFLAGS=$(pkg-config --cflags doca-gpunetio)])
+                    ],
+                    [
+                     GPUNETIO_CFLAGS="-I${with_doca_gpunetio}/include"
+                    ]) # "x$with_doca_gpunetio" != "xguess"
+             ]) # "x$with_doca_gpunetio" != "xno"
 
-AS_IF([test x$with_doca_gpunetio != xno], [
-  AS_IF([test x$with_doca_gpunetio = xguess],
-    [
-      AS_IF([$PKG_CONFIG --exists doca-gpunetio],
-            [
-              # Guess from pkg-config
-              GPUNETIO_CFLAGS=$(pkg-config --cflags doca-gpunetio)
-              GPUNETIO_LDFLAGS=$(pkg-config --libs-only-L doca-gpunetio)
-              GPUNETIO_LIBS=$(pkg-config --libs-only-l doca-gpunetio)
-            ])
-    ],
-    [
-      # User provided path
-      GPUNETIO_CFLAGS="-I${with_doca_gpunetio}/include"
-      for dir in lib lib64 lib/x86_64-linux-gnu; do
-        if test -d "${with_doca_gpunetio}/${dir}"; then
-          GPUNETIO_LDFLAGS="$GPUNETIO_LDFLAGS -L${with_doca_gpunetio}/${dir} "
-          # Add rpath-link to search for doca_gpunetio dependencies
-          GPUNETIO_LDFLAGS="$GPUNETIO_LDFLAGS -Wl,-rpath-link,${with_doca_gpunetio}/${dir}"
-        fi
-      done
-    ])
-])
+       AS_IF([test "x$CUDA_MAJOR_VERSION" = "x12" -a "x$CUDA_MINOR_VERSION" = "x9"],
+             [
+              GPUNETIO_CFLAGS="$GPUNETIO_CFLAGS -D_LIBCUDACXX_ATOMIC_UNSAFE_AUTOMATIC_STORAGE"
+             ])
 
-save_CPPFLAGS="$CPPFLAGS"
-save_LDFLAGS="$LDFLAGS"
-CPPFLAGS="$CPPFLAGS $CUDA_CFLAGS $GPUNETIO_CFLAGS"
-LDFLAGS="$LDFLAGS $CUDA_LDFLAGS $GPUNETIO_LDFLAGS -Wl,-rpath-link,$CUDA_LIB_DIR"
+       save_CPPFLAGS="$CPPFLAGS"
+       CPPFLAGS="$CPPFLAGS $CUDA_CFLAGS $GPUNETIO_CFLAGS"
 
-AC_CHECK_HEADERS([doca_gpunetio.h], [have_gpunetio=yes], [have_gpunetio=no])
-AC_CHECK_LIB([doca_gpunetio], [doca_gpu_verbs_bridge_export_qp],
-             [true], [have_gpunetio=no], [$GPUNETIO_LIBS])
+       gpunetio_happy=yes
+       AC_CHECK_HEADERS([doca_gpunetio.h], [], [gpunetio_happy=no])
 
-CPPFLAGS="$save_CPPFLAGS"
-LDFLAGS="$save_LDFLAGS"
+       CPPFLAGS="$save_CPPFLAGS"
+       LDFLAGS="$save_LDFLAGS"
+      ],
+      [gpunetio_happy=no])
 
-AS_IF([test x$have_gpunetio = xyes], [
-    uct_ib_mlx5_modules="${uct_ib_mlx5_modules}:gda"
-    AC_SUBST(GPUNETIO_CFLAGS)
-    AC_SUBST(GPUNETIO_LDFLAGS)
-    AC_SUBST(GPUNETIO_LIBS)
-])
-])
+AS_IF([test "x$gpunetio_happy" = "xyes"],
+      [
+       uct_ib_mlx5_modules="${uct_ib_mlx5_modules}:gda"
+       AC_SUBST(GPUNETIO_CFLAGS)
+      ],
+      [
+       # gpunetio was requested but not found
+       AS_IF([test "x$with_doca_gpunetio" != "xno" -a "x$with_doca_gpunetio" != "xguess"],
+             [AC_MSG_ERROR([doca_gpunetio not found (cuda found: $cuda_happy)])])
+      ])
 
-AM_CONDITIONAL([HAVE_GPUNETIO], [test x$have_gpunetio = xyes])
+AM_CONDITIONAL([HAVE_GPUNETIO], [test x$gpunetio_happy = xyes])
 AC_CONFIG_FILES([src/uct/ib/mlx5/gdaki/Makefile
                  src/uct/ib/mlx5/gdaki/ucx-ib-mlx5-gda.pc])

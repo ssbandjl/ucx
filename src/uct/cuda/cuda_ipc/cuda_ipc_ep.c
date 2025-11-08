@@ -3,12 +3,13 @@
  * See file LICENSE for terms.
  */
 
-#include "base/cuda_iface.h"
-#include "uct/api/uct_def.h"
-#include "uct/api/device/uct_device_types.h"
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
+ #ifdef HAVE_CONFIG_H
+ #  include "config.h"
+ #endif
+
+#include <uct/cuda/base/cuda_iface.h>
+#include <uct/api/uct_def.h>
+#include <uct/api/device/uct_device_types.h>
 
 #include "cuda_ipc_ep.h"
 #include "cuda_ipc_iface.h"
@@ -265,7 +266,7 @@ out:
     *device_ep_p = ep->device_ep;
     return UCS_OK;
 err_free_mem:
-    cuMemFree((CUdeviceptr)&ep->device_ep);
+    cuMemFree((CUdeviceptr)ep->device_ep);
     ep->device_ep = NULL;
 err:
     return status;

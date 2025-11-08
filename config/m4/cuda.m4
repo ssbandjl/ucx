@@ -3,6 +3,28 @@
 # See file LICENSE for terms.
 #
 
+NVCC_CUDA_MIN_REQUIRED_MAJOR=10
+NVCC_CUDA_MIN_REQUIRED_MINOR=2
+
+ARCH9_CODE="-gencode=arch=compute_70,code=sm_70"
+ARCH10_CODE="-gencode=arch=compute_75,code=sm_75"
+ARCH110_CODE="-gencode=arch=compute_80,code=sm_80"
+ARCH111_CODE="-gencode=arch=compute_86,code=sm_86"
+ARCH120_CODE="-gencode=arch=compute_90,code=sm_90"
+ARCH124_CODE="-gencode=arch=compute_89,code=sm_89"
+ARCH128_CODE="-gencode=arch=compute_100,code=sm_100 -gencode=arch=compute_120,code=sm_120"
+ARCH130_CODE="-gencode=arch=compute_110,code=sm_110"
+
+
+ARCH9_PTX="-gencode=arch=compute_70,code=compute_70"
+ARCH10_PTX=""
+ARCH110_PTX="-gencode=arch=compute_80,code=compute_80"
+ARCH111_PTX="-gencode=arch=compute_86,code=compute_86"
+ARCH120_PTX="-gencode=arch=compute_90,code=compute_90"
+ARCH124_PTX="-gencode=arch=compute_90,code=compute_90"
+ARCH128_PTX="-gencode=arch=compute_120,code=compute_120"
+ARCH130_PTX="-gencode=arch=compute_120,code=compute_120"
+
 # Define CUDA language
 AC_LANG_DEFINE([CUDA], [cuda], [NVCC], [NVCC], [C++], [
     ac_ext=cu
@@ -13,45 +35,82 @@ AC_LANG_DEFINE([CUDA], [cuda], [NVCC], [NVCC], [C++], [
 
 # Define CUDA language compiler
 AC_DEFUN([AC_LANG_COMPILER(CUDA)], [
-    AC_ARG_WITH([nvcc-gencode],
-                [AS_HELP_STRING([--with-nvcc-gencode=(OPTS)], [Build for specific GPU architectures])],
-                [],
-                [with_nvcc_gencode="-gencode=arch=compute_80,code=sm_80"])
-
     AC_ARG_VAR([NVCC], [nvcc compiler path])
     AC_ARG_VAR([NVCCFLAGS], [nvcc compiler flags])
-    BASE_NVCCFLAGS="$BASE_NVCCFLAGS $with_nvcc_gencode"
-    AC_CHECK_TOOL([NVCC], [nvcc], [])
+    BASE_NVCCFLAGS="$BASE_NVCCFLAGS -g $with_nvcc_gencode"
+    AS_IF([test ! -z "$with_cuda" -a -d "$with_cuda/bin"],
+          [CUDA_BIN_PATH="$with_cuda/bin"],
+          [CUDA_BIN_PATH=""])
+    AC_PATH_PROG([NVCC], [nvcc], [], [$CUDA_BIN_PATH:$PATH])
     AC_SUBST([NVCC], [$NVCC])
 ])
 
 # Check for nvcc compiler support
 AC_DEFUN([UCX_CUDA_CHECK_NVCC], [
     AS_IF([test "x$NVCC" != "x"], [
-        AC_MSG_CHECKING([$NVCC needs explicit c++11 option])
-        AC_LANG_PUSH([CUDA])
-        AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-            #if __cplusplus < 201103L
-              #error missing C++11
-            #endif
-          ]])],
-          [AC_MSG_RESULT([no])],
-          [AC_MSG_RESULT([yes])
-           BASE_NVCCFLAGS="$BASE_NVCCFLAGS -std=c++11"])
-        AC_LANG_POP
+        CUDA_MAJOR_VERSION=`$NVCC --version | grep release | sed 's/.*release //' | sed 's/\,.*//' |  cut -d "." -f 1`
+        CUDA_MINOR_VERSION=`$NVCC --version | grep release | sed 's/.*release //' | sed 's/\,.*//' |  cut -d "." -f 2`
+        AC_MSG_RESULT([Detected CUDA version: $CUDA_MAJOR_VERSION.$CUDA_MINOR_VERSION])
+        AS_IF([test $CUDA_MAJOR_VERSION -lt $NVCC_CUDA_MIN_REQUIRED_MAJOR -o \( $CUDA_MAJOR_VERSION -eq $NVCC_CUDA_MIN_REQUIRED_MAJOR -a $CUDA_MINOR_VERSION -lt $NVCC_CUDA_MIN_REQUIRED_MINOR \)],
+            [AC_MSG_WARN([Minimum required CUDA version for device code: $NVCC_CUDA_MIN_REQUIRED_MAJOR.$NVCC_CUDA_MIN_REQUIRED_MINOR])
+             NVCC=""
+            ])
 
-        AC_MSG_CHECKING([$NVCC can compile])
-        AC_LANG_PUSH([CUDA])
-        AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-            #include <cuda_runtime.h>
-            __global__ void my_kernel(void) {}
-            int main(void) { my_kernel<<<1, 1>>>(); return 0; }
-          ]])],
-          [AC_MSG_RESULT([yes])],
-          [AC_MSG_RESULT([no])
-           NVCC=""])
-        AC_LANG_POP
-	])
+        AS_IF([test "x$NVCC" != "x"], [
+                AC_ARG_WITH([nvcc-gencode],
+                            [AS_HELP_STRING([--with-nvcc-gencode=(OPTS)], [Build for specific GPU architectures])],
+                            [],
+                            [with_nvcc_gencode=default])
+
+                AS_IF([test "x$with_nvcc_gencode" = "xdefault"],
+                        [AS_CASE([$CUDA_MAJOR_VERSION],
+                                 [13],
+                                     [# offline compilation support for architectures before '<compute/sm/lto>_75' is discontinued
+                                      NVCC_ARCH="${ARCH10_CODE} ${ARCH110_CODE} ${ARCH111_CODE} ${ARCH120_CODE} ${ARCH124_CODE} ${ARCH128_CODE} ${ARCH130_CODE} ${ARCH130_PTX}"],
+                                 [12],
+                                     [AS_CASE([$CUDA_MINOR_VERSION],
+                                              [0|1|2|3],
+                                                  [NVCC_ARCH="${ARCH9_CODE} ${ARCH10_CODE} ${ARCH110_CODE} ${ARCH111_CODE} ${ARCH120_CODE} ${ARCH120_PTX}"],
+                                              [4|5|6|7],
+                                                  [NVCC_ARCH="${ARCH9_CODE} ${ARCH10_CODE} ${ARCH110_CODE} ${ARCH111_CODE} ${ARCH120_CODE} ${ARCH124_CODE} ${ARCH124_PTX}"],
+                                              [*],
+                                                  [NVCC_ARCH="${ARCH9_CODE} ${ARCH10_CODE} ${ARCH110_CODE} ${ARCH111_CODE} ${ARCH120_CODE} ${ARCH124_CODE} ${ARCH128_CODE} ${ARCH128_PTX}"])],
+
+                                 [11],
+                                     [AS_CASE([$CUDA_MINOR_VERSION],
+                                              [0],
+                                                  [NVCC_ARCH="${ARCH9_CODE} ${ARCH10_CODE} ${ARCH110_CODE} ${ARCH110_PTX}"],
+                                              [*],
+                                                  [NVCC_ARCH="${ARCH9_CODE} ${ARCH10_CODE} ${ARCH110_CODE} ${ARCH111_CODE} ${ARCH111_PTX}"])],
+                                 [*],
+                                     [NVCC_ARCH="${ARCH9_CODE} ${ARCH9_PTX}"])],
+                        [NVCC_ARCH="$with_nvcc_gencode"])
+                BASE_NVCCFLAGS="$BASE_NVCCFLAGS $NVCC_ARCH"
+                AC_MSG_CHECKING([$NVCC needs explicit c++11 option])
+                AC_LANG_PUSH([CUDA])
+                AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+                    #if __cplusplus < 201103L
+                    #error missing C++11
+                    #endif
+                ]])],
+                [AC_MSG_RESULT([no])],
+                [AC_MSG_RESULT([yes])
+                BASE_NVCCFLAGS="$BASE_NVCCFLAGS -std=c++11"])
+                AC_LANG_POP
+
+                AC_MSG_CHECKING([$NVCC can compile])
+                AC_LANG_PUSH([CUDA])
+                AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+                    #include <cuda_runtime.h>
+                    __global__ void my_kernel(void) {}
+                    int main(void) { my_kernel<<<1, 1>>>(); return 0; }
+                ]])],
+                [AC_MSG_RESULT([yes])],
+                [AC_MSG_RESULT([no])
+                NVCC=""])
+                AC_LANG_POP
+            ])
+        ])
 
     AM_CONDITIONAL([HAVE_NVCC], [test "x$NVCC" != x])
 ])
@@ -82,8 +141,7 @@ AS_IF([test "x$cuda_checked" != "xyes"],
          CUDART_LIBS=""
          CUDART_STATIC_LIBS=""
          NVML_LIBS=""
-         CUDA_BIN_PATH=""
-         CUDA_LIB_DIR=""
+         CUDA_LIB_DIRS=""
 
          AS_IF([test ! -z "$with_cuda" -a "x$with_cuda" != "xyes" -a "x$with_cuda" != "xguess"],
                [ucx_check_cuda_dir="$with_cuda"
@@ -91,8 +149,7 @@ AS_IF([test "x$cuda_checked" != "xyes"],
                 ucx_check_cuda_libdir="$with_cuda/lib$libsuff"
                 CUDA_CPPFLAGS="-I$with_cuda/include"
                 CUDA_LDFLAGS="-L$ucx_check_cuda_libdir -L$ucx_check_cuda_libdir/stubs"
-                CUDA_BIN_PATH="$with_cuda/bin"
-                CUDA_LIB_DIR="$ucx_check_cuda_libdir"])
+                CUDA_LIB_DIRS="$ucx_check_cuda_libdir $with_cuda/compat"])
 
          CPPFLAGS="$CPPFLAGS $CUDA_CPPFLAGS"
          LDFLAGS="$LDFLAGS $CUDA_LDFLAGS"
@@ -174,5 +231,11 @@ AS_IF([test "x$cuda_checked" != "xyes"],
 
         UCX_CUDA_CHECK_NVCC
    ]) # "x$cuda_checked" != "xyes"
+
+   # Set stubs include path for pkg-config
+   # e.g. UCX Device API headers include <uct/ib/mlx5/gdaki/gdaki.cuh>
+   # from a separate package. Stubs provide fallback when not installed.
+   STUB_CFLAGS="-I\${includedir}/stubs"
+   AC_SUBST([STUB_CFLAGS])
 
 ]) # UCX_CHECK_CUDA

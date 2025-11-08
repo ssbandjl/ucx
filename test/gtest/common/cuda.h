@@ -11,6 +11,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <memory>
+#include <vector>
+#include <ucs/debug/log.h>
 
 namespace ucx_cuda {
 
@@ -32,6 +34,11 @@ public:
     T &operator*() const
     {
         return *m_ptr;
+    }
+
+    T *operator->() const
+    {
+        return m_ptr.get();
     }
 
     T *device_ptr()
@@ -63,21 +70,53 @@ private:
     std::unique_ptr<T, decltype(&release)> m_ptr;
 };
 
-static inline void synchronize()
+template<typename T> class device_vector {
+public:
+    device_vector(const std::vector<T> &vec)
+    {
+        if (cudaMalloc(&m_device_ptr, vec.size() * sizeof(T)) != cudaSuccess) {
+            throw std::bad_alloc();
+        }
+
+        cudaMemcpy(m_device_ptr, vec.data(), vec.size() * sizeof(T),
+                   cudaMemcpyHostToDevice);
+    }
+
+    ~device_vector()
+    {
+        cudaFree(m_device_ptr);
+    }
+
+    T *ptr() const
+    {
+        return reinterpret_cast<T*>(m_device_ptr);
+    }
+
+private:
+    void *m_device_ptr;
+};
+
+template<typename T>
+device_vector<T> make_device_vector(const std::vector<T> &vec)
+{
+    return device_vector<T>(vec);
+}
+
+static inline ucs_status_t synchronize()
 {
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
-        std::stringstream ss;
-        ss << "kernel launch failure: " << cudaGetErrorString(err);
-        throw std::runtime_error(ss.str());
+        ucs_error("kernel launch failure: %s", cudaGetErrorString(err));
+        return UCS_ERR_IO_ERROR;
     }
 
     err = cudaDeviceSynchronize();
     if (err != cudaSuccess) {
-        std::stringstream ss;
-        ss << "cudaDeviceSynchronize(): " << cudaGetErrorString(err);
-        throw std::runtime_error(ss.str());
+        ucs_error("cudaDeviceSynchronize(): %s", cudaGetErrorString(err));
+        return UCS_ERR_IO_ERROR;
     }
+
+    return UCS_OK;
 }
 
 } // namespace ucx_cuda

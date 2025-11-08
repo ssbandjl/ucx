@@ -10,10 +10,15 @@
 #include "uct_device_types.h"
 
 #include <uct/api/uct_def.h>
-#include <ucs/sys/compiler_def.h>
 #include <uct/cuda/cuda_ipc/cuda_ipc.cuh>
+#include <ucs/sys/device_code.h>
 
 #include <uct/ib/mlx5/gdaki/gdaki.cuh>
+
+union uct_device_completion {
+    uct_rc_gda_completion_t   rc_gda;
+    uct_cuda_ipc_completion_t cuda_ipc;
+};
 
 
 /**
@@ -37,9 +42,14 @@
  * @param [in]  flags           Flags to modify the function behavior.
  * @param [in]  comp            Completion object to track the progress of operation.
  *
+ * @return UCS_INPROGRESS     - Operation successfully posted, use @ref
+ *                              uct_device_ep_progress and @ref
+ *                              uct_device_ep_check_completion to
+ *                              check for completion.
+ * @return UCS_OK             - Operation completed successfully.
  * @return Error code as defined by @ref ucs_status_t
  */
-template<uct_device_level_t level>
+template<ucs_device_level_t level>
 UCS_F_DEVICE ucs_status_t uct_device_ep_put_single(
         uct_device_ep_h device_ep, const uct_device_mem_element_t *mem_elem,
         const void *address, uint64_t remote_address, size_t length,
@@ -54,6 +64,7 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_single(
                                                  remote_address, length, flags,
                                                  comp);
     }
+
     return UCS_ERR_UNSUPPORTED;
 }
 
@@ -62,8 +73,8 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_single(
  * @ingroup UCT_DEVICE
  * @brief Posts one atomic add operation.
  *
- * This device routine increments a single memory value by @a inc_value using the 
- * device endpoint @a device_ep. The memory element @a mem_elem must be valid and 
+ * This device routine increments a single memory value by @a inc_value using the
+ * device endpoint @a device_ep. The memory element @a mem_elem must be valid and
  * contain the remote memory region to be modified.
  *
  * User can pass @a comp to track execution and completion status.
@@ -77,9 +88,14 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_single(
  * @param [in]  flags           Flags to modify the function behavior.
  * @param [in]  comp            Completion object to track the progress of operation.
  *
+ * @return UCS_INPROGRESS      - Operation successfully posted, use @ref
+ *                               uct_device_ep_progress and @ref
+ *                               uct_device_ep_check_completion to check
+ *                               for completion.
+ * @return UCS_OK              - Operation completed successfully.
  * @return Error code as defined by @ref ucs_status_t
  */
-template<uct_device_level_t level>
+template<ucs_device_level_t level>
 UCS_F_DEVICE ucs_status_t uct_device_ep_atomic_add(
         uct_device_ep_h device_ep, const uct_device_mem_element_t *mem_elem,
         uint64_t inc_value, uint64_t remote_address, uint64_t flags,
@@ -89,7 +105,11 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_atomic_add(
         return uct_rc_mlx5_gda_ep_atomic_add<level>(device_ep, mem_elem,
                                                     inc_value, remote_address,
                                                     flags, comp);
+    } else if (device_ep->uct_tl_id == UCT_DEVICE_TL_CUDA_IPC) {
+        return uct_cuda_ipc_ep_atomic_add<level>(device_ep, mem_elem, inc_value,
+                                                 remote_address, flags, comp);
     }
+
     return UCS_ERR_UNSUPPORTED;
 }
 
@@ -106,7 +126,7 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_atomic_add(
  * lengths must be valid for each corresponding descriptor list entry whose
  * index is referenced in @ref mem_list_indices.
  *
- * The size of the arrays mem_list, addresses, remote_addresses, and lengths 
+ * The size of the arrays mem_list, addresses, remote_addresses, and lengths
  * are all equal.
  *
  * The routine returns a request that can be progressed and checked for
@@ -124,15 +144,19 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_atomic_add(
  * @param [in]  addresses              Array of local addresses to send from.
  * @param [in]  remote_addresses       Array of remote addresses to send to.
  * @param [in]  lengths                Array of lengths in bytes for each send.
- * @param [in]  counter_index          Index of remote increment descriptor.
  * @param [in]  counter_inc_value      Value of the remote increment.
  * @param [in]  counter_remote_address Remote address to increment to.
  * @param [in]  flags                  Flags to modify the function behavior.
  * @param [out] req                    Request populated by the call.
  *
+ * @return UCS_INPROGRESS            - Operation successfully posted, use @ref
+ *                                     uct_device_ep_progress and @ref
+ *                                     uct_device_ep_check_completion to check
+ *                                     for completion.
+ * @return UCS_OK                    - Operation completed successfully.
  * @return Error code as defined by @ref ucs_status_t
  */
-template<uct_device_level_t level>
+template<ucs_device_level_t level>
 UCS_F_DEVICE ucs_status_t uct_device_ep_put_multi(
         uct_device_ep_h device_ep, const uct_device_mem_element_t *mem_list,
         unsigned mem_list_count, void *const *addresses,
@@ -147,7 +171,15 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_multi(
                                                    counter_inc_value,
                                                    counter_remote_address,
                                                    flags, comp);
+    } else if (device_ep->uct_tl_id == UCT_DEVICE_TL_CUDA_IPC) {
+        return uct_cuda_ipc_ep_put_multi<level>(device_ep, mem_list,
+                                                mem_list_count, addresses,
+                                                remote_addresses, lengths,
+                                                counter_inc_value,
+                                                counter_remote_address, flags,
+                                                comp);
     }
+
     return UCS_ERR_UNSUPPORTED;
 }
 
@@ -189,6 +221,8 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_multi(
  *                                     mem_list_indices.
  * @param [in]  addresses              Array of local addresses to send from.
  * @param [in]  remote_addresses       Array of remote addresses to send to.
+ * @param [in]  local_offsets          Array of local offsets to send from.
+ * @param [in]  remote_offsets         Array of remote offsets to send to.
  * @param [in]  lengths                Array of lengths in bytes for each send.
  * @param [in]  counter_index          Index of remote increment descriptor.
  * @param [in]  counter_inc_value      Value of the remote increment.
@@ -196,13 +230,19 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_multi(
  * @param [in]  flags                  Flags to modify the function behavior.
  * @param [in]  comp                   Completion object to track progress.
  *
+ * @return UCS_INPROGRESS            - Operation successfully posted, use @ref
+ *                                     uct_device_ep_progress and @ref
+ *                                     uct_device_ep_check_completion to check
+ *                                     for completion.
+ * @return UCS_OK                    - Operation completed successfully.
  * @return Error code as defined by @ref ucs_status_t
  */
-template<uct_device_level_t level>
+template<ucs_device_level_t level>
 UCS_F_DEVICE ucs_status_t uct_device_ep_put_multi_partial(
         uct_device_ep_h device_ep, const uct_device_mem_element_t *mem_list,
         const unsigned *mem_list_indices, unsigned mem_list_count,
         void *const *addresses, const uint64_t *remote_addresses,
+        const size_t *local_offsets, const size_t *remote_offsets,
         const size_t *lengths, unsigned counter_index,
         uint64_t counter_inc_value, uint64_t counter_remote_address,
         uint64_t flags, uct_device_completion_t *comp)
@@ -210,8 +250,15 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_multi_partial(
     if (device_ep->uct_tl_id == UCT_DEVICE_TL_RC_MLX5_GDA) {
         return uct_rc_mlx5_gda_ep_put_multi_partial<level>(
                 device_ep, mem_list, mem_list_indices, mem_list_count,
-                addresses, remote_addresses, lengths, counter_index,
-                counter_inc_value, counter_remote_address, flags, comp);
+                addresses, remote_addresses, local_offsets, remote_offsets,
+                lengths, counter_index, counter_inc_value,
+                counter_remote_address, flags, comp);
+    } else if (device_ep->uct_tl_id == UCT_DEVICE_TL_CUDA_IPC) {
+        return uct_cuda_ipc_ep_put_multi_partial<level>(
+                device_ep, mem_list, mem_list_indices, mem_list_count,
+                addresses, remote_addresses, local_offsets, remote_offsets,
+                lengths, counter_index, counter_inc_value,
+                counter_remote_address, flags, comp);
     }
     return UCS_ERR_UNSUPPORTED;
 }
@@ -222,31 +269,37 @@ UCS_F_DEVICE ucs_status_t uct_device_ep_put_multi_partial(
  * @brief Progress all operations on device endpoint @a device_ep.
  *
  * @param [in]  device_ep       Device endpoint to be used for the operation.
- *
- * @return UCS_OK           - Some operation was completed.
- * @return UCS_INPROGRESS   - No progress on the endpoint.
- * @return Error code as defined by @ref ucs_status_t
  */
-template<uct_device_level_t level>
-UCS_F_DEVICE ucs_status_t uct_device_ep_progress(uct_device_ep_h device_ep)
+template<ucs_device_level_t level>
+UCS_F_DEVICE void uct_device_ep_progress(uct_device_ep_h device_ep)
 {
     if (device_ep->uct_tl_id == UCT_DEVICE_TL_RC_MLX5_GDA) {
-        return uct_rc_mlx5_gda_ep_progress<level>(device_ep);
+        uct_rc_mlx5_gda_ep_progress<level>(device_ep);
     }
-    return UCS_ERR_UNSUPPORTED;
 }
 
 
 /**
  * @ingroup UCT_DEVICE
- * @brief Initialize a device completion object.
+ * @brief Check whether opetation executed on device endpoint @a device_ep was
+ * completed.
  *
- * @param [out] comp  Device completion object to initialize.
+ * @param [in]  device_ep       Device endpoint to be used for the operation.
+ * @param [in]  comp            Completion object tracking operation progress.
+ *
+ * @return UCS_OK           - Some operation was completed.
+ * @return UCS_INPROGRESS   - No progress on the endpoint.
+ * @return Error code as defined by @ref ucs_status_t
  */
-UCS_F_DEVICE void uct_device_completion_init(uct_device_completion_t *comp)
+template<ucs_device_level_t level>
+UCS_F_DEVICE ucs_status_t uct_device_ep_check_completion(
+        uct_device_ep_h device_ep, uct_device_completion_t *comp)
 {
-    comp->count  = 0;
-    comp->status = UCS_OK;
+    if (device_ep->uct_tl_id == UCT_DEVICE_TL_RC_MLX5_GDA) {
+        return uct_rc_mlx5_gda_ep_check_completion<level>(device_ep, comp);
+    }
+
+    return UCS_ERR_UNSUPPORTED;
 }
 
 #endif

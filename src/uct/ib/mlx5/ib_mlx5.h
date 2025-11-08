@@ -441,11 +441,16 @@ typedef struct uct_ib_mlx5_md {
     uint8_t                  log_max_dci_stream_channels;
     uint32_t                 smkey_index;
     struct {
-        /* Max dp ordering level per transport, 
+        /* Max dp ordering level per transport in DevX,
            as listed in uct_ib_mlx5_dp_ordering_t */
         uint8_t              rc;
         uint8_t              dc;
-    } dp_ordering_cap;
+    } dp_ordering_cap_devx;
+    struct {
+        /* DDP support per transport in DV API */
+        uint8_t              rc;
+        uint8_t              dc;
+    } ddp_support_dv;
 } uct_ib_mlx5_md_t;
 
 
@@ -931,9 +936,11 @@ void uct_ib_mlx5_verbs_srq_cleanup(uct_ib_mlx5_srq_t *srq, struct ibv_srq *verbs
 /**
  * DEVX UAR API
  */
-int uct_ib_mlx5_devx_uar_cmp(uct_ib_mlx5_devx_uar_t *uar,
-                             uct_ib_mlx5_md_t *md,
+int uct_ib_mlx5_devx_uar_cmp(uct_ib_mlx5_devx_uar_t *uar, uct_ib_mlx5_md_t *md,
                              uct_ib_mlx5_mmio_mode_t mmio_mode);
+
+ucs_status_t uct_ib_mlx5_devx_alloc_uar(uct_ib_mlx5_md_t *md, uint32_t flags,
+                                        struct mlx5dv_devx_uar **uar_p);
 
 ucs_status_t uct_ib_mlx5_devx_check_uar(uct_ib_mlx5_md_t *md);
 

@@ -20,19 +20,6 @@
  */
 
 /**
- * @brief Cooperation level when calling device functions.
- *
- * Must map exactly @ref ucp_device_level_t.
- */
-typedef enum {
-    UCT_DEVICE_LEVEL_THREAD = 0,
-    UCT_DEVICE_LEVEL_WARP   = 1,
-    UCT_DEVICE_LEVEL_BLOCK  = 2,
-    UCT_DEVICE_LEVEL_GRID   = 3
-} uct_device_level_t;
-
-
-/**
  * @brief Specify modifier flags for device sending functions.
  */
 typedef enum {
@@ -55,10 +42,7 @@ typedef struct uct_device_ep {
 
 
 /* Completion object for device operations */
-typedef struct uct_device_completion {
-    uint32_t     count;  /* How many operations are pending */
-    ucs_status_t status; /* Status of the operation */
-} uct_device_completion_t;
+typedef union uct_device_completion uct_device_completion_t;
 
 
 /* Base structure for all device memory elements */
